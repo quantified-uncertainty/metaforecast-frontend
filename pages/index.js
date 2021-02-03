@@ -1,5 +1,4 @@
 /* Imports */
-import { getPapers } from "../lib/airtablegraph.js";
 import { getForecasts} from "../lib/get-forecasts.js";
 import Layout from "./layout.js";
 import ReactMarkdown from "react-markdown";
