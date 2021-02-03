@@ -58,7 +58,8 @@ let displayMarkdown = (description) => {
 }
 
 let displayNumForecasts = (forecasts) => {
-  return forecasts ? forecasts+" forecasts" : "Forecast number unknown"
+  let forecastText = forecasts || "unknown"
+  return ("Number of forecasts: " +forecastText)
 
 }
 
@@ -69,7 +70,8 @@ let displayForecast = ({
   description,
   binaryQuestion,
   percentage,
-  forecasts
+  forecasts,
+  stars
 }) => {
   if(binaryQuestion){
     return (
@@ -81,7 +83,7 @@ let displayForecast = ({
           {": "+percentage}
         </div>
         <div>
-            {"Platform: " + platform+"; "+displayNumForecasts(forecasts)}
+            {stars +" = "+ "(Platform: " + platform+") + ("+displayNumForecasts(forecasts)+")"}
         </div>
         {displayMarkdown(description)}
   
@@ -96,7 +98,7 @@ let displayForecast = ({
             </a>
           </div>
         <div>
-          {"Platform: " + platform+"; "+displayNumForecasts(forecasts)}
+        {stars +" = "+ "(Platform: " + platform+") + ("+displayNumForecasts(forecasts)+")"}
         </div>
         {displayMarkdown(description)}
   
