@@ -10,32 +10,27 @@ export default function Layout(props) {
       </Head>
 
       <div>
-        <nav className="bg-gray-800">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <img
-                    className="h-8 w-8"
-                    src="https://tailwindui.com/img/logos/workflow-mark-indigo-500.svg"
-                    alt="Workflow"
-                  />
-                </div>
-                <div className=" md:block">
-                  <div className="ml-10 flex items-baseline space-x-4">
-                    <Link href={`/`} passHref>
-                      <span className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium cursor-pointer">
-                        Papers
-                      </span>
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </div>
+        <nav className="bg-gray-10">
+          <div className="ml-10 mr-10 flex flex-row-reverse items-start space-x-4">
+            <Link href={`/`} passHref>
+              <span className="m-5 text-black hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium cursor-pointer text-right">
+                How this works
+              </span>
+            </Link>
+            <Link href={`/`} passHref>
+              <span className="m-5 text-black hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium cursor-pointer text-right">
+                Database
+              </span>
+            </Link>
+            <Link href={`/`} passHref>
+              <span className="m-5 text-black hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium cursor-pointer text-right">
+                Search engine
+              </span>
+            </Link>
           </div>
         </nav>
         <main>
-          <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-left">
             <div className="py-8">{props.children}</div>
           </div>
         </main>

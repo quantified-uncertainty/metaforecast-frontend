@@ -1,3 +1,4 @@
+/* Imports */
 import { getPapers } from "../lib/airtablegraph.js";
 import Layout from "./layout.js";
 import ReactMarkdown from "react-markdown";
@@ -5,8 +6,22 @@ import Fuse from "fuse.js";
 import React, { useState } from "react";
 import Form from "../lib/form.js";
 
-let linkStyle =
-  "text-blue-500 hover:text-blue-700 visited:text-blue-700 hover:underline cursor-pointer";
+/* Definitions */
+const opts = {
+  includeScore: true,
+  keys: ["title", "author", "abstractNote", "publicationTitle", "manualTags"],
+};
+const initialValues = {
+  query: "",
+  typeBlogPost: true,
+  typeManuscript: true,
+  typeConferencePaper: true,
+  typeJournalArticle: true,
+  typeReport: true,
+};
+let linkStyle = "text-blue-500 hover:text-blue-700 visited:text-blue-700 hover:underline cursor-pointer";
+
+/* Helper functions */
 export async function getStaticProps() {
   const { papers } = await getPapers();
   return {
@@ -16,7 +31,7 @@ export async function getStaticProps() {
   };
 }
 
-let paper = ({
+let displayForecast = ({
   id,
   title,
   author,
@@ -76,22 +91,10 @@ let paper = ({
   );
 };
 
-const opts = {
-  includeScore: true,
-  keys: ["title", "author", "abstractNote", "publicationTitle", "manualTags"],
-};
-
-const initialValues = {
-  query: "",
-  typeBlogPost: true,
-  typeManuscript: true,
-  typeConferencePaper: true,
-  typeJournalArticle: true,
-  typeReport: true,
-};
-
-// TODO: use this for search:
+// Using this for search:
 // https://github.com/krisk/Fuse/search?q=%24and
+
+/* Body */
 
 export default function Home({ items }) {
   const [values, setValues] = useState(initialValues);
@@ -99,16 +102,16 @@ export default function Home({ items }) {
 
   let fuse = new Fuse(items, opts);
   let onChangeQuery = (query) => {
-    console.log("Chanigng queyr", query);
+    console.log("Changing queyr", query);
     setValues({ ...values, query });
     const results = fuse.search(query);
     setResults(results);
   };
   return (
     <Layout key="index">
-      <div className="mb-8">
-        <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight mb-2">
-          Big List of Papers
+      <div className="mb-5">
+        <h1 className="text-4xl text-gray-900 tracking-tight mb-2 text-center">
+          Metaforecasts
         </h1>
       </div>
       <label className="block mb-4">
@@ -123,8 +126,8 @@ export default function Home({ items }) {
       </label>
       {results
         .slice(0, 10)
-        .map((i) =>
-          paper({ ...i.item, onChangeQuery, score: i.score, index: i.refIndex })
+        .map((fuseSearchResult) =>
+        displayForecast({ ...fuseSearchResult.item, onChangeQuery, score: fuseSearchResult.score, index: fuseSearchResult.refIndex })
         )}
     </Layout>
   );
