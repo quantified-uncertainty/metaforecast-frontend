@@ -11,7 +11,7 @@ import Form from "../lib/form.js";
 // https://github.com/krisk/Fuse/
 const opts = {
   includeScore: true,
-  keys: ["title", "description"],
+  keys: ["title"],
 };
 
 const initialValues = {
