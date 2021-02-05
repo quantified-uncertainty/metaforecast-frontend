@@ -3,23 +3,28 @@ import { getForecasts} from "../lib/get-forecasts.js";
 import Layout from "./layout.js";
 import ReactMarkdown from "react-markdown";
 import Fuse from "fuse.js";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Form from "../lib/form.js";
+import { useRouter } from 'next/router' // https://nextjs.org/docs/api-reference/next/router
 
 /* Definitions */
 // We are using this for search:
 // https://github.com/krisk/Fuse/
 const opts = {
   includeScore: true,
-  keys: ["title", "platform"],
+  keys: ["title", "platform", "stars"],
   ignoreLocation: true
 };
 
-const initialValues = {
+const initialformInput = {
   query: "",
-  additionalmetadatawemightwanttouse: ""
 };
-let linkStyle = "text-blue-500 hover:text-blue-700 visited:text-blue-700 hover:underline cursor-pointer";
+const initialSettings = {
+    numDisplay: 10,//100,
+    timeoutId: null, 
+    awaitEndTyping: 500,
+    searchInstantly: true // Deprecated; now implicit if numDisplay>10
+}
 
 /* Helper functions */
 export async function getStaticProps() { //getServerSideProps
@@ -42,14 +47,14 @@ let displayMarkdown = (description) => {
       .replaceAll(") ,", "),")
     if(description.length > 1000){
       return(
-      <div class="font-mono text-xs">
+      <div className="font-mono text-xs">
         <ReactMarkdown>
             {description.slice(0,1000)+"..."}
         </ReactMarkdown>
       </div>)
     }else{
       return(
-        <div class="font-mono text-xs">
+        <div className="font-mono text-xs">
           <ReactMarkdown>
               {description}
           </ReactMarkdown>
@@ -108,10 +113,10 @@ let displayForecast = ({
   }
 };
 
-let executeSearch = (result, items) => {
+let executeSearch = (input, items) => {
 
   /* Search by platform */
-  let query = result.query
+  let query = input.query
   /*
   let platforms =  ["PredictIt", "PolyMarket", "Omen", "Metaculus", "Good Judgment", "Good Judgment Open", "CSET-foretell", "Elicit", "PredictionBook", "Hypermind"]
   for(let platform of platforms){
@@ -125,13 +130,14 @@ let executeSearch = (result, items) => {
     }
   }
   */
+  
   /* Search normally */
 
   let fuse = new Fuse(items, opts);
   let results = fuse.search(query).map(
     result => {
       if(result.item.platform == "Elicit"){
-        result.score = result.score*2 // Higher scores are worse
+        result.score = (result.score*2 + 0.1) // Higher scores are worse
       }
       return result
     }
@@ -145,16 +151,69 @@ let executeSearch = (result, items) => {
 /* Body */
 
 export default function Home({ items }) {
-  const [values, setValues] = useState(initialValues);
+  const [formInput, setformInput] = useState(initialformInput);
   const [results, setResults] = useState([]);
-  const [numdisplay, setNumDisplay] = useState(10);
+  const [settings, setSettings] = useState(initialSettings);
+  /*
+  {
+    numDisplay
+    awaitEndTyping
+    timeoutId
+  }
+  */
+  const router = useRouter() // gets url.
+  
+  /*
+  useEffect(() => {
+    // Get url
+    let router = useRouter()
+    console.log("Router:", router)
+    let urlParameters = router.query
+    console.log("Url parameters: ", urlParameters)
+    
+    // Type conversion
+    if(urlParameters.numDisplay){
+      urlParameters.numDisplay = Number(urlParameters.numDisplay)
+    }
+    if(urlParameters.searchInstantly){
+      urlParameters.searchInstantly= urlParameters.searchInstantly == "true" ? true:false
+    }
+    setSettings({...settings, urlParameters})
+  }, [])
+  */
+ 
 
-  let onChangeQuery = (query) => {
-    console.log("Changing query", query);
-    setValues({ ...values, query });
-    const results = fuse.search(query);
-    setResults(results);
-  };
+  let onChangeForm = (formInput) => {
+    console.log(settings)
+    console.log(settings)
+    setformInput(formInput);
+    
+    // Check url for parameters
+    let urlParameters = router.query
+    let numDisplayURLParameters = urlParameters.numDisplay
+    let numDisplayTemp = numDisplayURLParameters || settings.numDisplay
+    
+    if(numDisplayTemp<=10){
+      console.log("numDisplayTemp<=10")
+      console.log(settings.numDisplay)
+      let results = executeSearch(formInput, items)
+      setResults(results);
+    }else{
+      console.log("numDisplayTemp>=10")
+      clearTimeout(settings.timeoutId)
+      let newtimeoutId = setTimeout(() => {
+        let results = executeSearch(formInput, items)
+        setSettings({...settings, numDisplay: numDisplayTemp})
+        setResults(results);
+      }, settings.awaitEndTyping);
+      setSettings({...settings, timeoutId: newtimeoutId})
+    }
+        
+    //if(settings.searchInstantly && settings.searchInstantly!="false"){ // by default true
+    //}else{ // by default false
+    //}
+
+  }
   return (
     <Layout key="index">
       <div className="mb-5">
@@ -164,27 +223,22 @@ export default function Home({ items }) {
       </div>
       <label className="block mb-4">
         <Form
-          values={values}
-          onChange={(value) => {
-            setValues(value);
-            let results = executeSearch(value, items)
-            setNumDisplay(10)
-            setResults(results.slice(0,100));
-          }}
+          values={formInput}
+          onChange={onChangeForm}
         />
       </label>
       {results
-        .slice(0, numdisplay)
+        .slice(0, settings.numDisplay)
         .map((fuseSearchResult) =>
         displayForecast({ ...fuseSearchResult.item})
         )}
       <span
           className="mr-1 cursor-pointer"
           onClick={() => {
-            setNumDisplay(numdisplay+10)
+            setSettings({...settings, numDisplay: settings.numDisplay+10})
           }}
           >
-          {(results.length != 0 && numdisplay < 100) ?"Show more": ""}
+          {(results.length != 0 && settings.numDisplay < results.length) ? "Show more": ""}
       </span>
     </Layout>
   );
