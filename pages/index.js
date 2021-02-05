@@ -11,7 +11,8 @@ import Form from "../lib/form.js";
 // https://github.com/krisk/Fuse/
 const opts = {
   includeScore: true,
-  keys: ["title"],
+  keys: ["title", "platform"],
+  ignoreLocation: true
 };
 
 const initialValues = {
@@ -107,6 +108,40 @@ let displayForecast = ({
   }
 };
 
+let executeSearch = (result, items) => {
+
+  /* Search by platform */
+  let query = result.query
+  /*
+  let platforms =  ["PredictIt", "PolyMarket", "Omen", "Metaculus", "Good Judgment", "Good Judgment Open", "CSET-foretell", "Elicit", "PredictionBook", "Hypermind"]
+  for(let platform of platforms){
+    if(query.includes(platform)){
+      let newItems = items.filter(item => item.platform == platform)
+      let newquery = query.replace(platform, " ")
+      let fusebyPlatform = new Fuse(newItems, opts);
+      let resultsbyPlatform = fusebyPlatform.search(newquery)
+      console.log(resultsbyPlatform)
+      return(resultsbyPlatform)
+    }
+  }
+  */
+  /* Search normally */
+
+  let fuse = new Fuse(items, opts);
+  let results = fuse.search(query).map(
+    result => {
+      if(result.item.platform == "Elicit"){
+        result.score = result.score*2 // Higher scores are worse
+      }
+      return result
+    }
+  )
+  results.sort((a,b) => {
+    return (Number(a.score)>Number(b.score))?1:-1
+  })
+  console.log(results)
+  return results
+}
 /* Body */
 
 export default function Home({ items }) {
@@ -114,7 +149,6 @@ export default function Home({ items }) {
   const [results, setResults] = useState([]);
   const [numdisplay, setNumDisplay] = useState(10);
 
-  let fuse = new Fuse(items, opts);
   let onChangeQuery = (query) => {
     console.log("Changing query", query);
     setValues({ ...values, query });
@@ -131,20 +165,9 @@ export default function Home({ items }) {
       <label className="block mb-4">
         <Form
           values={values}
-          onChange={(result) => {
-            setValues(result);
-            const results = fuse.search(result.query).map(
-              result => {
-                if(result.item.platform == "Elicit"){
-                  result.score = result.score*2 // Higher scores are worse
-                }
-                return result
-              }
-            )
-            results.sort((a,b) => {
-              return (Number(a.score)>Number(b.score))?1:-1
-            })
-            console.log(results)
+          onChange={(value) => {
+            setValues(value);
+            let results = executeSearch(value, items)
             setNumDisplay(10)
             setResults(results.slice(0,100));
           }}
