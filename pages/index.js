@@ -235,7 +235,7 @@ export default function Home({ items }) {
       <span
           className="mr-1 cursor-pointer"
           onClick={() => {
-            setSettings({...settings, numDisplay: settings.numDisplay+10})
+            setSettings({...settings, numDisplay: settings.numDisplay*2})
           }}
           >
           {(results.length != 0 && settings.numDisplay < results.length) ? "Show more": ""}
