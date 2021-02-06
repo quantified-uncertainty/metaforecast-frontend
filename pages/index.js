@@ -71,7 +71,6 @@ let displayMarkdown = (description) => {
 let displayNumForecasts = (forecasts) => {
   let forecastText = forecasts || "unknown"
   return ("Number of forecasts: " +forecastText)
-
 }
 
 let displayForecast = ({
@@ -238,7 +237,7 @@ export default function Home({ items}){ //, urlQuery }) {
     // This has the advantage that the data gets sent in the very first request, as the html
     // However, it has the disadvantage that it produces static webpages
     // In particular, parsing the url for parameters proves to be somewhat difficult
-    // I do it by having a dummy state variable
+    // I do it by having a state variable
     if(queryParameters.processedUrlYet == false){
       console.log("processState")
       let urlQuery = router.query
