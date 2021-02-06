@@ -16,17 +16,8 @@ const opts = {
   ignoreLocation: true
 };
 
-const initialformInput = {
-  query: "",
-};
-const initialSettings = {
-    numDisplay: 10,//100,
-    timeoutId: null, 
-    awaitEndTyping: 500,
-    searchInstantly: true // Deprecated; now implicit if numDisplay>10
-}
+// Helper functions 
 
-/* Helper functions */
 export async function getStaticProps() { //getServerSideProps
   const { metaforecasts } = await getForecasts();
   return {
@@ -35,6 +26,18 @@ export async function getStaticProps() { //getServerSideProps
     },
   };
 }
+
+/*
+export async function getServerSideProps(context) { //getServerSideProps
+  const { metaforecasts } = await getForecasts();
+  return {
+    props: {
+      items: metaforecasts,
+      urlQuery: context.query
+    },
+  };
+}
+*/
 
 let displayMarkdown = (description) => {
   if(description == null){
@@ -83,7 +86,7 @@ let displayForecast = ({
     return (
       <div key={title} className="pb-6 pt-3">
         <div className="text-blue-800">
-          <a href={url} className="font-bold">
+          <a href={url} className="font-bold" target="_blank">
               {title}
           </a>
           {": "+percentage}
@@ -113,110 +116,101 @@ let displayForecast = ({
   }
 };
 
-let executeSearch = (input, items) => {
-
-  /* Search by platform */
-  let query = input.query
-  /*
-  let platforms =  ["PredictIt", "PolyMarket", "Omen", "Metaculus", "Good Judgment", "Good Judgment Open", "CSET-foretell", "Elicit", "PredictionBook", "Hypermind"]
-  for(let platform of platforms){
-    if(query.includes(platform)){
-      let newItems = items.filter(item => item.platform == platform)
-      let newquery = query.replace(platform, " ")
-      let fusebyPlatform = new Fuse(newItems, opts);
-      let resultsbyPlatform = fusebyPlatform.search(newquery)
-      console.log(resultsbyPlatform)
-      return(resultsbyPlatform)
-    }
-  }
-  */
-  
-  /* Search normally */
-
-  let fuse = new Fuse(items, opts);
-  let results = fuse.search(query).map(
-    result => {
-      if(result.item.platform == "Elicit"){
-        result.score = (result.score*2 + 0.1) // Higher scores are worse
-      }
-      return result
-    }
-  )
-  results.sort((a,b) => {
-    return (Number(a.score)>Number(b.score))?1:-1
-  })
-  console.log(results)
-  return results
-}
 /* Body */
-
-export default function Home({ items }) {
-  const [formInput, setformInput] = useState(initialformInput);
-  const [results, setResults] = useState([]);
-  const [settings, setSettings] = useState(initialSettings);
-  /*
-  {
-    numDisplay
-    awaitEndTyping
-    timeoutId
-  }
-  */
-  const router = useRouter() // gets url.
-  
-  /*
-  useEffect(() => {
-    // Get url
-    let router = useRouter()
-    console.log("Router:", router)
-    let urlParameters = router.query
-    console.log("Url parameters: ", urlParameters)
-    
-    // Type conversion
-    if(urlParameters.numDisplay){
-      urlParameters.numDisplay = Number(urlParameters.numDisplay)
-    }
-    if(urlParameters.searchInstantly){
-      urlParameters.searchInstantly= urlParameters.searchInstantly == "true" ? true:false
-    }
-    setSettings({...settings, urlParameters})
-  }, [])
-  */
+export default function Home({ items, urlQuery }) {
  
+  const initialformInput = ({
+    query: ""//urlQuery.query || "" // 
+  })
+  //console.log("initialformInput", initialformInput)
+  const [formInput, setformInput] = useState(initialformInput);
+  console.log("Merry go round")
+  const initialSettings = {
+      numDisplay: 10, //Number(urlQuery.numDisplay) || 10,//100,
+      timeoutId: null, 
+      awaitEndTyping: 1000,//Number(urlQuery.awaitEndTyping) || 1000,
+      shared: false, //urlQuery.query ? true : false,
+      time: Date.now()
+  }
+  //console.log("initialSettings", initialSettings)
+  const [settings, setSettings] = useState(initialSettings);
+  const router = useRouter()
+  
+  let initialResults = [] // executeSearch(urlQuery.query) // 
+  const [results, setResults] = useState(initialResults);
+
+  // Support functions which use the same context.
+
+  let executeSearch = (query) => {
+    let results = []
+      let fuse = new Fuse(items, opts);
+      if(query != undefined){
+        //console.log("query", query)
+        results = fuse.search(query)
+          .map(
+          result => {
+            if(result.item.platform == "Elicit"){
+              result.score = (result.score*2 + 0.1) // Higher scores are worse
+            }
+            return result
+          }
+        )
+        results.sort((a,b) => {
+          return (Number(a.score)>Number(b.score))?1:-1
+        })
+        console.log("Executing search")
+        //console.log(settings)
+      }
+    console.log(results)
+    return results
+
+  }  
 
   let onChangeForm = (formInput) => {
-    console.log(settings)
-    console.log(settings)
-    setformInput(formInput);
     
-    // Check url for parameters
+    //console.log(settings)
+    setformInput(formInput);
+    //console.log("formInput", formInput);
+ 
+    clearTimeout(settings.timeoutId)
+    setResults([]);
+        
     let urlParameters = router.query
     let numDisplayURLParameters = urlParameters.numDisplay
     let numDisplayTemp = numDisplayURLParameters || settings.numDisplay
     
-    if(numDisplayTemp<=10){
-      console.log("numDisplayTemp<=10")
-      console.log(settings.numDisplay)
-      let results = executeSearch(formInput, items)
-      setResults(results);
-    }else{
-      console.log("numDisplayTemp>=10")
-      clearTimeout(settings.timeoutId)
-      let newtimeoutId = setTimeout(() => {
-        let results = executeSearch(formInput, items)
-        setSettings({...settings, numDisplay: numDisplayTemp})
+    //if(settings.shared == true){
+    //  console.log(settings.time)
+    //  console.log("We are here")
+    //  router.push(``, undefined, { shallow: true })
+    //  setSettings({...settings, shared: false})
+    //} else {
+      let newtimeoutId = setTimeout(async () => {
+        let query = formInput.query
+        let results = executeSearch(query) // Why is this executing all the damned time!!
+        setSettings({...settings, timeoutId: null, numDisplay: numDisplayTemp})
         setResults(results);
-      }, settings.awaitEndTyping);
-      setSettings({...settings, timeoutId: newtimeoutId})
-    }
-        
-    //if(settings.searchInstantly && settings.searchInstantly!="false"){ // by default true
-    //}else{ // by default false
-    //}
+      //router.push(`?query=${query.replaceAll(" ", "%20")}&numDisplay=${settings.numDisplay}`, undefined, { shallow: true })
+      // That slows things inmensely.
+    
 
+      }, 500);
+      setSettings({...settings, timeoutId: newtimeoutId})
+    //}
+    
   }
+  
+  let displayForecasts = (results) => {
+    return results
+      .slice(0, settings.numDisplay)
+      .map((fuseSearchResult) =>
+        displayForecast({ ...fuseSearchResult.item})
+      )
+  }
+
   return (
     <Layout key="index">
-      <div className="mb-5">
+      <div className="mb-5">  
         <h1 className="text-4xl text-gray-900 tracking-tight mb-2 text-center">
           Metaforecasts
         </h1>
@@ -227,11 +221,7 @@ export default function Home({ items }) {
           onChange={onChangeForm}
         />
       </label>
-      {results
-        .slice(0, settings.numDisplay)
-        .map((fuseSearchResult) =>
-        displayForecast({ ...fuseSearchResult.item})
-        )}
+      {displayForecasts(results)}
       <span
           className="mr-1 cursor-pointer"
           onClick={() => {
@@ -240,6 +230,7 @@ export default function Home({ items }) {
           >
           {(results.length != 0 && settings.numDisplay < results.length) ? "Show more": ""}
       </span>
+
     </Layout>
   );
 }
