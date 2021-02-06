@@ -15,6 +15,7 @@
 # production
 /build
 /pages/old
+/lib/old
 
 # misc
 .DS_Store

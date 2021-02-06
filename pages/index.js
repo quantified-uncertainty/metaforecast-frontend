@@ -5,10 +5,12 @@ import ReactMarkdown from "react-markdown";
 import Fuse from "fuse.js";
 import React, { useState, useEffect } from "react";
 import Form from "../lib/form.js";
-import { useRouter } from 'next/router' // https://nextjs.org/docs/api-reference/next/router
+import { useRouter } from 'next/router'; // https://nextjs.org/docs/api-reference/next/router
+import Dropdown from "../lib/dropdown.js";
 
 /* Definitions */
-// We are using this for search:
+
+// Search options for:
 // https://github.com/krisk/Fuse/
 const opts = {
   includeScore: true,
@@ -116,106 +118,179 @@ let displayForecast = ({
   }
 };
 
+let displayForecasts = (results, settings) => {
+  return results
+    .slice(0, settings.numDisplay)
+    .map((fuseSearchResult) =>
+      displayForecast({ ...fuseSearchResult.item})
+  )
+}
+
+let howmanystars = (string) => {
+  let matches = string.match(/★/g);
+  return matches?matches.length:0
+}
+
+export function getstars(numstars){
+  let stars = "★★☆☆☆"
+  switch(numstars) {
+    case 0:
+      stars ="☆☆☆☆☆"
+      break;
+    case 1:
+      stars ="★☆☆☆☆"
+      break;
+    case 2:
+      stars = "★★☆☆☆"
+      break;
+    case 3:
+      stars = "★★★☆☆"
+      break;
+    case 4:
+      stars = "★★★★☆"
+      break;
+    case 5:
+      stars = "★★★★★"
+      break;
+    default:
+      stars = "★★☆☆☆"
+  }
+  return(stars) 
+}
+
 /* Body */
 export default function Home({ items}){ //, urlQuery }) {
   console.log("===============")
   console.log("New page render")
+  
+  /* States */
   const router = useRouter()
-  let initialformInput = ({
+  let initialQueryParameters = ({
     query: "",
-    counter: 0
+    processedUrlYet: false,
   })
-  const [formInput, setformInput] = useState(initialformInput);
+  const [queryParameters, setQueryParameters] = useState(initialQueryParameters);
   let initialSettings = {
       query: "",
       numDisplay:  10, 
       timeoutId: null, 
       awaitEndTyping: 1000,
       shared: false, 
-      time: Date.now()
+      time: Date.now(),
+
   }
   const [settings, setSettings] = useState(initialSettings);
   let initialResults =  [] 
   const [results, setResults] = useState(initialResults);
-  let initialDummyState =  {counter: 0}
-  const [dummyState, setDummyState] = useState(initialDummyState);
   
-  let executeSearch = (query) => {
+  let initialStars = {
+    starsThreshold: 3,
+    processedStarChangeYet: true
+  }
+  const [stars, setStars] = useState(initialStars)
+  
+  /* Functions which I want to have access to the Home namespace */
+  // I don't want to create an "items" object for each search.
+  let executeSearch = (query, starsThreshold) => {
     let results = []
-      let fuse = new Fuse(items, opts);
-      if(query != undefined){
-        console.log("query", query)
-        results = fuse.search(query)
-          .map(
-          result => {
-            if(result.item.platform == "Elicit"){
-              result.score = (result.score*2 + 0.1) // Higher scores are worse
-            }
-            return result
+    let itemsFilteredStars = items.filter(item => howmanystars(item.stars)>=starsThreshold)
+    let fuse = new Fuse(itemsFilteredStars, opts);
+    if(query != undefined){
+      console.log("query", query)
+      results = fuse.search(query)
+        .map(
+        result => {
+          if(result.item.platform == "Elicit"){
+            result.score = (result.score*2 + 0.1) // Higher scores are worse
           }
-        )
-        results.sort((a,b) => {
-          return (Number(a.score)>Number(b.score))?1:-1
-        })
-        console.log("Executing search")
-        console.log("query", query)
-        console.log(settings)
-      }
+          return result
+        }
+      )
+      results.sort((a,b) => {
+        return (Number(a.score)>Number(b.score))?1:-1
+      })
+      console.log("Executing search")
+      console.log("query", query)
+      console.log("starsThreshold", starsThreshold)
+      console.log(settings)
+    }
     console.log(results)
     return results
-  }  
-  let onChangeForm = (formInput) => {
-    setformInput({...formInput, counter:1});
+  }
+  
+  /* State controllers */
+  let onChangeForm = (queryParameters) => {
+    setQueryParameters({...queryParameters, processedUrlYet:true});
     clearTimeout(settings.timeoutId)
     setResults([]);
     let newtimeoutId = setTimeout(async () => {
-      let query = formInput.query
-      let results = executeSearch(query) //  Why is this executing all the damned time!!
-      setSettings({...settings, timeoutId: null}) //, numDisplay: numDisplayTemp})
+      let query = queryParameters.query
+      let results = executeSearch(query, stars.starsThreshold) 
+      setSettings({...settings, timeoutId: null}) 
       setResults(results);
-      router.push(`?query=${query}&numDisplay=${settings.numDisplay}`, undefined, { shallow: true })
-      // That slows things inmensely in the server case, unless we prevent defaults
+      router.push(`?query=${query}&numDisplay=${settings.numDisplay}&starsThreshold=${stars.starsThreshold}`, undefined, { shallow: true })
     }, 500);
     setSettings({...settings, timeoutId: newtimeoutId})
   }
   
-  let displayForecasts = (results) => {
-
-    return results
-      .slice(0, settings.numDisplay)
-      .map((fuseSearchResult) =>
-        displayForecast({ ...fuseSearchResult.item})
-    )
-  }
-  
-  let processDummyState = (formInput) => {
-    if(formInput.counter == 0){
-      console.log("processDummyStrate")
-      console.log("With router ", router)
+  let processState = (queryParameters, stars) => {
+    // I am using the static version of netlify, because the server side one is too slow
+    // This has the advantage that the data gets sent in the very first request, as the html
+    // However, it has the disadvantage that it produces static webpages
+    // In particular, parsing the url for parameters proves to be somewhat difficult
+    // I do it by having a dummy state variable
+    if(queryParameters.processedUrlYet == false){
+      console.log("processState")
       let urlQuery = router.query
-      console.log("With urlQuery ", router.query)
-      let urlSearchQuery = urlQuery?urlQuery.query:""
-      console.log("With urlSearchQuery ", urlSearchQuery)
-      if(urlSearchQuery && ! formInput.query){
-        console.log("processDummyStrate: conditional 1")    
-        console.log("With formInput.query", formInput.query)
-        setformInput({query: urlSearchQuery, counter: 1})
-        let results = executeSearch(urlSearchQuery)
-        setResults(results)
+      console.log("query", urlQuery)  
+
+      let queryParametersQuery = queryParameters.query      
+      let starThresholdQuery = urlQuery?Number(urlQuery.starsThreshold):false
+      if(starThresholdQuery){
+          let starsThresholdQueryProcessed =  Number(starThresholdQuery)
+          let starsThresholdQueryProcessed2 =  starsThresholdQueryProcessed>4?4:(starsThresholdQueryProcessed<1?1:starsThresholdQueryProcessed)
+          console.log(starsThresholdQueryProcessed2)
+          setStars({starsThreshold: starsThresholdQueryProcessed2, processedStarChangeYet: true})
       }
+      
+      let urlSearchQuery = urlQuery?urlQuery.query:""
+      if(urlSearchQuery && !queryParametersQuery){
+        setQueryParameters({...queryParameters, query: urlSearchQuery, processedUrlYet: true})
+        let results = executeSearch(urlSearchQuery, starThresholdQuery || stars.starsThreshold)
+        setResults(results)
+      } 
       if(urlSearchQuery==""){
-        setformInput({...formInput, counter: 1})
+        if(router.asPath.includes('query')){
+            setQueryParameters({...queryParameters,   processedUrlYet: true}) 
+        }
       }
       let numDisplayQuery = urlQuery?Number(urlQuery.numDisplay):false
       if(numDisplayQuery){
           setSettings({...settings, numDisplay:numDisplayQuery})
       }
-    }else {
+      console.log(queryParameters)
+    }else if(!stars.processedStarChangeYet){  
+      setStars({...stars,  
+        processedStarChangeYet: true})
+      let results = executeSearch(queryParameters.query, stars.starsThreshold)
+      router.push(`?query=${queryParameters.query}&numDisplay=${settings.numDisplay}&starsThreshold=${stars.starsThreshold}`, undefined, { shallow: true })
+      setResults(results)
+    } else {
       // Do nothing
     }
 
   }
-
+  
+  /* Change the stars threshold */
+  const starOptions = ["≥ ★☆☆☆☆", "≥ ★★☆☆☆", "≥ ★★★☆☆", "≥ ★★★★☆"]
+  let onChangeStars = (selection) => {
+    console.log("selection", selection)
+    console.log("greater than or equal", howmanystars(selection))
+    setStars({starsThreshold: howmanystars(selection), 
+    processedStarChangeYet: false})
+  }
+  
+  /* Final return */
   return (
     <Layout key="index">
       <div className="mb-5">  
@@ -223,15 +298,24 @@ export default function Home({ items}){ //, urlQuery }) {
           Metaforecasts
         </h1>
       </div>
-      <div className="invisible">{processDummyState(formInput)}
+      <div className="invisible">{processState(queryParameters, stars)}
       </div>
-      <label className="block mb-4">
+      <label className="block mb-1">
         <Form
-          values={formInput}
+          values={queryParameters}
           onChange={onChangeForm}
         />
       </label>
-      {displayForecasts(results)}
+      <div className="block mb-4 flex items-center justify-center border-none">
+          <Dropdown
+            options={starOptions}
+            onChange={onChangeStars}
+            name="dropdown"
+            value={stars.starsThreshold}
+            howmanystars={howmanystars}
+        />
+      </div>
+      {displayForecasts(results, settings)}
       <span
           className="mr-1 cursor-pointer"
           onClick={() => {
