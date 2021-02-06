@@ -117,35 +117,34 @@ let displayForecast = ({
 };
 
 /* Body */
-export default function Home({ items, urlQuery }) {
- 
-  const initialformInput = ({
-    query: ""//urlQuery.query || "" // 
+export default function Home({ items}){ //, urlQuery }) {
+  console.log("===============")
+  console.log("New page render")
+  const router = useRouter()
+  let initialformInput = ({
+    query: "",
+    counter: 0
   })
-  //console.log("initialformInput", initialformInput)
   const [formInput, setformInput] = useState(initialformInput);
-  console.log("Merry go round")
-  const initialSettings = {
-      numDisplay: 10, //Number(urlQuery.numDisplay) || 10,//100,
+  let initialSettings = {
+      query: "",
+      numDisplay:  10, 
       timeoutId: null, 
-      awaitEndTyping: 1000,//Number(urlQuery.awaitEndTyping) || 1000,
-      shared: false, //urlQuery.query ? true : false,
+      awaitEndTyping: 1000,
+      shared: false, 
       time: Date.now()
   }
-  //console.log("initialSettings", initialSettings)
   const [settings, setSettings] = useState(initialSettings);
-  const router = useRouter()
-  
-  let initialResults = [] // executeSearch(urlQuery.query) // 
+  let initialResults =  [] 
   const [results, setResults] = useState(initialResults);
-
-  // Support functions which use the same context.
-
+  let initialDummyState =  {counter: 0}
+  const [dummyState, setDummyState] = useState(initialDummyState);
+  
   let executeSearch = (query) => {
     let results = []
       let fuse = new Fuse(items, opts);
       if(query != undefined){
-        //console.log("query", query)
+        console.log("query", query)
         results = fuse.search(query)
           .map(
           result => {
@@ -159,53 +158,62 @@ export default function Home({ items, urlQuery }) {
           return (Number(a.score)>Number(b.score))?1:-1
         })
         console.log("Executing search")
-        //console.log(settings)
+        console.log("query", query)
+        console.log(settings)
       }
     console.log(results)
     return results
-
   }  
-
   let onChangeForm = (formInput) => {
-    
-    //console.log(settings)
-    setformInput(formInput);
-    //console.log("formInput", formInput);
- 
+    setformInput({...formInput, counter:1});
     clearTimeout(settings.timeoutId)
     setResults([]);
-        
-    let urlParameters = router.query
-    let numDisplayURLParameters = urlParameters.numDisplay
-    let numDisplayTemp = numDisplayURLParameters || settings.numDisplay
-    
-    //if(settings.shared == true){
-    //  console.log(settings.time)
-    //  console.log("We are here")
-    //  router.push(``, undefined, { shallow: true })
-    //  setSettings({...settings, shared: false})
-    //} else {
-      let newtimeoutId = setTimeout(async () => {
-        let query = formInput.query
-        let results = executeSearch(query) // Why is this executing all the damned time!!
-        setSettings({...settings, timeoutId: null, numDisplay: numDisplayTemp})
-        setResults(results);
-      //router.push(`?query=${query.replaceAll(" ", "%20")}&numDisplay=${settings.numDisplay}`, undefined, { shallow: true })
-      // That slows things inmensely.
-    
-
-      }, 500);
-      setSettings({...settings, timeoutId: newtimeoutId})
-    //}
-    
+    let newtimeoutId = setTimeout(async () => {
+      let query = formInput.query
+      let results = executeSearch(query) //  Why is this executing all the damned time!!
+      setSettings({...settings, timeoutId: null}) //, numDisplay: numDisplayTemp})
+      setResults(results);
+      router.push(`?query=${query}&numDisplay=${settings.numDisplay}`, undefined, { shallow: true })
+      // That slows things inmensely in the server case, unless we prevent defaults
+    }, 500);
+    setSettings({...settings, timeoutId: newtimeoutId})
   }
   
   let displayForecasts = (results) => {
+
     return results
       .slice(0, settings.numDisplay)
       .map((fuseSearchResult) =>
         displayForecast({ ...fuseSearchResult.item})
-      )
+    )
+  }
+  
+  let processDummyState = (formInput) => {
+    if(formInput.counter == 0){
+      console.log("processDummyStrate")
+      console.log("With router ", router)
+      let urlQuery = router.query
+      console.log("With urlQuery ", router.query)
+      let urlSearchQuery = urlQuery?urlQuery.query:""
+      console.log("With urlSearchQuery ", urlSearchQuery)
+      if(urlSearchQuery && ! formInput.query){
+        console.log("processDummyStrate: conditional 1")    
+        console.log("With formInput.query", formInput.query)
+        setformInput({query: urlSearchQuery, counter: 1})
+        let results = executeSearch(urlSearchQuery)
+        setResults(results)
+      }
+      if(urlSearchQuery==""){
+        setformInput({...formInput, counter: 1})
+      }
+      let numDisplayQuery = urlQuery?Number(urlQuery.numDisplay):false
+      if(numDisplayQuery){
+          setSettings({...settings, numDisplay:numDisplayQuery})
+      }
+    }else {
+      // Do nothing
+    }
+
   }
 
   return (
@@ -214,6 +222,8 @@ export default function Home({ items, urlQuery }) {
         <h1 className="text-4xl text-gray-900 tracking-tight mb-2 text-center">
           Metaforecasts
         </h1>
+      </div>
+      <div className="invisible">{processDummyState(formInput)}
       </div>
       <label className="block mb-4">
         <Form
