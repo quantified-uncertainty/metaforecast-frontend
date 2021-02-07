@@ -6,7 +6,9 @@ import Fuse from "fuse.js";
 import React, { useState, useEffect } from "react";
 import Form from "../lib/form.js";
 import { useRouter } from 'next/router'; // https://nextjs.org/docs/api-reference/next/router
-import Dropdown from "../lib/dropdown.js";
+import DropdownForStars from "../lib/dropdown.js";
+import {SliderForNumDisplay,SliderForNumForecasts} from "../lib/slider.js";
+import MultiSelectPlatform from "../lib/multiSelectPlatforms.js";
 
 /* Definitions */
 
@@ -40,6 +42,8 @@ export async function getServerSideProps(context) { //getServerSideProps
   };
 }
 */
+
+// Display functions
 
 let displayMarkdown = (description) => {
   if(description == null){
@@ -117,14 +121,7 @@ let displayForecast = ({
   }
 };
 
-let displayForecasts = (results, settings) => {
-  return results
-    .slice(0, settings.numDisplay)
-    .map((fuseSearchResult) =>
-      displayForecast({ ...fuseSearchResult.item})
-  )
-}
-
+// Stars
 let howmanystars = (string) => {
   let matches = string.match(/★/g);
   return matches?matches.length:0
@@ -157,6 +154,22 @@ export function getstars(numstars){
   return(stars) 
 }
 
+// URL slugs
+let transformObjectIntoUrlSlug = (obj) => {
+  let results = []
+  for(let key in obj){
+    if(typeof obj[key] == "number" || typeof obj[key] == "string" ){
+      results.push(`${key}=${obj[key]}`)
+    }else if(key=="forecastingPlatforms"){
+      let arr = obj[key].map(x => x.value)
+      let arrstring = arr.join("|")
+      results.push(`${key}=${arrstring}`)
+    }
+  }
+  let string = "?"+results.join("&")
+  return string
+}
+
 /* Body */
 export default function Home({ items}){ //, urlQuery }) {
   console.log("===============")
@@ -167,35 +180,51 @@ export default function Home({ items}){ //, urlQuery }) {
   let initialQueryParameters = ({
     query: "",
     processedUrlYet: false,
+    starsThreshold: 3,
+    numDisplay:  20, 
+    forecastsThreshold: 0,
+    forecastingPlatforms: [ // Excluding Elicit and Omen
+      { value: 'CSET-foretell', label: 'CSET-foretell' },
+      { value: 'Good Judgment', label: 'Good Judgment' },
+      { value: 'Good Judgment Open', label: 'Good Judgment Open' },
+      { value: 'Hypermind', label: 'Hypermind' },
+      { value: 'Metaculus', label: 'Metaculus' },
+      { value: 'PolyMarket', label: 'PolyMarket' },
+      { value: 'PredictIt', label: 'PredictIt' }
+    ]    
   })
   const [queryParameters, setQueryParameters] = useState(initialQueryParameters);
   let initialSettings = {
-      query: "",
-      numDisplay:  10, 
       timeoutId: null, 
-      awaitEndTyping: 1000,
-      shared: false, 
+      awaitEndTyping: 500,
       time: Date.now(),
-
   }
   const [settings, setSettings] = useState(initialSettings);
   let initialResults =  [] 
   const [results, setResults] = useState(initialResults);
   
-  let initialStars = {
-    starsThreshold: 3,
-    processedStarChangeYet: true
-  }
-  const [stars, setStars] = useState(initialStars)
-  
   /* Functions which I want to have access to the Home namespace */
   // I don't want to create an "items" object for each search.
-  let executeSearch = (query, starsThreshold) => {
+  let executeSearch = (queryData) => {
     let results = []
+    let query = queryData.query
+    let forecastsThreshold = queryData.forecastsThreshold
+    let starsThreshold = queryData.starsThreshold
+    let forecastingPlatforms = queryData.forecastingPlatforms.map(x => x.value)
+    
+    let itemsFiltered = items.filter(item => 
+      howmanystars(item.stars)>=starsThreshold && 
+      item.forecasts>=forecastsThreshold &&
+      forecastingPlatforms.includes(item.platform)
+    )
+
+        /*
     let itemsFilteredStars = items.filter(item => howmanystars(item.stars)>=starsThreshold)
-    let fuse = new Fuse(itemsFilteredStars, opts);
+    let itemsFilteredNumForecasters = itemsFilteredStars.filter(item => item.forecasts>=forecastsThreshold)
+    let itemsFilteredPlatforms = itemsFilteredNumForecasters.filter(item => forecastingPlatforms.includes(item.platform))
+    */
+    let fuse = new Fuse(itemsFiltered, opts);
     if(query != undefined){
-      console.log("query", query)
       results = fuse.search(query)
         .map(
         result => {
@@ -209,72 +238,69 @@ export default function Home({ items}){ //, urlQuery }) {
         return (Number(a.score)>Number(b.score))?1:-1
       })
       console.log("Executing search")
-      console.log("query", query)
-      console.log("starsThreshold", starsThreshold)
+      console.log("executeSearch/query", query)
+      console.log("executeSearch/starsThreshold", starsThreshold)
+      console.log("executeSearch/forecastsThreshold", forecastsThreshold)
+      console.log("executeSearch/forecastingPlatforms", forecastingPlatforms)
+
       console.log(settings)
     }
     console.log(results)
     return results
   }
+  // I don't want display forecasts to change with a change in queryParameters, but I want it to have access to the queryParameters, in particular the numDisplay
+  let displayForecasts = (results) => {
+    return results
+      .slice(0, queryParameters.numDisplay)
+      .map((fuseSearchResult) =>
+        displayForecast({ ...fuseSearchResult.item})
+    )
+  }
   
   /* State controllers */
-  let onChangeForm = (queryParameters) => {
-    setQueryParameters({...queryParameters, processedUrlYet:true});
+  let onChangeSearchInputs = (newQueryParameters) => {
+    setQueryParameters({...newQueryParameters, processedUrlYet:true});
+    console.log("onChangeSearchInputs/newQueryParameters",newQueryParameters)
     clearTimeout(settings.timeoutId)
     setResults([]);
     let newtimeoutId = setTimeout(async () => {
-      let query = queryParameters.query
-      let results = executeSearch(query, stars.starsThreshold) 
-      setSettings({...settings, timeoutId: null}) 
+      console.log("onChangeSearchInputs/timeout/newQueryParameters",newQueryParameters)
+      let urlSlug = transformObjectIntoUrlSlug(newQueryParameters)
+      router.push(urlSlug)
+      let results = executeSearch(newQueryParameters) 
       setResults(results);
-      router.push(`?query=${query}&numDisplay=${settings.numDisplay}&starsThreshold=${stars.starsThreshold}`, undefined, { shallow: true })
-    }, 500);
+      setSettings({...settings, timeoutId: null}) 
+    }, settings.awaitEndTyping);
     setSettings({...settings, timeoutId: newtimeoutId})
   }
   
-  let processState = (queryParameters, stars) => {
+  let processState = (queryParameters) => {
     // I am using the static version of netlify, because the server side one is too slow
     // This has the advantage that the data gets sent in the very first request, as the html
     // However, it has the disadvantage that it produces static webpages
     // In particular, parsing the url for parameters proves to be somewhat difficult
     // I do it by having a state variable
+    
+    // Process the URL at the beginning
     if(queryParameters.processedUrlYet == false){
-      console.log("processState")
       let urlQuery = router.query
-      console.log("query", urlQuery)  
-
-      let queryParametersQuery = queryParameters.query      
-      let starThresholdQuery = urlQuery?Number(urlQuery.starsThreshold):false
-      if(starThresholdQuery){
-          let starsThresholdQueryProcessed =  Number(starThresholdQuery)
-          let starsThresholdQueryProcessed2 =  starsThresholdQueryProcessed>4?4:(starsThresholdQueryProcessed<1?1:starsThresholdQueryProcessed)
-          console.log(starsThresholdQueryProcessed2)
-          setStars({starsThreshold: starsThresholdQueryProcessed2, processedStarChangeYet: true})
-      }
+      console.log("processState/queryParameters", queryParameters)
+      console.log("processState/query", urlQuery)
       
-      let urlSearchQuery = urlQuery?urlQuery.query:""
-      if(urlSearchQuery && !queryParametersQuery){
-        setQueryParameters({...queryParameters, query: urlSearchQuery, processedUrlYet: true})
-        let results = executeSearch(urlSearchQuery, starThresholdQuery || stars.starsThreshold)
-        setResults(results)
-      } 
-      if(urlSearchQuery==""){
-        if(router.asPath.includes('query')){
-            setQueryParameters({...queryParameters,   processedUrlYet: true}) 
+      if(!(urlQuery && Object.keys(urlQuery).length === 0)){
+        let initialQuery = queryParameters
+        let newQuery = {...initialQuery, ...urlQuery, processedUrlYet: true} 
+        if(!Array.isArray(newQuery.forecastingPlatforms)){
+          let forecastingPlatformsAsArray  = newQuery.forecastingPlatforms.split("|")
+          let forecastingPlatformsAsObject = forecastingPlatformsAsArray.map(x => ({value:x, label:x}))
+          newQuery.forecastingPlatforms = forecastingPlatformsAsObject
         }
+        setQueryParameters(newQuery) 
+        let results = executeSearch(newQuery)
+        setResults(results)
       }
-      let numDisplayQuery = urlQuery?Number(urlQuery.numDisplay):false
-      if(numDisplayQuery){
-          setSettings({...settings, numDisplay:numDisplayQuery})
-      }
-      console.log(queryParameters)
-    }else if(!stars.processedStarChangeYet){  
-      setStars({...stars,  
-        processedStarChangeYet: true})
-      let results = executeSearch(queryParameters.query, stars.starsThreshold)
-      router.push(`?query=${queryParameters.query}&numDisplay=${settings.numDisplay}&starsThreshold=${stars.starsThreshold}`, undefined, { shallow: true })
-      setResults(results)
-    } else {
+
+    }else {
       // Do nothing
     }
 
@@ -283,12 +309,43 @@ export default function Home({ items}){ //, urlQuery }) {
   /* Change the stars threshold */
   const starOptions = ["≥ ★☆☆☆☆", "≥ ★★☆☆☆", "≥ ★★★☆☆", "≥ ★★★★☆"]
   let onChangeStars = (selection) => {
-    console.log("selection", selection)
-    console.log("greater than or equal", howmanystars(selection))
-    setStars({starsThreshold: howmanystars(selection), 
-    processedStarChangeYet: false})
+    console.log("onChangeStars/selection", selection)
+    console.log("onChangeStars/greater than or equal", howmanystars(selection))
+    let newQueryParameters = {...queryParameters, starsThreshold: howmanystars(selection)}
+    onChangeSearchInputs(newQueryParameters)
   }
   
+  /* Change the number of elements to display  */
+  let onChangeSliderForNumDisplay = (event) => {
+    console.log("onChangeSliderForNumDisplay", event[0])
+    let newQueryParameters = {...queryParameters, numDisplay: Math.round(event[0])}
+    onChangeSearchInputs(newQueryParameters) // Slightly inefficient because it recomputes the search in time, but it makes my logic easier.
+  }
+  
+  /* Change the number of elements to display  */
+  let onChangeSliderForNumForecasts = (event) => {
+    console.log("onChangeSliderForNumForecasts", event[0])
+    let newQueryParameters = {...queryParameters, forecastsThreshold: Math.round(event[0])}
+    onChangeSearchInputs(newQueryParameters)
+  }
+
+  /* Change on the search bar */
+  let onChangeSearchBar = (value) => {
+    console.log("onChangeSearchBar/New query:", value)
+    let newQueryParameters = {...queryParameters, query: value}
+    onChangeSearchInputs(newQueryParameters)
+  }
+
+  /*Change selected platforms */
+  let onChangeSelectedPlatforms = (value) => {
+    console.log("onChangeSelectedPlatforms/Change in platforms:", value)
+    let newQueryParameters = {...queryParameters, forecastingPlatforms: value}
+    onChangeSearchInputs(newQueryParameters)
+  }
+
+  /* Show advanced */
+  let [advancedOptions, showAdvancedOptions] = useState(false)
+
   /* Final return */
   return (
     <Layout key="index">
@@ -297,24 +354,55 @@ export default function Home({ items}){ //, urlQuery }) {
           Metaforecasts
         </h1>
       </div>
-      <div className="invisible">{processState(queryParameters, stars)}
+      <div className="invisible">{processState(queryParameters)}
       </div>
       <label className="block mb-1">
         <Form
-          values={queryParameters}
-          onChange={onChangeForm}
+          value={queryParameters.query}
+          onChange={onChangeSearchBar}
         />
       </label>
-      <div className="block mb-4 flex items-center justify-center border-none">
-          <Dropdown
-            options={starOptions}
-            onChange={onChangeStars}
-            name="dropdown"
-            value={stars.starsThreshold}
-            howmanystars={howmanystars}
-        />
+      <div className="flex flex-col mx-auto justify-center items-center">
+      <button 
+      className="text-center text-gray-600 text-sm"
+      onClick={() => showAdvancedOptions(!advancedOptions)}>
+        Advanced options ▼
+      </button>
       </div>
-      {displayForecasts(results, settings)}
+
+      <div className={`flex-1 flex-col mx-auto justify-center items-center w-full ${advancedOptions?"":"hidden"}`}>
+        <div className="grid grid-cols-3 rows-2 items-center content-center">
+          <div className="flex row-span-1 col-start-1 col-end-1 row-start-1 row-end-1 items-center justify-center mb-4">
+          <SliderForNumForecasts
+                onChange={onChangeSliderForNumForecasts}
+                value={queryParameters.forecastsThreshold}
+            />
+          </div>
+          <div className="flex col-start-2 col-end-2 row-start-1 row-end-1 items-center justify-center mb-4">
+            <DropdownForStars
+                options={starOptions}
+                onChange={onChangeStars}
+                name="dropdown"
+                value={queryParameters.starsThreshold}
+                howmanystars={howmanystars}
+            />
+          </div>
+          <div className="flex col-start-3 col-end-3 row-start-1 row-end-1 items-center justify-center mb-4">
+            <SliderForNumDisplay
+              value={queryParameters.numDisplay}
+              onChange={onChangeSliderForNumDisplay}
+            />
+          </div>
+          <div className="flex col-span-3 items-center justify-center mb-4">
+            <MultiSelectPlatform
+              value={queryParameters.forecastingPlatforms}
+              onChange={onChangeSelectedPlatforms}
+            />
+          </div>
+        </div>
+      </div>
+
+      {displayForecasts(results)}
       <span
           className="mr-1 cursor-pointer"
           onClick={() => {

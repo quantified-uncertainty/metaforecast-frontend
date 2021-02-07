@@ -10,6 +10,7 @@ module.exports = {
   },
   variants: {
     extend: {},
+    margin: ['responsive', 'hover'],
   },
   plugins: [require("@tailwindcss/forms"), require("@tailwindcss/typography")],
 };
