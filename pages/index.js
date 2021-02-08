@@ -1,13 +1,19 @@
 /* Imports */
-import { getForecasts} from "../lib/get-forecasts.js";
-import Layout from "./layout.js";
-import ReactMarkdown from "react-markdown";
-import Fuse from "fuse.js";
+
+// React
 import React, { useState, useEffect } from "react";
-import Form from "../lib/form.js";
 import { useRouter } from 'next/router'; // https://nextjs.org/docs/api-reference/next/router
+
+// Utilities
+import Fuse from "fuse.js";
+import { getForecasts} from "../lib/get-forecasts.js";
+import displayForecast from "./displayForecast.js";
+
+// Parts
+import Layout from "./layout.js";
+import Form from "../lib/form.js";
 import DropdownForStars from "../lib/dropdown.js";
-import {SliderForNumDisplay,SliderForNumForecasts} from "../lib/slider.js";
+import {SliderElement, SliderForNumForecasts} from "../lib/slider.js";
 import MultiSelectPlatform from "../lib/multiSelectPlatforms.js";
 import ButtonsForStars from "../lib/buttonsForStars.js";
 
@@ -43,91 +49,6 @@ export async function getServerSideProps(context) { //getServerSideProps
   };
 }
 */
-
-// Display functions
-
-let displayMarkdown = (description) => {
-  if(description == null){
-    return
-  }else{
-    description = description==null?"":description
-      .replaceAll("] (", "](")
-      .replaceAll(") )", "))")
-      .replaceAll("( [", "([")
-      .replaceAll(") ,", "),")
-    if(description.length > 1000){
-      return(
-      <div className="font-mono text-xs">
-        <ReactMarkdown>
-            {description.slice(0,1000)+"..."}
-        </ReactMarkdown>
-      </div>)
-    }else{
-      return(
-        <div className="font-mono text-xs">
-          <ReactMarkdown>
-              {description}
-          </ReactMarkdown>
-        </div>)
-    }
-  }
-}
-
-let displayNumForecasts = (forecasts, stars, platform) => {
-  let text
-  if(!forecasts && forecasts!=0){
-    text = `${stars} / ${platform} / Forecast number unknown`
-  }else{
-    text = `${stars} / ${platform} / ${forecasts} forecasts`
-  }
-  return text
-}
-
-let displayForecast = ({
-  title,
-  url,
-  platform,
-  description,
-  binaryQuestion,
-  percentage,
-  forecasts,
-  stars
-}) => {
-  if(binaryQuestion){
-    return (
-      <div key={title} className="pb-6 pt-3">
-        <div className="text-blue-800">
-          <a href={url} className="font-bold" target="_blank">
-              {title}
-          </a>
-          <span className="text-black">
-            {" "+percentage}
-          </span>
-        </div>
-        <div>
-            {displayNumForecasts(forecasts, stars, platform)}
-        </div>
-        {displayMarkdown(description)}
-  
-      </div>
-    );
-  }else{
-    return (
-      <div key={title} className="pb-6 pt-3">
-        <div className="text-blue-800">
-          <a href={url} className="font-bold">
-              {title}
-            </a>
-          </div>
-        <div className="text-black">
-            {displayNumForecasts(forecasts, stars, platform)}
-        </div>
-        {displayMarkdown(description)}
-  
-      </div>
-    );
-  }
-};
 
 // Stars
 let howmanystars = (string) => {
@@ -319,6 +240,9 @@ export default function Home({ items}){ //, urlQuery }) {
   }
   
   /* Change the number of elements to display  */
+  let displayFunctionNumDisplaySlider=(value)=> {
+    return Math.round(value)!=1?"Show "+Math.round(value)+" results":"Show "+Math.round(value)+" result"
+  }
   let onChangeSliderForNumDisplay = (event) => {
     console.log("onChangeSliderForNumDisplay", event[0])
     let newQueryParameters = {...queryParameters, numDisplay: Math.round(event[0])}
@@ -326,6 +250,9 @@ export default function Home({ items}){ //, urlQuery }) {
   }
   
   /* Change the forecast threshold */
+  let displayFunctionNumForecasts=(value)=> {
+    return "# Forecasts > "+Math.round(value)
+  }
   let onChangeSliderForNumForecasts = (event) => {
     console.log("onChangeSliderForNumForecasts", event[0])
     let newQueryParameters = {...queryParameters, forecastsThreshold: Math.round(event[0])}
@@ -377,9 +304,10 @@ export default function Home({ items}){ //, urlQuery }) {
         <div className={`flex-1 flex-col mx-auto justify-center items-center w-full ${advancedOptions?"":"hidden"}`}>
           <div className="grid grid-cols-3 grid-rows-2 items-center content-center">
             <div className="flex row-span-1 col-start-1 col-end-1 row-start-1 row-end-1 items-center justify-center mb-4">
-            <SliderForNumForecasts
+            <SliderElement
                   onChange={onChangeSliderForNumForecasts}
                   value={queryParameters.forecastsThreshold}
+                  displayFunction={displayFunctionNumForecasts}
               />
             </div>
             <div className="flex col-start-2 col-end-2 row-start-1 row-end-1 items-center justify-center mb-4">
@@ -389,9 +317,10 @@ export default function Home({ items}){ //, urlQuery }) {
               />
             </div>
             <div className="flex col-start-3 col-end-3 row-start-1 row-end-1 items-center justify-center mb-4">
-              <SliderForNumDisplay
+              <SliderElement
                 value={queryParameters.numDisplay}
                 onChange={onChangeSliderForNumDisplay}
+                displayFunction={displayFunctionNumDisplaySlider}
               />
             </div>
             <div className="flex col-span-3 items-center justify-center mb-4">
