@@ -45,7 +45,7 @@ let formatForecastData = (forecasts, stars, platform) => {
 
 /* Body */
 
-export default function displayForecast({
+let displayForecast = ({
   title,
   url,
   platform,
@@ -54,7 +54,7 @@ export default function displayForecast({
   percentage,
   forecasts,
   stars
-}){
+}) => {
   if(binaryQuestion){
     return (
       <div key={title} className="pb-6 pt-3">
@@ -90,3 +90,11 @@ export default function displayForecast({
     );
   }
 };
+
+export default function displayForecasts(results, numDisplay){
+  return results
+        .slice(0, numDisplay)
+        .map((fuseSearchResult) =>
+          displayForecast({ ...fuseSearchResult.item})
+      )
+}

@@ -7,7 +7,7 @@ import { useRouter } from 'next/router'; // https://nextjs.org/docs/api-referenc
 // Utilities
 import Fuse from "fuse.js";
 import { getForecasts} from "../lib/get-forecasts.js";
-import displayForecast from "./displayForecast.js";
+import displayForecasts from "./displayForecasts.js";
 
 // Parts
 import Layout from "./layout.js";
@@ -173,12 +173,8 @@ export default function Home({ items}){ //, urlQuery }) {
     return results
   }
   // I don't want display forecasts to change with a change in queryParameters, but I want it to have access to the queryParameters, in particular the numDisplay. Hence why this function lives inside Home. 
-  let displayForecasts = (results) => {
-    return results
-      .slice(0, queryParameters.numDisplay)
-      .map((fuseSearchResult) =>
-        displayForecast({ ...fuseSearchResult.item})
-    )
+  let displayForecastsWrapper = (results) => {
+    return displayForecasts(results, queryParameters.numDisplay)
   }
   
   /* State controllers */
@@ -333,7 +329,7 @@ export default function Home({ items}){ //, urlQuery }) {
         </div>
       </div>
 
-      {displayForecasts(results)}
+      {displayForecastsWrapper(results)}
       <span
           className="mr-1 cursor-pointer"
           onClick={() => {
