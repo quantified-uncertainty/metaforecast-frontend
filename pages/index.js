@@ -351,7 +351,9 @@ export default function Home({ items }) {
         </div>
       </div>
 
-      {displayForecastsWrapper(results)}
+      <div className="grid grid-cols-3 gap-4">
+        {displayForecastsWrapper(results)}
+      </div>
       <span
         className="mr-1 cursor-pointer"
         onClick={() => {
