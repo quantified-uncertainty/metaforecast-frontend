@@ -9,6 +9,7 @@ import { useRouter } from 'next/router'; // https://nextjs.org/docs/api-referenc
 import DropdownForStars from "../lib/dropdown.js";
 import {SliderForNumDisplay,SliderForNumForecasts} from "../lib/slider.js";
 import MultiSelectPlatform from "../lib/multiSelectPlatforms.js";
+import ButtonsForStars from "../lib/buttonsForStars.js";
 
 /* Definitions */
 
@@ -94,7 +95,9 @@ let displayForecast = ({
           <a href={url} className="font-bold" target="_blank">
               {title}
           </a>
-          {": "+percentage}
+          <span className="text-black">
+            {" "+percentage}
+          </span>
         </div>
         <div>
             {stars +" = "+ "(Platform: " + platform+") + ("+displayNumForecasts(forecasts)+")"}
@@ -111,7 +114,7 @@ let displayForecast = ({
               {title}
             </a>
           </div>
-        <div>
+        <div className="text-black">
         {stars +" = "+ "(Platform: " + platform+") + ("+displayNumForecasts(forecasts)+")"}
         </div>
         {displayMarkdown(description)}
@@ -308,10 +311,9 @@ export default function Home({ items}){ //, urlQuery }) {
   
   /* Change the stars threshold */
   const starOptions = ["≥ ★☆☆☆☆", "≥ ★★☆☆☆", "≥ ★★★☆☆", "≥ ★★★★☆"]
-  let onChangeStars = (selection) => {
-    console.log("onChangeStars/selection", selection)
-    console.log("onChangeStars/greater than or equal", howmanystars(selection))
-    let newQueryParameters = {...queryParameters, starsThreshold: howmanystars(selection)}
+  let onChangeStars = (value) => {
+    console.log("onChangeStars/buttons", value)
+    let newQueryParameters = {...queryParameters, starsThreshold: value}
     onChangeSearchInputs(newQueryParameters)
   }
   
@@ -356,48 +358,47 @@ export default function Home({ items}){ //, urlQuery }) {
       </div>
       <div className="invisible">{processState(queryParameters)}
       </div>
+
       <label className="block mb-1">
         <Form
           value={queryParameters.query}
           onChange={onChangeSearchBar}
         />
       </label>
-      <div className="flex flex-col mx-auto justify-center items-center">
-      <button 
-      className="text-center text-gray-600 text-sm"
-      onClick={() => showAdvancedOptions(!advancedOptions)}>
-        Advanced options ▼
-      </button>
-      </div>
 
-      <div className={`flex-1 flex-col mx-auto justify-center items-center w-full ${advancedOptions?"":"hidden"}`}>
-        <div className="grid grid-cols-3 rows-2 items-center content-center">
-          <div className="flex row-span-1 col-start-1 col-end-1 row-start-1 row-end-1 items-center justify-center mb-4">
-          <SliderForNumForecasts
-                onChange={onChangeSliderForNumForecasts}
-                value={queryParameters.forecastsThreshold}
-            />
-          </div>
-          <div className="flex col-start-2 col-end-2 row-start-1 row-end-1 items-center justify-center mb-4">
-            <DropdownForStars
-                options={starOptions}
-                onChange={onChangeStars}
-                name="dropdown"
-                value={queryParameters.starsThreshold}
-                howmanystars={howmanystars}
-            />
-          </div>
-          <div className="flex col-start-3 col-end-3 row-start-1 row-end-1 items-center justify-center mb-4">
-            <SliderForNumDisplay
-              value={queryParameters.numDisplay}
-              onChange={onChangeSliderForNumDisplay}
-            />
-          </div>
-          <div className="flex col-span-3 items-center justify-center mb-4">
-            <MultiSelectPlatform
-              value={queryParameters.forecastingPlatforms}
-              onChange={onChangeSelectedPlatforms}
-            />
+      <div className="flex flex-col mx-auto justify-center items-center">
+        <button 
+        className="text-center text-gray-600 text-sm mb-2"
+        onClick={() => showAdvancedOptions(!advancedOptions)}>
+          Advanced options ▼
+        </button>
+
+        <div className={`flex-1 flex-col mx-auto justify-center items-center w-full ${advancedOptions?"":"hidden"}`}>
+          <div className="grid grid-cols-3 grid-rows-2 items-center content-center">
+            <div className="flex row-span-1 col-start-1 col-end-1 row-start-1 row-end-1 items-center justify-center mb-4">
+            <SliderForNumForecasts
+                  onChange={onChangeSliderForNumForecasts}
+                  value={queryParameters.forecastsThreshold}
+              />
+            </div>
+            <div className="flex col-start-2 col-end-2 row-start-1 row-end-1 items-center justify-center mb-4">
+              <ButtonsForStars
+              onChange={onChangeStars}
+              value={queryParameters.starsThreshold}
+              />
+            </div>
+            <div className="flex col-start-3 col-end-3 row-start-1 row-end-1 items-center justify-center mb-4">
+              <SliderForNumDisplay
+                value={queryParameters.numDisplay}
+                onChange={onChangeSliderForNumDisplay}
+              />
+            </div>
+            <div className="flex col-span-3 items-center justify-center mb-4">
+              <MultiSelectPlatform
+                value={queryParameters.forecastingPlatforms}
+                onChange={onChangeSelectedPlatforms}
+              />
+            </div>
           </div>
         </div>
       </div>
