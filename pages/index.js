@@ -73,9 +73,14 @@ let displayMarkdown = (description) => {
   }
 }
 
-let displayNumForecasts = (forecasts) => {
-  let forecastText = forecasts || "unknown"
-  return ("Number of forecasts: " +forecastText)
+let displayNumForecasts = (forecasts, stars, platform) => {
+  let text
+  if(!forecasts && forecasts!=0){
+    text = `${stars} / ${platform} / Forecast number unknown`
+  }else{
+    text = `${stars} / ${platform} / ${forecasts} forecasts`
+  }
+  return text
 }
 
 let displayForecast = ({
@@ -100,7 +105,7 @@ let displayForecast = ({
           </span>
         </div>
         <div>
-            {stars +" = "+ "(Platform: " + platform+") + ("+displayNumForecasts(forecasts)+")"}
+            {displayNumForecasts(forecasts, stars, platform)}
         </div>
         {displayMarkdown(description)}
   
@@ -115,7 +120,7 @@ let displayForecast = ({
             </a>
           </div>
         <div className="text-black">
-        {stars +" = "+ "(Platform: " + platform+") + ("+displayNumForecasts(forecasts)+")"}
+            {displayNumForecasts(forecasts, stars, platform)}
         </div>
         {displayMarkdown(description)}
   
