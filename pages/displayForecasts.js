@@ -78,7 +78,10 @@ let displayForecast = ({
 );
 
 export default function displayForecasts(results, numDisplay) {
-  return results
-    .slice(0, numDisplay)
-    .map((fuseSearchResult) => displayForecast({ ...fuseSearchResult.item }));
+  return (
+    !!results.slice &&
+    results
+      .slice(0, numDisplay)
+      .map((fuseSearchResult) => displayForecast({ ...fuseSearchResult.item }))
+  );
 }
