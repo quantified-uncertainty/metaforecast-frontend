@@ -226,11 +226,6 @@ export default function Home({ items}){ //, urlQuery }) {
       forecastingPlatforms.includes(item.platform)
     )
 
-        /*
-    let itemsFilteredStars = items.filter(item => howmanystars(item.stars)>=starsThreshold)
-    let itemsFilteredNumForecasters = itemsFilteredStars.filter(item => item.forecasts>=forecastsThreshold)
-    let itemsFilteredPlatforms = itemsFilteredNumForecasters.filter(item => forecastingPlatforms.includes(item.platform))
-    */
     let fuse = new Fuse(itemsFiltered, opts);
     if(query != undefined){
       results = fuse.search(query)
@@ -256,7 +251,7 @@ export default function Home({ items}){ //, urlQuery }) {
     console.log(results)
     return results
   }
-  // I don't want display forecasts to change with a change in queryParameters, but I want it to have access to the queryParameters, in particular the numDisplay
+  // I don't want display forecasts to change with a change in queryParameters, but I want it to have access to the queryParameters, in particular the numDisplay. Hence why this function lives inside Home. 
   let displayForecasts = (results) => {
     return results
       .slice(0, queryParameters.numDisplay)
@@ -284,12 +279,13 @@ export default function Home({ items}){ //, urlQuery }) {
   
   let processState = (queryParameters) => {
     // I am using the static version of netlify, because the server side one is too slow
+    // (see getServerSideProps vs getStaticProps under helper functions)
     // This has the advantage that the data gets sent in the very first request, as the html
     // However, it has the disadvantage that it produces static webpages
     // In particular, parsing the url for parameters proves to be somewhat difficult
     // I do it by having a state variable
     
-    // Process the URL at the beginning
+    // Process the URL on initial page load
     if(queryParameters.processedUrlYet == false){
       let urlQuery = router.query
       console.log("processState/queryParameters", queryParameters)
@@ -329,7 +325,7 @@ export default function Home({ items}){ //, urlQuery }) {
     onChangeSearchInputs(newQueryParameters) // Slightly inefficient because it recomputes the search in time, but it makes my logic easier.
   }
   
-  /* Change the number of elements to display  */
+  /* Change the forecast threshold */
   let onChangeSliderForNumForecasts = (event) => {
     console.log("onChangeSliderForNumForecasts", event[0])
     let newQueryParameters = {...queryParameters, forecastsThreshold: Math.round(event[0])}
