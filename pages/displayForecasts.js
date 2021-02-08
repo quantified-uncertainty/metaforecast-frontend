@@ -6,42 +6,42 @@ import ReactMarkdown from "react-markdown";
 /* Support functions */
 
 let displayMarkdown = (description) => {
-  if(description == null){
-    return
-  }else{
-    description = description==null?"":description
-      .replaceAll("] (", "](")
-      .replaceAll(") )", "))")
-      .replaceAll("( [", "([")
-      .replaceAll(") ,", "),")
-    if(description.length > 1000){
-      return(
-      <div className="font-mono text-xs">
-        <ReactMarkdown>
-            {description.slice(0,1000)+"..."}
-        </ReactMarkdown>
-      </div>)
-    }else{
-      return(
+  if (description == null) {
+    return;
+  } else {
+    description =
+      description == null
+        ? ""
+        : description
+            .replaceAll("] (", "](")
+            .replaceAll(") )", "))")
+            .replaceAll("( [", "([")
+            .replaceAll(") ,", "),");
+    if (description.length > 1000) {
+      return (
         <div className="font-mono text-xs">
-          <ReactMarkdown>
-              {description}
-          </ReactMarkdown>
-        </div>)
+          <ReactMarkdown>{description.slice(0, 1000) + "..."}</ReactMarkdown>
+        </div>
+      );
+    } else {
+      return (
+        <div className="font-mono text-xs">
+          <ReactMarkdown>{description}</ReactMarkdown>
+        </div>
+      );
     }
   }
-}
+};
 
 let formatForecastData = (forecasts, stars, platform) => {
-  let text
-  if(!forecasts && forecasts!=0){
-    text = `${stars} / ${platform} / Forecast number unknown`
-  }else{
-    text = `${stars} / ${platform} / ${forecasts} forecasts`
+  let text;
+  if (!forecasts && forecasts != 0) {
+    text = `${stars} / ${platform} / Forecast number unknown`;
+  } else {
+    text = `${stars} / ${platform} / ${forecasts} forecasts`;
   }
-  return text
-}
-
+  return text;
+};
 
 /* Body */
 
@@ -53,48 +53,40 @@ let displayForecast = ({
   binaryQuestion,
   percentage,
   forecasts,
-  stars
+  stars,
 }) => {
-  if(binaryQuestion){
+  if (binaryQuestion) {
     return (
       <div key={title} className="pb-6 pt-3">
         <div className="text-blue-800">
           <a href={url} className="font-bold" target="_blank">
-              {title}
+            {title}
           </a>
-          <span className="text-black">
-            {" "+percentage}
-          </span>
+          <span className="text-black">{" " + percentage}</span>
         </div>
-        <div>
-            {formatForecastData(forecasts, stars, platform)}
-        </div>
+        <div>{formatForecastData(forecasts, stars, platform)}</div>
         {displayMarkdown(description)}
-  
       </div>
     );
-  }else{
+  } else {
     return (
       <div key={title} className="pb-6 pt-3">
         <div className="text-blue-800">
           <a href={url} className="font-bold">
-              {title}
-            </a>
-          </div>
+            {title}
+          </a>
+        </div>
         <div className="text-black">
-            {formatForecastData(forecasts, stars, platform)}
+          {formatForecastData(forecasts, stars, platform)}
         </div>
         {displayMarkdown(description)}
-  
       </div>
     );
   }
 };
 
-export default function displayForecasts(results, numDisplay){
+export default function displayForecasts(results, numDisplay) {
   return results
-        .slice(0, numDisplay)
-        .map((fuseSearchResult) =>
-          displayForecast({ ...fuseSearchResult.item})
-      )
+    .slice(0, numDisplay)
+    .map((fuseSearchResult) => displayForecast({ ...fuseSearchResult.item }));
 }

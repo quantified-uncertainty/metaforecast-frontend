@@ -2,7 +2,6 @@ import Link from "next/link";
 import Head from "next/head";
 
 export default function Layout(props) {
-  
   return (
     <div>
       <Head>
@@ -14,14 +13,16 @@ export default function Layout(props) {
         <nav className="bg-gray-10">
           <div className="ml-10 mr-10 flex flex-row-reverse items-start space-x-4">
             <div className="m-5 text-black hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium cursor-pointer text-right">
-            <a href="https://github.com/QURIresearch/metaforecasts" target="_blank">
+              <a
+                href="https://github.com/QURIresearch/metaforecasts"
+                target="_blank"
+              >
                 How this works
-            </a>
-
+              </a>
             </div>
             <div className="m-5 text-black hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium cursor-pointer text-right">
               <a href="https://airtable.com/shrUotmcMmmTdIjmX" target="_blank">
-                  Database
+                Database
               </a>
             </div>
           </div>
