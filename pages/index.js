@@ -269,7 +269,7 @@ export default function Home({ items }) {
 
   /* Change the forecast threshold */
   let displayFunctionNumForecasts = (value) => {
-    return "# Forecasts > " + Math.round(value);
+    return "# forecasts (fs.) > " + Math.round(value);
   };
   let onChangeSliderForNumForecasts = (event) => {
     console.log("onChangeSliderForNumForecasts", event[0]);
