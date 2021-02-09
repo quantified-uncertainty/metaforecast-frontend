@@ -29,10 +29,11 @@ let displayMarkdown = (description) => {
 };
 
 let numerateForecasts = (number) => {
+   // Non breaking space: \u00a0
   if (!number && number != 0) {
     return (<>
       <label className="text-gray-600">
-        {"\u00a0¿? Forecasts"}
+        {"\u00a0¿? 🔮"}
       </label>
     </>)
   } else {
@@ -41,7 +42,7 @@ let numerateForecasts = (number) => {
         {number}
       </div>
       <label className="text-gray-600">
-        {number == 1?"\u00a0Forecast":"\u00a0Forecasts"}
+        {"\u00a0🔮"}
       </label>
     </>)
   }
