@@ -5,43 +5,38 @@ import ReactMarkdown from "react-markdown";
 
 /* Support functions */
 
+let cleanText = (text) => {
+  const textString = !!text ? text : "";
+  return textString
+    .replaceAll("] (", "](")
+    .replaceAll(") )", "))")
+    .replaceAll("( [", "([")
+    .replaceAll(") ,", "),");
+};
+
+let truncateText = (length, text) =>
+  text.length > length ? text.slice(0, length) + "..." : text;
+
 let displayMarkdown = (description) => {
-  if(description == null){
-    return
-  }else{
-    description = description==null?"":description
-      .replaceAll("] (", "](")
-      .replaceAll(") )", "))")
-      .replaceAll("( [", "([")
-      .replaceAll(") ,", "),")
-    if(description.length > 1000){
-      return(
-      <div className="font-mono text-xs">
-        <ReactMarkdown>
-            {description.slice(0,1000)+"..."}
-        </ReactMarkdown>
-      </div>)
-    }else{
-      return(
-        <div className="font-mono text-xs">
-          <ReactMarkdown>
-              {description}
-          </ReactMarkdown>
-        </div>)
-    }
-  }
-}
+  let formatted = truncateText(200, cleanText(description));
+  return formatted === "" ? (
+    ""
+  ) : (
+    <div className="text-sm">
+      <ReactMarkdown>{formatted}</ReactMarkdown>
+    </div>
+  );
+};
 
 let formatForecastData = (forecasts, stars, platform) => {
-  let text
-  if(!forecasts && forecasts!=0){
-    text = `${stars} / ${platform} / Forecast number unknown`
-  }else{
-    text = `${stars} / ${platform} / ${forecasts} forecasts`
+  let text;
+  if (!forecasts && forecasts != 0) {
+    text = `${stars} / ${platform} / Forecast number unknown`;
+  } else {
+    text = `${stars} / ${platform} / ${forecasts} forecasts`;
   }
-  return text
-}
-
+  return text;
+};
 
 /* Body */
 
@@ -53,48 +48,40 @@ let displayForecast = ({
   binaryQuestion,
   percentage,
   forecasts,
-  stars
-}) => {
-  if(binaryQuestion){
-    return (
-      <div key={title} className="pb-6 pt-3">
-        <div className="text-blue-800">
-          <a href={url} className="font-bold" target="_blank">
-              {title}
-          </a>
-          <span className="text-black">
-            {" "+percentage}
-          </span>
+  stars,
+}) => (
+  <div
+    key={title}
+    className="flex flex-col px-4 py-3 bg-white rounded-md shadow"
+  >
+    <div className="flex-grow">
+      <div>
+        <div className="text-blue-700 bg-blue-100 rounded-md px-2 text-lg font-bold inline-block mb-2">
+          {binaryQuestion ? percentage : ""}
         </div>
-        <div>
-            {formatForecastData(forecasts, stars, platform)}
-        </div>
-        {displayMarkdown(description)}
-  
       </div>
-    );
-  }else{
-    return (
-      <div key={title} className="pb-6 pt-3">
-        <div className="text-blue-800">
-          <a href={url} className="font-bold">
-              {title}
-            </a>
-          </div>
-        <div className="text-black">
-            {formatForecastData(forecasts, stars, platform)}
-        </div>
-        {displayMarkdown(description)}
-  
+      <div className="text-gray-900 text-lg mb-2 font-medium">
+        <a
+          href={url}
+          target="_blank"
+          className="hover:underline cursor-pointer"
+        >
+          {title}
+        </a>
       </div>
-    );
-  }
-};
+      <div className="text-gray-700 mb-2">{displayMarkdown(description)}</div>
+    </div>
+    <div className="flex-grow-0">
+      {formatForecastData(forecasts, stars, platform)}
+    </div>
+  </div>
+);
 
-export default function displayForecasts(results, numDisplay){
-  return results
-        .slice(0, numDisplay)
-        .map((fuseSearchResult) =>
-          displayForecast({ ...fuseSearchResult.item})
-      )
+export default function displayForecasts(results, numDisplay) {
+  return (
+    !!results.slice &&
+    results
+      .slice(0, numDisplay)
+      .map((fuseSearchResult) => displayForecast({ ...fuseSearchResult.item }))
+  );
 }
