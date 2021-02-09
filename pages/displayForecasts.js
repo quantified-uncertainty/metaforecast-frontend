@@ -29,61 +29,56 @@ let displayMarkdown = (description) => {
 };
 
 let numerateForecasts = (number) => {
-  if(!number && number !=0){
+  if (!number && number != 0) {
     return (<>
       <label className="text-gray-600">
-        {"\u00a0¿? fs."}
+        {"\u00a0¿? Forecasts"}
       </label>
     </>)
-  }else if(number ==1){
+  } else {
     return (<>
       <div>
         {number}
       </div>
       <label className="text-gray-600">
-        {"\u00a0f."}
-      </label>
-    </>)
-  }
-  else if(number==0 || number != 1){
-    return (<>
-      <div>
-        {number}
-      </div>
-      <label className="text-gray-600">
-        {"\u00a0fs."}
+        {number == 1?"\u00a0Forecast":"\u00a0Forecasts"}
       </label>
     </>)
   }
 }
 
 let forecastHeader = (stars, platform, forecasts, binaryQuestion, percentage) => {
-  return (
-    <div className={`grid md:grid-cols-4 w-full items-center`}>
-      <div className="flex md:col-span-1 md:col-start-1 md:col-end-1 md:justify-self-start sm:justify-self-center">
-        {stars}
-      </div>
-      <div className="flex md:col-span-1 px-1 md:col-start-2 md:col-end-2 md:justify-self-center sm:justify-self-center">
-        {platform}
-      </div>
-      <div className="flex md:col-span-1 px-1 md:col-start-3 md:col-end-3 md:justify-self-end sm:justify-self-center">
-        {numerateForecasts(forecasts)}
-      </div>
-      <div className="flex md:col-span-1 md:col-start-4 md:col-end-4 text-blue-700 bg-blue-100 rounded-md px-2 text-lg font-bold inline-block mb-2 md:justify-self-end sm:justify-self-center">
-        {binaryQuestion ? percentage : ""}
-      </div>
-    </div>)
-
-  let text;
-  if (!forecasts && forecasts != 0) {
-    text = `${stars} / ${platform} / Forecast number unknown`;
+  if (binaryQuestion) {
+    return (
+      <div className={`grid lg:grid-cols-4 w-full items-center`}>
+        <div className="flex lg:col-span-1 lg:col-start-1 lg:col-end-1 lg:justify-self-start sm:justify-self-center">
+          {stars}
+        </div>
+        <div className="flex lg:col-span-1 lg:mr-4 lg:col-start-2 lg:col-end-2 lg:justify-self-center sm:justify-self-center">
+          {platform}
+        </div>
+        <div className="flex lg:col-span-1 lg:ml-4 lg:col-start-3 lg:col-end-3 lg:justify-self-center sm:justify-self-center">
+          {numerateForecasts(forecasts)}
+        </div>
+        <div className="flex lg:col-span-1 lg:col-start-4 lg:col-end-4 text-blue-700 bg-blue-100 rounded-md px-2 text-lg font-bold inline-block mb-2 lg:justify-self-end sm:justify-self-center">
+          {binaryQuestion ? percentage : ""}
+        </div>
+      </div>)
   } else {
-    text = `${stars} / ${platform} / ${forecasts} ${forecasts == 1 ? "forecast" : "forecasts"}`
+    return (
+      <div className={`grid lg:grid-cols-3 w-full items-center`}>
+        <div className="flex lg:col-span-1 lg:col-start-1 lg:col-end-1  justify-self-center lg:justify-self-start">
+          {stars}
+        </div>
+        <div className="flex lg:col-span-1 px-1 lg:col-start-2 lg:col-end-2 justify-self-center lg:justify-self-center">
+          {platform}
+        </div>
+        <div className="flex lg:col-span-1 px-1 lg:col-start-3 lg:col-end-3 justify-self-center lg:justify-self-end">
+          {numerateForecasts(forecasts)}
+        </div>
+      </div>)
   }
 
-  text = binaryQuestion ? " " + text : text
-
-  return text;
 };
 
 /* Body */
@@ -100,7 +95,7 @@ let displayForecast = ({
 }) => (
   <div
     key={title}
-    className="flex flex-col px-4 py-3 bg-white rounded-md shadow"
+    className="flex flex-col-reverse lg:flex-col px-4 py-3 bg-white rounded-md shadow"
   >
     <div className="flex-1 flex-col">
       {forecastHeader(stars, platform, forecasts, binaryQuestion, percentage)}
