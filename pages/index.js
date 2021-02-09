@@ -8,7 +8,7 @@ import { useRouter } from "next/router"; // https://nextjs.org/docs/api-referenc
 import Fuse from "fuse.js";
 import { getForecasts } from "../lib/get-forecasts.js";
 import displayForecasts from "./displayForecasts.js";
-
+import searchGuesstimate from "../lib/searchGuesstimate.js";
 // Parts
 import Layout from "./layout.js";
 import Form from "../lib/form.js";
@@ -119,6 +119,7 @@ export default function Home({ items }) {
       { value: "CSET-foretell", label: "CSET-foretell" },
       { value: "Good Judgment", label: "Good Judgment" },
       { value: "Good Judgment Open", label: "Good Judgment Open" },
+      { value: 'Guesstimate', label: 'Guesstimate' },
       { value: "Hypermind", label: "Hypermind" },
       { value: "Metaculus", label: "Metaculus" },
       { value: "PolyMarket", label: "PolyMarket" },
@@ -148,38 +149,46 @@ export default function Home({ items }) {
       (x) => x.value
     );
 
-    let itemsFiltered = items.filter(
-      (item) =>
-        howmanystars(item.stars) >= starsThreshold &&
-        item.forecasts >= forecastsThreshold &&
-        forecastingPlatforms.includes(item.platform)
-    );
+    searchGuesstimate(query).then(itemsGuesstimate => {
+      // We enter the first level of asynchronous hell.
+      let itemsTotal = items.concat(itemsGuesstimate)
 
-    let fuse = new Fuse(itemsFiltered, opts);
-    if (query != undefined) {
-      results = fuse.search(query).map((result) => {
-        if (result.item.platform == "Elicit") {
-          result.score = result.score * 2 + 0.1; // Higher scores are worse
-        }
-        return result;
-      });
-      results.sort((a, b) => {
-        return Number(a.score) > Number(b.score) ? 1 : -1;
-      });
-      console.log("Executing search");
-      console.log("executeSearch/query", query);
-      console.log("executeSearch/starsThreshold", starsThreshold);
-      console.log("executeSearch/forecastsThreshold", forecastsThreshold);
-      console.log("executeSearch/forecastingPlatforms", forecastingPlatforms);
+      let itemsFiltered = itemsTotal.filter(
+        (item) =>
+          howmanystars(item.stars) >= starsThreshold &&
+          item.forecasts >= forecastsThreshold &&
+          forecastingPlatforms.includes(item.platform)
+      );
 
-      console.log(settings);
-    }
-    console.log(results);
-    return results;
+      let fuse = new Fuse(itemsFiltered, opts);
+      if (query != undefined) {
+        results = fuse.search(query).map((result) => {
+          if (result.item.platform == "Elicit") {
+            result.score = result.score * 2 + 0.1; // Higher scores are worse
+          } else if(result.item.platform == "Guesstimate"){
+            result.score = (result.score + 0.1) // Higher scores are worse
+          }
+          return result;
+        });
+        results.sort((a, b) => {
+          return Number(a.score) > Number(b.score) ? 1 : -1;
+        });
+        console.log("Executing search");
+        console.log("executeSearch/query", query);
+        console.log("executeSearch/starsThreshold", starsThreshold);
+        console.log("executeSearch/forecastsThreshold", forecastsThreshold);
+        console.log("executeSearch/forecastingPlatforms", forecastingPlatforms);
+
+        console.log(settings);
+      }
+      console.log(results);
+      setResults(results)
+    })
   };
   // I don't want display forecasts to change with a change in queryParameters, but I want it to have access to the queryParameters, in particular the numDisplay. Hence why this function lives inside Home.
   let displayForecastsWrapper = (results) => {
-    return displayForecasts(results, queryParameters.numDisplay);
+    let numDisplayRounded = queryParameters.numDisplay !=0? queryParameters.numDisplay+(3-queryParameters.numDisplay%3):0
+    return displayForecasts(results, numDisplayRounded);
   };
 
   /* State controllers */
@@ -195,8 +204,7 @@ export default function Home({ items }) {
       );
       let urlSlug = transformObjectIntoUrlSlug(newQueryParameters);
       router.push(urlSlug);
-      let results = executeSearch(newQueryParameters);
-      setResults(results);
+      executeSearch(newQueryParameters);
       setSettings({ ...settings, timeoutId: null });
     }, settings.awaitEndTyping);
     setSettings({ ...settings, timeoutId: newtimeoutId });
@@ -229,8 +237,7 @@ export default function Home({ items }) {
           newQuery.forecastingPlatforms = forecastingPlatformsAsObject;
         }
         setQueryParameters(newQuery);
-        let results = executeSearch(newQuery);
-        setResults(results);
+        executeSearch(newQuery);
       }
     } else {
       // Do nothing
@@ -316,9 +323,8 @@ export default function Home({ items }) {
         </button>
 
         <div
-          className={`flex-1 flex-col mx-auto justify-center items-center w-full ${
-            advancedOptions ? "" : "hidden"
-          }`}
+          className={`flex-1 flex-col mx-auto justify-center items-center w-full ${advancedOptions ? "" : "hidden"
+            }`}
         >
           <div className="grid grid-cols-3 grid-rows-2 items-center content-center">
             <div className="flex row-span-1 col-start-1 col-end-1 row-start-1 row-end-1 items-center justify-center mb-4">

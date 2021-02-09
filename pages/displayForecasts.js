@@ -33,7 +33,7 @@ let formatForecastData = (forecasts, stars, platform) => {
   if (!forecasts && forecasts != 0) {
     text = `${stars} / ${platform} / Forecast number unknown`;
   } else {
-    text = `${stars} / ${platform} / ${forecasts} forecasts`;
+    text = `${stars} / ${platform} / ${forecasts} ${forecasts==1?"forecast" : "forecasts"}`
   }
   return text;
 };
@@ -56,9 +56,6 @@ let displayForecast = ({
   >
     <div className="flex-grow">
       <div>
-        <div className="text-blue-700 bg-blue-100 rounded-md px-2 text-lg font-bold inline-block mb-2">
-          {binaryQuestion ? percentage : ""}
-        </div>
       </div>
       <div className="text-gray-900 text-lg mb-2 font-medium">
         <a
@@ -68,6 +65,11 @@ let displayForecast = ({
         >
           {title}
         </a>
+        {" "}
+        <div className="text-blue-700 bg-blue-100 rounded-md px-2 text-lg font-bold inline-block mb-2">
+          {binaryQuestion ? percentage : ""}
+        </div>
+
       </div>
       <div className="text-gray-700 mb-2">{displayMarkdown(description)}</div>
     </div>
