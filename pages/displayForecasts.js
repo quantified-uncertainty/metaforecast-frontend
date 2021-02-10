@@ -47,19 +47,18 @@ let numerateForecasts = (number) => {
   }
 }
 
-let forecastHeader = (stars, platform, forecasts, binaryQuestion, percentage) => {
-    return (
-      <div className={`grid lg:grid-cols-3 w-full items-center`}>
-        <div className="flex lg:col-span-1 lg:col-start-1 lg:col-end-1 lg:justify-self-start sm:justify-self-center">
-          {stars}
-        </div>
-        <div className={`flex lg:col-span-1 lg:mr-8 lg:col-start-2 lg:col-end-2 lg:justify-self-center sm:justify-self-center${platform.length>10?" text-sm":""}`}>
-          {platform.replaceAll(" ", "\u00a0")}
-        </div>
-        <div className="flex lg:col-span-1 lg:col-start-3 lg:col-end-3 lg:justify-self-center sm:justify-self-end">
-          {numerateForecasts(forecasts)}
-        </div>
-      </div>)
+let forecastHeader = (stars, platform, forecasts) => {
+    return (<div className="flex-1 grid lg:grid-cols-3 w-full flex-col align-bottom items-end self-end mt-2">
+    <div className="flex lg:col-span-1 lg:col-start-1 lg:col-end-1 justify-self-center lg:justify-self-start">
+      {stars}
+    </div>
+    <div className={`flex lg:col-span-1 lg:mr-8 lg:col-start-2 lg:col-end-2 justify-self-center lg:justify-self-center${platform.length>10?" text-sm":""}`}>
+      {platform.replaceAll(" ", "\u00a0")}
+    </div>
+    <div className="flex lg:col-span-1 lg:col-start-3 lg:col-end-3 justify-self-center lg:justify-self-end">
+      {numerateForecasts(forecasts)}
+    </div>
+</div>)
 
 };
 
@@ -74,10 +73,11 @@ let displayForecast = ({
   percentage,
   forecasts,
   stars,
+  visualization
 }) => (
   <div
     key={title}
-    className="flex flex-col px-4 py-3 bg-white rounded-md shadow"
+    className="flex flex-col px-4 py-3 bg-white rounded-md shadow place-content-stretch"
   >
     <div className="flex-grow">
       <div className="text-gray-900 text-lg mb-2 font-medium">
@@ -88,16 +88,17 @@ let displayForecast = ({
         >
           {title}
           {"   "}
-          <div className="text-blue-700 bg-blue-100 rounded-md px-2 text-lg font-bold inline-block mb-2">
+          <div className="text-blue-700 bg-blue-100 rounded-md px-2 text-lg font-bold inline-block mb-0.5">
           {binaryQuestion ? percentage : ""}
         </div>
         </a>
       </div>
-      <div className="text-gray-700 mb-2">{displayMarkdown(description)}</div>
+      <div className={`text-gray-700 mb-2${platform=="Guesstimate"?" hidden":""}`}>{displayMarkdown(description)}</div>
+      <div className={platform=="Guesstimate"?"":"hidden"}>
+        <img src={visualization} alt="Guesstimate Screenshot"/>
+      </div>
     </div>
-    <div className="flex-1 flex-col">
-      {forecastHeader(stars, platform, forecasts, binaryQuestion, percentage)}
-    </div>
+    {forecastHeader(stars, platform, forecasts)}
   </div>
 );
 
