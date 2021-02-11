@@ -117,6 +117,7 @@ export default function Home({ items }) {
     forecastingPlatforms: [
       // Excluding Elicit and Omen
       { value: "CSET-foretell", label: "CSET-foretell" },
+      // { value: 'GiveWell', label: 'GiveWell' },
       { value: "Good Judgment", label: "Good Judgment" },
       { value: "Good Judgment Open", label: "Good Judgment Open" },
       { value: 'Guesstimate', label: 'Guesstimate' },
@@ -269,7 +270,7 @@ export default function Home({ items }) {
 
   /* Change the forecast threshold */
   let displayFunctionNumForecasts = (value) => {
-    return "# forecasts (fs.) > " + Math.round(value);
+    return "# Forecasts > " + Math.round(value);
   };
   let onChangeSliderForNumForecasts = (event) => {
     console.log("onChangeSliderForNumForecasts", event[0]);
@@ -305,7 +306,7 @@ export default function Home({ items }) {
     <Layout key="index">
       <div className="mb-5">
         <h1 className="text-4xl text-gray-900 tracking-tight mb-2 text-center">
-          Metaforecasts
+          Metaforecast
         </h1>
       </div>
       <div className="invisible">{processState(queryParameters)}</div>

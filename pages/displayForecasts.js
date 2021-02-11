@@ -17,8 +17,9 @@ let cleanText = (text) => { // Note: should no longer be necessary
 let truncateText = (length, text) =>
   text.length > length ? text.slice(0, length) + "..." : text;
 
-let displayMarkdown = (description) => {
+let displayMarkdown = (description,platform) => {
   let formatted = truncateText(200, cleanText(description));
+  // description = platform == "GiveWell"?"Internal forecasts by the GiveWell team":description
   return formatted === "" ? (
     ""
   ) : (
@@ -56,7 +57,7 @@ let forecastHeader = (stars, platform, forecasts) => {
       {platform.replaceAll(" ", "\u00a0")}
     </div>
     <div className="flex lg:col-span-1 lg:col-start-3 lg:col-end-3 justify-self-center lg:justify-self-end">
-      {numerateForecasts(forecasts)}
+      {platform=="GiveWell"?"":numerateForecasts(forecasts)}
     </div>
 </div>)
 
@@ -93,7 +94,7 @@ let displayForecast = ({
         </div>
         </a>
       </div>
-      <div className={`text-gray-700 mb-2${platform=="Guesstimate"?" hidden":""}`}>{displayMarkdown(description)}</div>
+      <div className={`text-gray-700 mb-2${platform=="Guesstimate"?" hidden":""}`}>{displayMarkdown(description, platform)}</div>
       <div className={platform=="Guesstimate"?"":"hidden"}>
         <img src={visualization} alt="Guesstimate Screenshot"/>
       </div>
