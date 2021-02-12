@@ -166,7 +166,7 @@ export default function Home({ items }) {
         results = fuse.search(query).map((result) => {
           if (result.item.platform == "Elicit") {
             result.score = result.score * 2 + 0.1; // Higher scores are worse
-          } else if(result.item.platform == "Guesstimate"){
+          } else if (result.item.platform == "Guesstimate") {
             result.score = (result.score + 0.1) // Higher scores are worse
           }
           return result;
@@ -188,7 +188,7 @@ export default function Home({ items }) {
   };
   // I don't want display forecasts to change with a change in queryParameters, but I want it to have access to the queryParameters, in particular the numDisplay. Hence why this function lives inside Home.
   let displayForecastsWrapper = (results) => {
-    let numDisplayRounded = queryParameters.numDisplay !=0? queryParameters.numDisplay+(3-queryParameters.numDisplay%3):0
+    let numDisplayRounded = queryParameters.numDisplay != 0 ? queryParameters.numDisplay + (3 - queryParameters.numDisplay % 3) : 0
     return displayForecasts(results, numDisplayRounded);
   };
 
@@ -303,7 +303,7 @@ export default function Home({ items }) {
 
   /* Final return */
   return (
-    <Layout key="index">
+    <Layout key="index" page="search">
       <div className="mb-5">
         <h1 className="text-4xl text-gray-900 tracking-tight mb-2 text-center">
           Metaforecast
