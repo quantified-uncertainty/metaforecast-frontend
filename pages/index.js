@@ -125,6 +125,7 @@ export default function Home({ items }) {
       { value: "Metaculus", label: "Metaculus" },
       { value: "PolyMarket", label: "PolyMarket" },
       { value: "PredictIt", label: "PredictIt" },
+      { value: 'Smarkets', label: 'Smarkets' },
     ],
   };
   const [queryParameters, setQueryParameters] = useState(

@@ -5,7 +5,7 @@ export default function Layout(props) {
   return (
     <div>
       <Head>
-        <title>Metaforecasts</title>
+        <title>Metaforecast</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
