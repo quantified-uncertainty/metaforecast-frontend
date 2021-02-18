@@ -97,7 +97,7 @@ export function getstars(numstars) {
   return stars;
 }
 
-let forecastFooter = (stars, platform, forecasts) => {
+let forecastFooter = (stars, platform, numforecasts) => {
   return (<div className="flex-1 grid lg:grid-cols-3 w-full flex-col align-bottom items-end self-end text-center mt-2">
     <div className="flex lg:col-span-1 lg:col-start-1 lg:col-end-1 justify-self-center lg:justify-self-start">
       {getstars(stars)}
@@ -106,7 +106,7 @@ let forecastFooter = (stars, platform, forecasts) => {
       {platform.replaceAll(" ", "\u00a0")}
     </div>
     <div className="flex-1lg:col-span-1 lg:col-start-3 lg:col-end-3 justify-self-center lg:justify-self-end">
-      {numerateForecasts(forecasts)}
+      {numerateForecasts(numforecasts)}
     </div>
   </div>)
 
@@ -120,7 +120,7 @@ let displayForecast = ({
   platform,
   description,
   options,
-  forecasts,
+  numforecasts,
   stars,
   visualization
 }) => (
@@ -150,7 +150,7 @@ let displayForecast = ({
       <img src={visualization} alt="Guesstimate Screenshot" />
     </div>
     {options.length != 2 ? forecastOptions(options) : ""}
-    {forecastFooter(stars, platform, forecasts)}
+    {forecastFooter(stars, platform, numforecasts)}
   </div>
 );
 
