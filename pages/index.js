@@ -132,7 +132,7 @@ export default function Home({ items }) {
       let itemsFiltered = itemsTotal.filter(
         (item) =>
           item.stars >= starsThreshold &&
-          item.numforecasts >= forecastsThreshold && 
+          (item.numforecasts >= forecastsThreshold || forecastsThreshold == 0) && 
           forecastingPlatforms.includes(item.platform)
       );
 
@@ -151,7 +151,7 @@ export default function Home({ items }) {
         });
         console.log("Executing search");
         console.log("executeSearch/query", query);
-        //console.log("executeSearch/items  ", items);
+        console.log("executeSearch/items  ", items);
         console.log("executeSearch/starsThreshold", starsThreshold);
         console.log("executeSearch/forecastsThreshold", forecastsThreshold);
         console.log("executeSearch/forecastingPlatforms", forecastingPlatforms);

@@ -18,7 +18,7 @@ let truncateText = (length, text) =>
   text.length > length ? text.slice(0, length) + "..." : text;
 
 let displayMarkdown = (description, platform) => {
-  let formatted = truncateText(200, cleanText(description));
+  let formatted = truncateText(500, cleanText(description));
   // description = platform == "GiveWell"?"Internal forecasts by the GiveWell team":description
   return formatted === "" ? (
     ""
@@ -52,17 +52,16 @@ let formatProbability = probability => (probability * 100).toFixed(0) + "%"
 
 let generateRow = (option, numOptions) => {
   return (
-    <tr className="self-center place-content-center justify-center w-full">
-      <td className="text-right w-6/12">{option.name}</td>
-      <td className="text-center">{"  "}</td>
-      <td className="text-blue-700 bg-blue-100 rounded-md w-6/12 inline p-2">{formatProbability(option.probability)}</td>
+    <tr className="">
+      <td className="pb-4">{option.name}</td>
+      <td className="text-blue-700 bg-blue-100 rounded-md text-left inline p-2">{formatProbability(option.probability)}</td>
     </tr>
   )
 }
 let forecastOptions = (options) => {
   return (
-    <div className="flex-1 w-full self-end mb-2">
-      <table className="flex-1 justify-self-center self-center place-content-center w-full ">
+    <div className="flex-1 w-full self-end mb-2 mt-2">
+      <table className="flex-1 justify-self-center self-center w-full ">
         <tbody className="flex-1 justify-self-center">{options.map(option => generateRow(option, options.length))}
         </tbody>
       </table>
