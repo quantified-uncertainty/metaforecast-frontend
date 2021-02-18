@@ -142,7 +142,7 @@ let displayForecast = ({
       </a>
     </div>
 
-    <div className={`text-gray-700 ${platform == "Guesstimate" || options.length != 2? " hidden" : ""}`}>
+    <div className={`text-gray-700 ${platform == "Guesstimate" || options.length > 2? " hidden" : ""}`}>
       {displayMarkdown(description, platform)}
     </div>
 
