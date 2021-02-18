@@ -31,7 +31,9 @@ const opts = {
 
 export async function getStaticProps() {
   //getServerSideProps
-  const { metaforecasts } = await getForecasts();
+  // const { metaforecasts } = await getForecasts();
+  let metaforecasts = await getForecasts();
+  //console.log("metaforecasts", metaforecasts)
   return {
     props: {
       items: metaforecasts,
@@ -56,33 +58,6 @@ let howmanystars = (string) => {
   let matches = string.match(/★/g);
   return matches ? matches.length : 0;
 };
-
-export function getstars(numstars) {
-  let stars = "★★☆☆☆";
-  switch (numstars) {
-    case 0:
-      stars = "☆☆☆☆☆";
-      break;
-    case 1:
-      stars = "★☆☆☆☆";
-      break;
-    case 2:
-      stars = "★★☆☆☆";
-      break;
-    case 3:
-      stars = "★★★☆☆";
-      break;
-    case 4:
-      stars = "★★★★☆";
-      break;
-    case 5:
-      stars = "★★★★★";
-      break;
-    default:
-      stars = "★★☆☆☆";
-  }
-  return stars;
-}
 
 // URL slugs
 let transformObjectIntoUrlSlug = (obj) => {
@@ -139,7 +114,6 @@ export default function Home({ items }) {
   const [settings, setSettings] = useState(initialSettings);
   let initialResults = [];
   const [results, setResults] = useState(initialResults);
-
   /* Functions which I want to have access to the Home namespace */
   // I don't want to create an "items" object for each search.
   let executeSearch = (queryData) => {
@@ -157,8 +131,8 @@ export default function Home({ items }) {
 
       let itemsFiltered = itemsTotal.filter(
         (item) =>
-          howmanystars(item.stars) >= starsThreshold &&
-          item.forecasts >= forecastsThreshold &&
+          item.stars >= starsThreshold &&
+          item.numforecasts >= forecastsThreshold && 
           forecastingPlatforms.includes(item.platform)
       );
 
@@ -177,6 +151,7 @@ export default function Home({ items }) {
         });
         console.log("Executing search");
         console.log("executeSearch/query", query);
+        //console.log("executeSearch/items  ", items);
         console.log("executeSearch/starsThreshold", starsThreshold);
         console.log("executeSearch/forecastsThreshold", forecastsThreshold);
         console.log("executeSearch/forecastingPlatforms", forecastingPlatforms);
