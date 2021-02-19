@@ -136,7 +136,7 @@ export default function Home({ items }) {
           forecastingPlatforms.includes(item.platform) &&
           true
       );
-      console.log(itemsFiltered.filter(item =))
+
       let fuse = new Fuse(itemsFiltered, opts);
       if (query != undefined) {
         results = fuse.search(query).map((result) => {

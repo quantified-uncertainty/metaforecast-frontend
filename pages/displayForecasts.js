@@ -92,7 +92,7 @@ export function getstars(numstars) {
 }
 
 let metaculusEmbed = (item) => {
-  console.log(item.url)
+  //console.log(item.url)
   let embedurl = item.url
     .replace("questions", "questions/embed")
     .split("/")
