@@ -86,7 +86,7 @@ export default function Home({ items }) {
   let initialQueryParameters = {
     query: "",
     processedUrlYet: false,
-    starsThreshold: 3,
+    starsThreshold: 2,
     numDisplay: 20,
     forecastsThreshold: 0,
     forecastingPlatforms: [
