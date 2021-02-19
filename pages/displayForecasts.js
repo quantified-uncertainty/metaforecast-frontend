@@ -11,21 +11,27 @@ let cleanText = (text) => { // Note: should no longer be necessary
     .replaceAll("] (", "](")
     .replaceAll(") )", "))")
     .replaceAll("( [", "([")
-    .replaceAll(") ,", "),");
+    .replaceAll(") ,", "),")
+    .replaceAll("==", "")
+    .replaceAll("Background\n", "")
+    .replaceAll("Context\n", "")
+    .replaceAll("---", "- ")
+
 };
 
 let truncateText = (length, text) =>
   text.length > length ? text.slice(0, length) + "..." : text;
 
 let displayMarkdown = (description, platform) => {
-  let formatted = truncateText(200, cleanText(description));
+  let formatted = truncateText(250, cleanText(description));
   // description = platform == "GiveWell"?"Internal forecasts by the GiveWell team":description
   // overflow-hidden overflow-ellipsis h-24
+  console.log(formatted)
   return formatted === "" ? (
     ""
   ) : (
-      <div className="text-sm ">
-        <ReactMarkdown>{formatted}</ReactMarkdown>
+      <div className="text-sm overflow-clip">
+        <ReactMarkdown linkTarget="_blank" className="font-normal">{formatted}</ReactMarkdown>
       </div>
     );
 };
@@ -36,13 +42,13 @@ let generateRow = (option, numOptions) => {
   return (
     <tr className="">
       <td className="pb-4">
-      <div className="text-blue-700 bg-blue-100 rounded-md justify-self-center inline p-2 mr-1">
+        <div className="text-blue-700 bg-blue-100 rounded-md justify-self-center inline p-2 mr-1">
           {formatProbability(option.probability)}
         </div>
-        {" "} 
+        {" "}
         {option.name}
-              
-        
+
+
       </td>
     </tr>
   )
@@ -88,7 +94,7 @@ export function getstars(numstars) {
 let metaculusEmbed = (item) => {
   console.log(item.url)
   let embedurl = item.url
-    .replace("questions","questions/embed")
+    .replace("questions", "questions/embed")
     .split("/")
   embedurl.pop()
   embedurl.pop()
@@ -99,8 +105,8 @@ let metaculusEmbed = (item) => {
     className="flex flex-col px-4 py-3 bg-white rounded-md shadow place-content-stretch flex-grow place-self-center"
   >
     <div className="justify-self-center place-self-center">
-    <iframe className={`h-${item.title.length > 80?72:60} justify-self-center self-center`} 
-    src={embedurl} />
+      <iframe className={`h-${item.title.length > 80 ? 72 : 60} justify-self-center self-center`}
+        src={embedurl} />
     </div>
 
     {forecastFooter(item.stars, item.platform, item.numforecasts)}
@@ -154,22 +160,22 @@ let displayForecast = ({
   visualization
 }) => (
   <a
-  key={title}
-  href={url}
-  target="_blank"
-  className="hover:no-underline cursor-pointbler flex flex-col px-4 py-3 bg-white rounded-md shadow place-content-stretch flex-grow"
->
+    key={title}
+    href={url}
+    target="_blank"
+    className="hover:no-underline cursor-pointbler flex flex-col px-4 py-3 bg-white rounded-md shadow place-content-stretch flex-grow text-black no-underline"
+  >
 
     <div className="text-gray-900 text-lg mb-2 font-medium justify-self-start">
 
-        {title.replace("</a>","")}
-        {"   "}
-        <div className="text-blue-700 bg-blue-100 rounded-md px-2 text-lg font-bold inline-block mb-0.5">
-          {options.length == 2 ? formatProbability(options[0].probability) : ""}
-        </div>
+      {title.replace("</a>", "")}
+      {"   "}
+      <div className="text-blue-700 bg-blue-100 rounded-md px-2 text-lg font-bold inline-block mb-0.5">
+        {options.length == 2 ? formatProbability(options[0].probability) : ""}
+      </div>
     </div>
 
-    <div className={`text-gray-700 ${platform == "Guesstimate" || options.length > 2? " hidden" : ""}`}>
+    <div className={`text-gray-700 ${platform == "Guesstimate" || options.length > 2 ? " hidden" : ""}`}>
       {displayMarkdown(description, platform)}
     </div>
 
@@ -188,9 +194,9 @@ export default function displayForecasts(results, numDisplay) {
     results
       .slice(0, numDisplay)
       .map((fuseSearchResult) => {
-    
-        let display = fuseSearchResult.item.platform == "Metaculus" ? 
-          metaculusEmbed(fuseSearchResult.item):     
+
+        let display = fuseSearchResult.item.platform == "Metaculus" ?
+          metaculusEmbed(fuseSearchResult.item) :
           displayForecast({ ...fuseSearchResult.item })
         let displayOld = displayForecast({ ...fuseSearchResult.item })
         return displayOld
