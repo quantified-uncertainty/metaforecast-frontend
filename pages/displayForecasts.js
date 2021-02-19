@@ -18,43 +18,32 @@ let truncateText = (length, text) =>
   text.length > length ? text.slice(0, length) + "..." : text;
 
 let displayMarkdown = (description, platform) => {
-  let formatted = truncateText(500, cleanText(description));
+  let formatted = truncateText(200, cleanText(description));
   // description = platform == "GiveWell"?"Internal forecasts by the GiveWell team":description
+  // overflow-hidden overflow-ellipsis h-24
   return formatted === "" ? (
     ""
   ) : (
-      <div className="text-sm">
+      <div className="text-sm ">
         <ReactMarkdown>{formatted}</ReactMarkdown>
       </div>
     );
 };
-
-let numerateForecasts = (number) => {
-  if (!number && number != 0) {
-    return (<>
-      <label className="text-gray-600">
-        {"\u00a0¿? Forecasts"}
-      </label>
-    </>)
-  } else { // Non breaking space: \u00a0
-    return (<>
-      <div>
-        {number}
-      </div>
-      <label className="text-gray-600">
-        {number == 1 ? "\u00a0Forecast" : "\u00a0Forecasts"}
-      </label>
-    </>)
-  }
-}
 
 let formatProbability = probability => (probability * 100).toFixed(0) + "%"
 
 let generateRow = (option, numOptions) => {
   return (
     <tr className="">
-      <td className="pb-4">{option.name}</td>
-      <td className="text-blue-700 bg-blue-100 rounded-md text-left inline p-2">{formatProbability(option.probability)}</td>
+      <td className="pb-4">
+      <div className="text-blue-700 bg-blue-100 rounded-md justify-self-center inline p-2 mr-1">
+          {formatProbability(option.probability)}
+        </div>
+        {" "} 
+        {option.name}
+              
+        
+      </td>
     </tr>
   )
 }
@@ -96,6 +85,47 @@ export function getstars(numstars) {
   return stars;
 }
 
+let metaculusEmbed = (item) => {
+  console.log(item.url)
+  let embedurl = item.url
+    .replace("questions","questions/embed")
+    .split("/")
+  embedurl.pop()
+  embedurl.pop()
+  embedurl = embedurl.join("/")
+
+  return <div
+    key={item.title}
+    className="flex flex-col px-4 py-3 bg-white rounded-md shadow place-content-stretch flex-grow place-self-center"
+  >
+    <div className="justify-self-center place-self-center">
+    <iframe className={`h-${item.title.length > 80?72:60} justify-self-center self-center`} 
+    src={embedurl} />
+    </div>
+
+    {forecastFooter(item.stars, item.platform, item.numforecasts)}
+  </div>;
+}
+
+let numerateForecasts = (number) => {
+  if (!number && number != 0) {
+    return (<>
+      <label className="text-gray-600">
+        {"\u00a0¿? Forecasts"}
+      </label>
+    </>)
+  } else { // Non breaking space: \u00a0
+    return (<>
+      <div className="inline-block">
+        {number}
+      </div>
+      <label className="text-gray-600">
+        {number == 1 ? "\u00a0Forecast" : "\u00a0Forecasts"}
+      </label>
+    </>)
+  }
+}
+
 let forecastFooter = (stars, platform, numforecasts) => {
   return (<div className="flex-1 grid lg:grid-cols-3 w-full flex-col align-bottom items-end self-end text-center mt-2">
     <div className="flex lg:col-span-1 lg:col-start-1 lg:col-end-1 justify-self-center lg:justify-self-start">
@@ -123,22 +153,20 @@ let displayForecast = ({
   stars,
   visualization
 }) => (
-  <div
-    key={title}
-    className="flex flex-col px-4 py-3 bg-white rounded-md shadow place-content-stretch flex-grow"
-  >
+  <a
+  key={title}
+  href={url}
+  target="_blank"
+  className="hover:no-underline cursor-pointbler flex flex-col px-4 py-3 bg-white rounded-md shadow place-content-stretch flex-grow"
+>
+
     <div className="text-gray-900 text-lg mb-2 font-medium justify-self-start">
-      <a
-        href={url}
-        target="_blank"
-        className="hover:underline cursor-pointbler"
-      >
-        {title}
+
+        {title.replace("</a>","")}
         {"   "}
         <div className="text-blue-700 bg-blue-100 rounded-md px-2 text-lg font-bold inline-block mb-0.5">
           {options.length == 2 ? formatProbability(options[0].probability) : ""}
         </div>
-      </a>
     </div>
 
     <div className={`text-gray-700 ${platform == "Guesstimate" || options.length > 2? " hidden" : ""}`}>
@@ -150,7 +178,8 @@ let displayForecast = ({
     </div>
     {options.length != 2 ? forecastOptions(options) : ""}
     {forecastFooter(stars, platform, numforecasts)}
-  </div>
+  </a>
+
 );
 
 export default function displayForecasts(results, numDisplay) {
@@ -158,6 +187,13 @@ export default function displayForecasts(results, numDisplay) {
     !!results.slice &&
     results
       .slice(0, numDisplay)
-      .map((fuseSearchResult) => displayForecast({ ...fuseSearchResult.item }))
-  );
+      .map((fuseSearchResult) => {
+    
+        let display = fuseSearchResult.item.platform == "Metaculus" ? 
+          metaculusEmbed(fuseSearchResult.item):     
+          displayForecast({ ...fuseSearchResult.item })
+        let displayOld = displayForecast({ ...fuseSearchResult.item })
+        return displayOld
+      })
+  )
 }
