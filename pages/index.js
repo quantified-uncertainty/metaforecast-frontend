@@ -133,9 +133,10 @@ export default function Home({ items }) {
         (item) =>
           item.stars >= starsThreshold &&
           (item.numforecasts >= forecastsThreshold || forecastsThreshold == 0) &&
-          forecastingPlatforms.includes(item.platform)
+          forecastingPlatforms.includes(item.platform) &&
+          true
       );
-
+      console.log(itemsFiltered.filter(item =))
       let fuse = new Fuse(itemsFiltered, opts);
       if (query != undefined) {
         results = fuse.search(query).map((result) => {

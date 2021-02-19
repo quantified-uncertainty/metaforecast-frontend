@@ -26,7 +26,7 @@ let displayMarkdown = (description, platform) => {
   let formatted = truncateText(250, cleanText(description));
   // description = platform == "GiveWell"?"Internal forecasts by the GiveWell team":description
   // overflow-hidden overflow-ellipsis h-24
-  console.log(formatted)
+  // console.log(formatted)
   return formatted === "" ? (
     ""
   ) : (
