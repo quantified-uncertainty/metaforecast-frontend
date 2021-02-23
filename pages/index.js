@@ -148,8 +148,24 @@ export default function Home({ items }) {
           return result;
         });
         results.sort((a, b) => {
-          return Number(a.score) > Number(b.score) ? 1 : -1;
+          return Number(a.score) > Number(b.score) ? 1 : -1; // Higher scores are worse
         });
+        // Sort exact matches by forecast quality, rather than by string match.
+        let querylowercase = query.toLowerCase()
+        let resultsExactMatch = results.filter(r => r.item.title.toLowerCase().includes(querylowercase))
+        resultsExactMatch.sort((a, b) => {
+          if(a.item.stars != b.item.stars){
+            return Number(a.item.stars) < Number(b.item.stars) ? 1 : -1
+          }else if(a.item.numforecasts != b.item.numforecasts){
+            return (Number(a.item.numforecasts) || 20) < (Number(b.item.numforecasts) || 20) ? 1 : -1
+            // undefined => equivalent to 20 forecasts (not that many) for the purposes of sorting
+          }else{
+            return Number(a.score) > Number(b.score) ? 1 : -1
+          }
+          
+        })
+        let resultsNotExactMatch = results.filter(r => !r.item.title.toLowerCase().includes(querylowercase))
+        results = resultsExactMatch.concat(resultsNotExactMatch)
         console.log("Executing search");
         console.log("executeSearch/query", query);
         console.log("executeSearch/items  ", itemsTotal);

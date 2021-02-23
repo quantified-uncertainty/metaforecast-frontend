@@ -15,8 +15,9 @@ let cleanText = (text) => { // Note: should no longer be necessary
     .replaceAll("==", "") // Denotes a title in markdown
     .replaceAll("Background\n", "")
     .replaceAll("Context\n", "")
-    .replaceAll("---", "- ")
+    .replaceAll("--- \n", "- ")
   textString = textString.slice(0,1) == "=" ? textString.slice(1) : textString
+  //console.log(textString)
   return textString
 
 };
