@@ -6,16 +6,18 @@ import ReactMarkdown from "react-markdown";
 /* Support functions */
 
 let cleanText = (text) => { // Note: should no longer be necessary
-  const textString = !!text ? text : "";
-  return textString
+  let textString = !!text ? text : "";
+  textString = textString
     .replaceAll("] (", "](")
     .replaceAll(") )", "))")
     .replaceAll("( [", "([")
     .replaceAll(") ,", "),")
-    .replaceAll("==", "")
+    .replaceAll("==", "") // Denotes a title in markdown
     .replaceAll("Background\n", "")
     .replaceAll("Context\n", "")
     .replaceAll("---", "- ")
+  textString = textString.slice(0,1) == "=" ? textString.slice(1) : textString
+  return textString
 
 };
 
