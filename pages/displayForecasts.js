@@ -40,17 +40,19 @@ let formatProbability = probability => (probability * 100).toFixed(0) + "%"
 
 let generateRow = (option, numOptions) => {
   return (
-    <tr className="">
-      <td className="pb-4">
-        <div className="text-blue-700 bg-blue-100 rounded-md justify-self-center inline p-2 mr-1">
-          {formatProbability(option.probability)}
-        </div>
-        {" "}
-        {option.name}
-
-
-      </td>
-    </tr>
+    <>
+      <tr className="">
+        <td className="">
+          <div className="text-blue-700 bg-blue-100 rounded-md inline p-2 mr-2 place-self-center">
+            {formatProbability(option.probability)}
+          </div>
+        </td>
+        <td className="text-black justify-self-center">
+          <div>{option.name}</div>
+        </td>
+      </tr>
+      <p className="text-white text-sm"></p>
+    </>
   )
 }
 let forecastOptions = (options) => {
@@ -115,11 +117,11 @@ let metaculusEmbed = (item) => {
 
 let numerateForecasts = (number) => {
   if (!number && number != 0) {
-    return (<>
-      <label className="text-gray-600">
-        {"\u00a0¿? Forecasts"}
-      </label>
-    </>)
+    return <></>/*(<>
+        <label className="text-gray-600">
+          {"\u00a0¿? Forecasts"}
+        </label>
+      </>)*/
   } else { // Non breaking space: \u00a0
     return (<>
       <div className="inline-block">
@@ -132,7 +134,7 @@ let numerateForecasts = (number) => {
   }
 }
 
-let forecastFooter = (stars, platform, numforecasts) => {
+let forecastFooterOld = (stars, platform, numforecasts) => {
   return (<div className="flex-1 grid lg:grid-cols-3 w-full flex-col align-bottom items-end self-end text-center mt-2">
     <div className="flex lg:col-span-1 lg:col-start-1 lg:col-end-1 justify-self-center lg:justify-self-start">
       {getstars(stars)}
@@ -140,8 +142,27 @@ let forecastFooter = (stars, platform, numforecasts) => {
     <div className={`flex-1 lg:col-span-1 lg:mr-8 lg:col-start-2 lg:col-end-2 justify-self-center lg:justify-self-center w-full ${platform.length > 10 ? " text-sm" : ""}`}>
       {platform.replaceAll(" ", "\u00a0")}
     </div>
-    <div className="flex-1lg:col-span-1 lg:col-start-3 lg:col-end-3 justify-self-center lg:justify-self-end">
+    <div className="flex-1 lg:col-span-1 lg:col-start-3 lg:col-end-3 justify-self-center lg:justify-self-end">
       {numerateForecasts(numforecasts)}
+    </div>
+  </div>)
+
+};
+
+let forecastFooter = (stars, platform, numforecasts) => {
+  // flex grid w-full align-bottom items-end self-end text-center mt-2 align-self-end bg-black self-end
+  // grid text-center flex-col align-bottom
+  return (<div className="flex-1 grid items-end text-center">
+    <div>
+      <div className="justify-self-center">
+        {getstars(stars)}
+      </div>
+      <div className="justify-self-center">
+        {platform.replaceAll(" ", "\u00a0")}
+      </div>
+      <div className="justify-self-center">
+        {numerateForecasts(numforecasts)}
+      </div>
     </div>
   </div>)
 
