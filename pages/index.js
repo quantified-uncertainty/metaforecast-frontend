@@ -152,7 +152,7 @@ export default function Home({ items }) {
         });
         console.log("Executing search");
         console.log("executeSearch/query", query);
-        console.log("executeSearch/items  ", items);
+        console.log("executeSearch/items  ", itemsTotal);
         console.log("executeSearch/starsThreshold", starsThreshold);
         console.log("executeSearch/forecastsThreshold", forecastsThreshold);
         console.log("executeSearch/forecastingPlatforms", forecastingPlatforms);
