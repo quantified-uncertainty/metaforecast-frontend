@@ -6,7 +6,7 @@ let readmeMarkdownText = `# About
 
 This is a search engine for probabilities. Given a query, it searches for relevant questions in various prediction markets and forecasting platforms (namely CSET-foretell, Elicit, Good Judgment, Good Judgment Open, Guesstimate, Hypermind, Metaculus, Omen, Polymarket, PredictIt and Smarkets). For example, try searching for "China", "North Korea", "Semiconductors", "COVID", or "Trump".
 
-You can read more about the back-end used to fetch probabilities [here](https://github.com/QURIresearch/metaforecasts/blob/multipleOptions/README.md).
+You can read more about the back-end used to fetch probabilities [here](https://github.com/QURIresearch/metaforecasts/blob/multipleOptions/README.md), or view the source for the front-end [here](https://github.com/QURIresearch/metaforecast-website-nextjs). 
 
 ## Advanced search
 If your initial search doesn't succeed, you might want to try tinkering with the advanced search. In particular, try increasing or decreasing the stars threshold, or changing the number of search results shown. 
