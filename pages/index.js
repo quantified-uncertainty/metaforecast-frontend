@@ -23,7 +23,7 @@ import ButtonsForStars from "../lib/buttonsForStars.js";
 // https://github.com/krisk/Fuse/
 const opts = {
   includeScore: true,
-  keys: ["title", "platform", "stars"],
+  keys: ["title", "platform", " "],
   ignoreLocation: true,
 };
 
@@ -87,7 +87,7 @@ export default function Home({ items }) {
     query: "",
     processedUrlYet: false,
     starsThreshold: 2,
-    numDisplay: 20,
+    numDisplay: 20, // 20
     forecastsThreshold: 0,
     forecastingPlatforms: [
       // Excluding Elicit and Omen
@@ -154,15 +154,15 @@ export default function Home({ items }) {
         let querylowercase = query.toLowerCase()
         let resultsExactMatch = results.filter(r => r.item.title.toLowerCase().includes(querylowercase))
         resultsExactMatch.sort((a, b) => {
-          if(a.item.stars != b.item.stars){
+          if (a.item.stars != b.item.stars) {
             return Number(a.item.stars) < Number(b.item.stars) ? 1 : -1
-          }else if(a.item.numforecasts != b.item.numforecasts){
+          } else if (a.item.numforecasts != b.item.numforecasts) {
             return (Number(a.item.numforecasts) || 20) < (Number(b.item.numforecasts) || 20) ? 1 : -1
             // undefined => equivalent to 20 forecasts (not that many) for the purposes of sorting
-          }else{
+          } else {
             return Number(a.score) > Number(b.score) ? 1 : -1
           }
-          
+
         })
         let resultsNotExactMatch = results.filter(r => !r.item.title.toLowerCase().includes(querylowercase))
         results = resultsExactMatch.concat(resultsNotExactMatch)
@@ -181,7 +181,9 @@ export default function Home({ items }) {
   };
   // I don't want display forecasts to change with a change in queryParameters, but I want it to have access to the queryParameters, in particular the numDisplay. Hence why this function lives inside Home.
   let displayForecastsWrapper = (results) => {
-    let numDisplayRounded = queryParameters.numDisplay != 0 ? queryParameters.numDisplay + (3 - queryParameters.numDisplay % 3) : 0
+    let numDisplayRounded = queryParameters.numDisplay % 3 != 0 ? queryParameters.numDisplay + (3 - Math.round(queryParameters.numDisplay) % 3) : queryParameters.numDisplay
+    console.log("numDisplay", queryParameters.numDisplay)
+    console.log("numDisplayRounded", numDisplayRounded)
     return displayForecasts(results, numDisplayRounded);
   };
 
@@ -189,8 +191,9 @@ export default function Home({ items }) {
   let onChangeSearchInputs = (newQueryParameters) => {
     setQueryParameters({ ...newQueryParameters, processedUrlYet: true });
     console.log("onChangeSearchInputs/newQueryParameters", newQueryParameters);
-    clearTimeout(settings.timeoutId);
+
     setResults([]);
+    clearTimeout(settings.timeoutId);
     let newtimeoutId = setTimeout(async () => {
       console.log(
         "onChangeSearchInputs/timeout/newQueryParameters",
