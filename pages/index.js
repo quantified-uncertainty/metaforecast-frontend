@@ -309,7 +309,7 @@ export default function Home({ items }) {
   return (
     <Layout key="index" page="search">
       <div className="m-5">
-        <h1 className="text-4xl text-gray-900 tracking-tight mb-2 text-center font-normal">
+        <h1 className="text-4xl text-gray-800 tracking-tight mb-2 text-center font-normal ">
           Metaforecast
         </h1>
         <div className="invisible">{processState(queryParameters)}</div>

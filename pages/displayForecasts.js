@@ -57,6 +57,18 @@ let generateRow = (option, numOptions) => {
   );
 };
 
+let forecastOptions = (options) => {
+  return (
+    <div className="flex-1 w-full self-end mb-2 mt-2">
+      <table className="flex-1 justify-self-center self-center w-full ">
+        <tbody className="flex-1 justify-self-center">
+          {options.map((option) => generateRow(option, options.length))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
 export function getstars(numstars) {
   let stars = "★★☆☆☆";
   switch (numstars) {
@@ -132,39 +144,17 @@ let numerateForecasts = (number) => {
   }
 };
 
-let forecastFooterOld = (stars, platform, numforecasts) => {
-  return (
-    <div className="flex-1 grid lg:grid-cols-3 w-full flex-col align-bottom items-end self-end text-center mt-2">
-      <div className="flex lg:col-span-1 lg:col-start-1 lg:col-end-1 justify-self-center lg:justify-self-start">
-        {getstars(stars)}
-      </div>
-      <div
-        className={`flex-1 lg:col-span-1 lg:mr-8 lg:col-start-2 lg:col-end-2 justify-self-center lg:justify-self-center w-full ${
-          platform.length > 10 ? " text-sm" : ""
-        }`}
-      >
-        {platform.replaceAll(" ", "\u00a0")}
-      </div>
-      <div className="flex-1 lg:col-span-1 lg:col-start-3 lg:col-end-3 justify-self-center lg:justify-self-end">
-        {numerateForecasts(numforecasts)}
-      </div>
-    </div>
-  );
-};
-
 let forecastFooter = (stars, platform, numforecasts) => {
   // flex grid w-full align-bottom items-end self-end text-center mt-2 align-self-end bg-black self-end
   // grid text-center flex-col align-bottom
   return (
-    <div className="flex-1 flex-row grid items-end text-center">
-      <div>
-        <div className="justify-self-center">{getstars(stars)}</div>
-        <div className="justify-self-center">
-          {platform.replaceAll(" ", "\u00a0")}
-        </div>
-        <div className="justify-self-center">
-          {numerateForecasts(numforecasts)}
-        </div>
+    <div className="flex-1 grid items-end text-center">
+      <div className="justify-self-center text-gray-700">{getstars(stars)}</div>
+      <div className="justify-self-center text-gray-700">
+        {platform.replaceAll(" ", "\u00a0")}
+      </div>
+      <div className="justify-self-center text-gray-700">
+        {numerateForecasts(numforecasts)}
       </div>
     </div>
   );
