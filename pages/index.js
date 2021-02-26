@@ -25,7 +25,7 @@ const opts = {
   includeScore: true,
   keys: ["title", "platform", " "],
   ignoreLocation: true,
-  threshold: 0.4
+  //threshold: 0.4
 };
 
 // Helper functions
@@ -171,7 +171,7 @@ export default function Home({ items }) {
           .filter(r => !r.item.title
             .toLowerCase()
             .includes(querylowercase)
-            && r.score < 0.4
+            //&& r.score < 0.4
           )
         results = resultsExactMatch.concat(resultsNotExactMatch)
         console.log("Executing search");
