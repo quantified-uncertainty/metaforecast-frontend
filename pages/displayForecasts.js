@@ -5,7 +5,8 @@ import ReactMarkdown from "react-markdown";
 
 /* Support functions */
 
-let cleanText = (text) => { // Note: should no longer be necessary
+let cleanText = (text) => {
+  // Note: should no longer be necessary
   let textString = !!text ? text : "";
   textString = textString
     .replaceAll("] (", "](")
@@ -15,11 +16,10 @@ let cleanText = (text) => { // Note: should no longer be necessary
     .replaceAll("==", "") // Denotes a title in markdown
     .replaceAll("Background\n", "")
     .replaceAll("Context\n", "")
-    .replaceAll("--- \n", "- ")
-  textString = textString.slice(0,1) == "=" ? textString.slice(1) : textString
+    .replaceAll("--- \n", "- ");
+  textString = textString.slice(0, 1) == "=" ? textString.slice(1) : textString;
   //console.log(textString)
-  return textString
-
+  return textString;
 };
 
 let truncateText = (length, text) =>
@@ -33,41 +33,43 @@ let displayMarkdown = (description, platform) => {
   return formatted === "" ? (
     ""
   ) : (
-      <div className="text-sm overflow-clip">
-        <ReactMarkdown linkTarget="_blank" className="font-normal">{formatted}</ReactMarkdown>
-      </div>
-    );
+    <div className="text-sm overflow-clip">
+      <ReactMarkdown linkTarget="_blank" className="font-normal">
+        {formatted}
+      </ReactMarkdown>
+    </div>
+  );
 };
 
-let formatProbability = probability => (probability * 100).toFixed(0) + "%"
+let formatProbability = (probability) => (probability * 100).toFixed(0) + "%";
 
 let generateRow = (option, numOptions) => {
   return (
     <>
-      <tr className="">
+      <tr className="pb-2">
         <td className="">
-          <div className="text-blue-700 bg-blue-100 rounded-md inline p-2 mr-2 place-self-center">
+          <div className="text-blue-700 bg-blue-100 rounded-md py-1 px-2 w-full text-center">
             {formatProbability(option.probability)}
           </div>
         </td>
-        <td className="text-black justify-self-center">
+        <td className="text-gray-600 pl-3 leading-snug text-sm">
           <div>{option.name}</div>
         </td>
       </tr>
-      <p className="text-white text-sm"></p>
     </>
-  )
-}
+  );
+};
 let forecastOptions = (options) => {
   return (
     <div className="flex-1 w-full self-end mb-2 mt-2">
       <table className="flex-1 justify-self-center self-center w-full ">
-        <tbody className="flex-1 justify-self-center">{options.map(option => generateRow(option, options.length))}
+        <tbody className="flex-1 justify-self-center">
+          {options.map((option) => generateRow(option, options.length))}
         </tbody>
       </table>
     </div>
-  )
-}
+  );
+};
 
 export function getstars(numstars) {
   let stars = "★★☆☆☆";
@@ -98,77 +100,88 @@ export function getstars(numstars) {
 
 let metaculusEmbed = (item) => {
   //console.log(item.url)
-  let embedurl = item.url
-    .replace("questions", "questions/embed")
-    .split("/")
-  embedurl.pop()
-  embedurl.pop()
-  embedurl = embedurl.join("/")
+  let embedurl = item.url.replace("questions", "questions/embed").split("/");
+  embedurl.pop();
+  embedurl.pop();
+  embedurl = embedurl.join("/");
 
-  return <div
-    key={item.title}
-    className="flex flex-col px-4 py-3 bg-white rounded-md shadow place-content-stretch flex-grow place-self-center"
-  >
-    <div className="justify-self-center place-self-center">
-      <iframe className={`h-${item.title.length > 80 ? 72 : 60} justify-self-center self-center`}
-        src={embedurl} />
+  return (
+    <div
+      key={item.title}
+      className="flex flex-col px-4 py-3 bg-white rounded-md shadow place-content-stretch flex-grow place-self-center"
+    >
+      <div className="justify-self-center place-self-center">
+        <iframe
+          className={`h-${
+            item.title.length > 80 ? 72 : 60
+          } justify-self-center self-center`}
+          src={embedurl}
+        />
+      </div>
+
+      {forecastFooter(item.stars, item.platform, item.numforecasts)}
     </div>
-
-    {forecastFooter(item.stars, item.platform, item.numforecasts)}
-  </div>;
-}
+  );
+};
 
 let numerateForecasts = (number) => {
   if (!number && number != 0) {
-    return <></>/*(<>
+    return (
+      <></>
+    ); /*(<>
         <label className="text-gray-600">
           {"\u00a0¿? Forecasts"}
         </label>
       </>)*/
-  } else { // Non breaking space: \u00a0
-    return (<>
-      <div className="inline-block">
-        {number}
-      </div>
-      <label className="text-gray-600">
-        {number == 1 ? "\u00a0Forecast" : "\u00a0Forecasts"}
-      </label>
-    </>)
+  } else {
+    // Non breaking space: \u00a0
+    return (
+      <>
+        <div className="inline-block">{number}</div>
+        <label className="text-gray-600">
+          {number == 1 ? "\u00a0Forecast" : "\u00a0Forecasts"}
+        </label>
+      </>
+    );
   }
-}
+};
 
 let forecastFooterOld = (stars, platform, numforecasts) => {
-  return (<div className="flex-1 grid lg:grid-cols-3 w-full flex-col align-bottom items-end self-end text-center mt-2">
-    <div className="flex lg:col-span-1 lg:col-start-1 lg:col-end-1 justify-self-center lg:justify-self-start">
-      {getstars(stars)}
+  return (
+    <div className="flex-1 grid lg:grid-cols-3 w-full flex-col align-bottom items-end self-end text-center mt-2">
+      <div className="flex lg:col-span-1 lg:col-start-1 lg:col-end-1 justify-self-center lg:justify-self-start">
+        {getstars(stars)}
+      </div>
+      <div
+        className={`flex-1 lg:col-span-1 lg:mr-8 lg:col-start-2 lg:col-end-2 justify-self-center lg:justify-self-center w-full ${
+          platform.length > 10 ? " text-sm" : ""
+        }`}
+      >
+        {platform.replaceAll(" ", "\u00a0")}
+      </div>
+      <div className="flex-1 lg:col-span-1 lg:col-start-3 lg:col-end-3 justify-self-center lg:justify-self-end">
+        {numerateForecasts(numforecasts)}
+      </div>
     </div>
-    <div className={`flex-1 lg:col-span-1 lg:mr-8 lg:col-start-2 lg:col-end-2 justify-self-center lg:justify-self-center w-full ${platform.length > 10 ? " text-sm" : ""}`}>
-      {platform.replaceAll(" ", "\u00a0")}
-    </div>
-    <div className="flex-1 lg:col-span-1 lg:col-start-3 lg:col-end-3 justify-self-center lg:justify-self-end">
-      {numerateForecasts(numforecasts)}
-    </div>
-  </div>)
-
+  );
 };
 
 let forecastFooter = (stars, platform, numforecasts) => {
   // flex grid w-full align-bottom items-end self-end text-center mt-2 align-self-end bg-black self-end
   // grid text-center flex-col align-bottom
-  return (<div className="flex-1 grid items-end text-center">
-    <div>
-      <div className="justify-self-center">
-        {getstars(stars)}
-      </div>
-      <div className="justify-self-center">
-        {platform.replaceAll(" ", "\u00a0")}
-      </div>
-      <div className="justify-self-center">
-        {numerateForecasts(numforecasts)}
+  return (
+    <div className="flex-1 grid items-end text-center">
+      <div>
+        <div className="justify-self-center">{getstars(stars)}</div>
+        <div className="justify-self-center">
+          {platform.replaceAll(" ", "\u00a0")}
+        </div>
+        <div className="justify-self-center">
+          {numerateForecasts(numforecasts)}
+        </div>
       </div>
     </div>
-  </div>)
-
+  );
 };
 
 /* Body */
@@ -181,7 +194,7 @@ let displayForecast = ({
   options,
   numforecasts,
   stars,
-  visualization
+  visualization,
 }) => (
   <a
     key={title}
@@ -189,9 +202,7 @@ let displayForecast = ({
     target="_blank"
     className="hover:no-underline cursor-pointbler flex flex-col px-4 py-3 bg-white rounded-md shadow place-content-stretch flex-grow text-black no-underline"
   >
-
     <div className="text-gray-900 text-lg mb-2 font-medium justify-self-start">
-
       {title.replace("</a>", "")}
       {"   "}
       <div className="text-blue-700 bg-blue-100 rounded-md px-2 text-lg font-bold inline-block mb-0.5">
@@ -199,7 +210,11 @@ let displayForecast = ({
       </div>
     </div>
 
-    <div className={`text-gray-700 ${platform == "Guesstimate" || options.length > 2 ? " hidden" : ""}`}>
+    <div
+      className={`text-gray-700 ${
+        platform == "Guesstimate" || options.length > 2 ? " hidden" : ""
+      }`}
+    >
       {displayMarkdown(description, platform)}
     </div>
 
@@ -209,21 +224,18 @@ let displayForecast = ({
     {options.length != 2 ? forecastOptions(options) : ""}
     {forecastFooter(stars, platform, numforecasts)}
   </a>
-
 );
 
 export default function displayForecasts(results, numDisplay) {
   return (
     !!results.slice &&
-    results
-      .slice(0, numDisplay)
-      .map((fuseSearchResult) => {
-
-        let display = fuseSearchResult.item.platform == "Metaculus" ?
-          metaculusEmbed(fuseSearchResult.item) :
-          displayForecast({ ...fuseSearchResult.item })
-        let displayOld = displayForecast({ ...fuseSearchResult.item })
-        return displayOld
-      })
-  )
+    results.slice(0, numDisplay).map((fuseSearchResult) => {
+      let display =
+        fuseSearchResult.item.platform == "Metaculus"
+          ? metaculusEmbed(fuseSearchResult.item)
+          : displayForecast({ ...fuseSearchResult.item });
+      let displayOld = displayForecast({ ...fuseSearchResult.item });
+      return displayOld;
+    })
+  );
 }
