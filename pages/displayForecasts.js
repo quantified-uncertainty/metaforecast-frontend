@@ -45,28 +45,20 @@ let formatProbability = (probability) => (probability * 100).toFixed(0) + "%";
 
 let generateRow = (option, numOptions) => {
   return (
-    <>
-      <tr className="pb-2">
-        <td className="">
-          <div className="text-blue-700 bg-blue-100 rounded-md py-1 px-2 w-full text-center">
-            {formatProbability(option.probability)}
-          </div>
-        </td>
-        <td className="text-gray-600 pl-3 leading-snug text-sm">
-          <div>{option.name}</div>
-        </td>
-      </tr>
-    </>
+    <div className="items-center flex">
+      <div className="w-14 flex-none text-blue-700 bg-blue-100 rounded-md py-1 my-1 text-center">
+        {formatProbability(option.probability)}
+      </div>
+      <div className="flex-auto text-gray-600 pl-3 leading-snug text-sm">
+        {option.name}
+      </div>
+    </div>
   );
 };
 let forecastOptions = (options) => {
   return (
-    <div className="flex-1 w-full self-end mb-2 mt-2">
-      <table className="flex-1 justify-self-center self-center w-full ">
-        <tbody className="flex-1 justify-self-center">
-          {options.map((option) => generateRow(option, options.length))}
-        </tbody>
-      </table>
+    <div className="mb-2 mt-2">
+      {options.map((option) => generateRow(option, options.length))}
     </div>
   );
 };
