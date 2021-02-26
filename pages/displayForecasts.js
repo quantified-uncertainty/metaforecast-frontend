@@ -16,7 +16,8 @@ let cleanText = (text) => {
     .replaceAll("==", "") // Denotes a title in markdown
     .replaceAll("Background\n", "")
     .replaceAll("Context\n", "")
-    .replaceAll("--- \n", "- ");
+    .replaceAll("--- \n", "- ")
+    .replaceAll(/\[(.*?)\]\(.*?\)/g, "$1");
   textString = textString.slice(0, 1) == "=" ? textString.slice(1) : textString;
   //console.log(textString)
   return textString;
@@ -33,7 +34,7 @@ let displayMarkdown = (description, platform) => {
   return formatted === "" ? (
     ""
   ) : (
-    <div className="text-sm overflow-clip">
+    <div className="overflow-clip">
       <ReactMarkdown linkTarget="_blank" className="font-normal">
         {formatted}
       </ReactMarkdown>
@@ -46,19 +47,12 @@ let formatProbability = (probability) => (probability * 100).toFixed(0) + "%";
 let generateRow = (option, numOptions) => {
   return (
     <div className="items-center flex">
-      <div className="w-14 flex-none text-blue-700 bg-blue-100 rounded-md py-1 my-1 text-center">
+      <div className="w-14 flex-none text-blue-700 bg-blue-100 rounded-md py-0.5 my-1 text-center">
         {formatProbability(option.probability)}
       </div>
-      <div className="flex-auto text-gray-600 pl-3 leading-snug text-sm">
+      <div className="flex-auto text-gray-700 pl-3 leading-snug text-sm">
         {option.name}
       </div>
-    </div>
-  );
-};
-let forecastOptions = (options) => {
-  return (
-    <div className="mb-2 mt-2">
-      {options.map((option) => generateRow(option, options.length))}
     </div>
   );
 };
@@ -162,7 +156,7 @@ let forecastFooter = (stars, platform, numforecasts) => {
   // flex grid w-full align-bottom items-end self-end text-center mt-2 align-self-end bg-black self-end
   // grid text-center flex-col align-bottom
   return (
-    <div className="flex-1 grid items-end text-center">
+    <div className="flex-1 flex-row grid items-end text-center">
       <div>
         <div className="justify-self-center">{getstars(stars)}</div>
         <div className="justify-self-center">
@@ -191,19 +185,24 @@ let displayForecast = ({
   <a
     key={title}
     href={url}
-    target="_blank"
-    className="hover:no-underline cursor-pointbler flex flex-col px-4 py-3 bg-white rounded-md shadow place-content-stretch flex-grow text-black no-underline"
+    className="hover:bg-gray-100 hover:no-underline cursor-pointbler flex flex-col px-4 py-3 bg-white rounded-md shadow place-content-stretch flex-grow no-underline"
   >
     <div className="text-gray-900 text-lg mb-2 font-medium justify-self-start">
       {title.replace("</a>", "")}
-      {"   "}
-      <div className="text-blue-700 bg-blue-100 rounded-md px-2 text-lg font-bold inline-block mb-0.5">
-        {options.length == 2 ? formatProbability(options[0].probability) : ""}
-      </div>
     </div>
+    {options.length == 2 && (
+      <div className="w-16 text-blue-600 bg-blue-100 rounded-md px-1 text-lg font-bold text-center mb-5">
+        {formatProbability(options[0].probability)}
+      </div>
+    )}
+    {options.length != 2 && (
+      <div className="mb-2 mt-2">
+        {options.map((option) => generateRow(option, options.length))}
+      </div>
+    )}
 
     <div
-      className={`text-gray-700 ${
+      className={`text-gray-500 ${
         platform == "Guesstimate" || options.length > 2 ? " hidden" : ""
       }`}
     >
@@ -213,7 +212,6 @@ let displayForecast = ({
     <div className={platform == "Guesstimate" ? "" : "hidden"}>
       <img src={visualization} alt="Guesstimate Screenshot" />
     </div>
-    {options.length != 2 ? forecastOptions(options) : ""}
     {forecastFooter(stars, platform, numforecasts)}
   </a>
 );
