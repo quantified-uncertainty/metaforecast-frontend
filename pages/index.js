@@ -25,6 +25,7 @@ const opts = {
   includeScore: true,
   keys: ["title", "platform", " "],
   ignoreLocation: true,
+  threshold: 0.4
 };
 
 // Helper functions
@@ -152,7 +153,9 @@ export default function Home({ items }) {
         });
         // Sort exact matches by forecast quality, rather than by string match.
         let querylowercase = query.toLowerCase()
-        let resultsExactMatch = results.filter(r => r.item.title.toLowerCase().includes(querylowercase))
+        let resultsExactMatch = results.filter(r => r.item.title
+          .toLowerCase()
+          .includes(querylowercase))
         resultsExactMatch.sort((a, b) => {
           if (a.item.stars != b.item.stars) {
             return Number(a.item.stars) < Number(b.item.stars) ? 1 : -1
@@ -164,7 +167,12 @@ export default function Home({ items }) {
           }
 
         })
-        let resultsNotExactMatch = results.filter(r => !r.item.title.toLowerCase().includes(querylowercase))
+        let resultsNotExactMatch = results
+          .filter(r => !r.item.title
+            .toLowerCase()
+            .includes(querylowercase)
+            && r.score < 0.4
+          )
         results = resultsExactMatch.concat(resultsNotExactMatch)
         console.log("Executing search");
         console.log("executeSearch/query", query);
