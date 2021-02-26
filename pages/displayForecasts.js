@@ -16,7 +16,7 @@ let cleanText = (text) => { // Note: should no longer be necessary
     .replaceAll("Background\n", "")
     .replaceAll("Context\n", "")
     .replaceAll("--- \n", "- ")
-  textString = textString.slice(0,1) == "=" ? textString.slice(1) : textString
+  textString = textString.slice(0, 1) == "=" ? textString.slice(1) : textString
   //console.log(textString)
   return textString
 
@@ -50,7 +50,7 @@ let generateRow = (option, numOptions) => {
             {formatProbability(option.probability)}
           </div>
         </td>
-        <td className="text-black justify-self-center">
+        <td className="text-gray-800 justify-self-center">
           <div>{option.name}</div>
         </td>
       </tr>
@@ -157,13 +157,13 @@ let forecastFooter = (stars, platform, numforecasts) => {
   // grid text-center flex-col align-bottom
   return (<div className="flex-1 grid items-end text-center">
     <div>
-      <div className="justify-self-center">
+      <div className="justify-self-center text-gray-700">
         {getstars(stars)}
       </div>
-      <div className="justify-self-center">
+      <div className="justify-self-center text-gray-700">
         {platform.replaceAll(" ", "\u00a0")}
       </div>
-      <div className="justify-self-center">
+      <div className="justify-self-center text-gray-700">
         {numerateForecasts(numforecasts)}
       </div>
     </div>
@@ -187,10 +187,10 @@ let displayForecast = ({
     key={title}
     href={url}
     target="_blank"
-    className="hover:no-underline cursor-pointbler flex flex-col px-4 py-3 bg-white rounded-md shadow place-content-stretch flex-grow text-black no-underline"
+    className="hover:no-underline cursor-pointbler flex flex-col px-4 py-3 bg-white rounded-md shadow place-content-stretch flex-grow text-gray-800 no-underline"
   >
 
-    <div className="text-gray-900 text-lg mb-2 font-medium justify-self-start">
+    <div className="text-gray-800 text-lg mb-2 font-medium justify-self-start">
 
       {title.replace("</a>", "")}
       {"   "}
