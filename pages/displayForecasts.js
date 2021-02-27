@@ -44,24 +44,19 @@ let displayMarkdown = (description, platform) => {
 
 let formatProbability = (probability) => (probability * 100).toFixed(0) + "%";
 
-let chooseColor = (probability) => {
-  if (probability < 0.1) {
-    return "bg-blue-50 text-blue-500";
-  } else if (probability < 0.3) {
-    return "bg-blue-100 text-blue-600";
-  } else if (probability < 0.7) {
-    return "bg-blue-200 text-blue-700";
-  } else {
-    return "bg-blue-300 text-blue-800";
-  }
-};
-
 let generateRow = (option, numOptions) => {
-  const color = () => {
-    if (option.probability < 0.3) {
-      ("sdf");
+  let chooseColor = (probability) => {
+    if (probability < 0.1) {
+      return "bg-blue-50 text-blue-500";
+    } else if (probability < 0.3) {
+      return "bg-blue-100 text-blue-600";
+    } else if (probability < 0.7) {
+      return "bg-blue-200 text-blue-700";
+    } else {
+      return "bg-blue-300 text-blue-800";
     }
   };
+
   return (
     <div className="items-center flex">
       <div
@@ -178,7 +173,80 @@ let forecastFooter = (stars, platform, numforecasts) => {
 };
 
 /* Body */
+let primaryForecastColor = (probability) => {
+  if (probability < 0.03) {
+    return "bg-red-600";
+  } else if (probability < 0.1) {
+    return "bg-red-600 opacity-80";
+  } else if (probability < 0.2) {
+    return "bg-red-600 opacity-70";
+  } else if (probability < 0.3) {
+    return "bg-red-600 opacity-60";
+  } else if (probability < 0.4) {
+    return "bg-red-600 opacity-50";
+  } else if (probability < 0.5) {
+    return "bg-gray-500";
+  } else if (probability < 0.6) {
+    return "bg-gray-500";
+  } else if (probability < 0.7) {
+    return "bg-green-600 opacity-50";
+  } else if (probability < 0.8) {
+    return "bg-green-600 opacity-60";
+  } else if (probability < 0.9) {
+    return "bg-green-600 opacity-70";
+  } else if (probability < 0.97) {
+    return "bg-green-600 opacity-80";
+  } else {
+    return "bg-green-600";
+  }
+};
+let textColor = (probability) => {
+  if (probability < 0.03) {
+    return "text-red-600";
+  } else if (probability < 0.1) {
+    return "text-red-600 opacity-80";
+  } else if (probability < 0.2) {
+    return "text-red-600 opacity-70";
+  } else if (probability < 0.3) {
+    return "text-red-600 opacity-60";
+  } else if (probability < 0.4) {
+    return "text-red-600 opacity-50";
+  } else if (probability < 0.5) {
+    return "text-gray-500";
+  } else if (probability < 0.6) {
+    return "text-gray-500";
+  } else if (probability < 0.7) {
+    return "text-green-600 opacity-50";
+  } else if (probability < 0.8) {
+    return "text-green-600 opacity-60";
+  } else if (probability < 0.9) {
+    return "text-green-600 opacity-70";
+  } else if (probability < 0.97) {
+    return "text-green-600 opacity-80";
+  } else {
+    return "text-green-600";
+  }
+};
 
+let primaryEstimateAsText = (probability) => {
+  if (probability < 0.03) {
+    return "Exceptionally unlikely";
+  } else if (probability < 0.1) {
+    return "Very unlikely";
+  } else if (probability < 0.3) {
+    return "Unlikely";
+  } else if (probability < 0.4) {
+    return "Unlikely";
+  } else if (probability < 0.6) {
+    return "About Even";
+  } else if (probability < 0.9) {
+    return "likely";
+  } else if (probability < 0.97) {
+    return "Very likely";
+  } else {
+    return "Virtually certain";
+  }
+};
 let displayForecast = ({
   title,
   url,
@@ -199,8 +267,21 @@ let displayForecast = ({
         {title.replace("</a>", "")}
       </div>
       {options.length == 2 && (
-        <div className="w-16 text-blue-600 bg-blue-100 rounded-md px-1 text-lg font-bold text-center mb-5">
-          {formatProbability(options[0].probability)}
+        <div className="mb-5 mt-2 block">
+          <span
+            className={`${primaryForecastColor(
+              options[0].probability
+            )} text-white w-16 rounded-md inline-block text-lg font-bold text-center `}
+          >
+            {formatProbability(options[0].probability)}
+          </span>
+          <span
+            className={`${textColor(
+              options[0].probability
+            )} font-bold ml-2 text-gray-500 inline-block`}
+          >
+            {primaryEstimateAsText(options[0].probability)}
+          </span>
         </div>
       )}
       {options.length != 2 && (
