@@ -22,11 +22,11 @@ export default function Layout(props) {
             <div className="items-center justify-between flex">
               <div className="flex">
                 <Link href={`/`} passHref className="font-bold">
-                  <a className="no-underline text-blue-800 font-md justify-center items-center flex">
+                  <a className="no-underline font-md justify-center items-center flex">
                     <span className="mr-2 text-2xl text-blue-800">
                       <GiDiceEightFacesEight />
                     </span>
-                    <span className="text-xl">Metaforecast</span>
+                    <span className="text-lg text-gray-700">Metaforecast</span>
                   </a>
                 </Link>
               </div>
