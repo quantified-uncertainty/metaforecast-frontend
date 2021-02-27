@@ -47,7 +47,7 @@ let formatProbability = (probability) => (probability * 100).toFixed(0) + "%";
 let generateRow = (option, numOptions) => {
   return (
     <div className="items-center flex">
-      <div className="w-14 flex-none text-blue-700 bg-blue-100 rounded-md py-0.5 my-1 text-center">
+      <div className="w-14 flex-none text-blue-700 bg-blue-100 rounded-md py-0.5 my-1 text-sm text-center">
         {formatProbability(option.probability)}
       </div>
       <div className="flex-auto text-gray-700 pl-3 leading-snug text-sm">
@@ -122,25 +122,18 @@ let metaculusEmbed = (item) => {
   );
 };
 
-let numerateForecasts = (number) => {
-  if (!number && number != 0) {
-    return (
-      <></>
-    ); /*(<>
-        <label className="text-gray-600">
-          {"\u00a0¿? Forecasts"}
-        </label>
-      </>)*/
-  } else {
-    // Non breaking space: \u00a0
+let numerateForecasts = (number, platform) => {
+  if (!!number && platform !== "Guesstimate") {
     return (
       <>
-        <div className="inline-block">{number}</div>
-        <label className="text-gray-600">
+        <span className="inline-block font-bold">{number}</span>
+        <span className="text-gray-400">
           {number == 1 ? "\u00a0Forecast" : "\u00a0Forecasts"}
-        </label>
+        </span>
       </>
     );
+  } else if (platform === "Guesstimate") {
+    return <span className="text-gray-400">1 Model</span>;
   }
 };
 
@@ -148,13 +141,16 @@ let forecastFooter = (stars, platform, numforecasts) => {
   // flex grid w-full align-bottom items-end self-end text-center mt-2 align-self-end bg-black self-end
   // grid text-center flex-col align-bottom
   return (
-    <div className="flex-1 grid items-end text-center">
-      <div className="justify-self-center text-gray-700">{getstars(stars)}</div>
-      <div className="justify-self-center text-gray-700">
+    <div className="flex-1 text-gray-600">
+      <div className="inline-block mr-5 text-yellow-400 opacity-80">
+        {getstars(stars)}
+      </div>
+      <div className="inline-block font-bold mr-4 text-sm">
         {platform.replaceAll(" ", "\u00a0")}
       </div>
-      <div className="justify-self-center text-gray-700">
-        {numerateForecasts(numforecasts)}
+      {platform !== ""}
+      <div className="inline-block text-sm">
+        {numerateForecasts(numforecasts, platform)}
       </div>
     </div>
   );
@@ -177,32 +173,36 @@ let displayForecast = ({
     href={url}
     className="hover:bg-gray-100 hover:no-underline cursor-pointbler flex flex-col px-4 py-3 bg-white rounded-md shadow place-content-stretch flex-grow no-underline"
   >
-    <div className="text-gray-900 text-lg mb-2 font-medium justify-self-start">
-      {title.replace("</a>", "")}
-    </div>
-    {options.length == 2 && (
-      <div className="w-16 text-blue-600 bg-blue-100 rounded-md px-1 text-lg font-bold text-center mb-5">
-        {formatProbability(options[0].probability)}
+    <div className="flex-grow">
+      <div className="text-gray-900 text-lg mb-2 font-medium justify-self-start">
+        {title.replace("</a>", "")}
       </div>
-    )}
-    {options.length != 2 && (
-      <div className="mb-2 mt-2">
-        {options.map((option) => generateRow(option, options.length))}
-      </div>
-    )}
+      {options.length == 2 && (
+        <div className="w-16 text-blue-600 bg-blue-100 rounded-md px-1 text-lg font-bold text-center mb-5">
+          {formatProbability(options[0].probability)}
+        </div>
+      )}
+      {options.length != 2 && (
+        <div className="mb-2 mt-2">
+          {options.map((option) => generateRow(option, options.length))}
+        </div>
+      )}
 
-    <div
-      className={`text-gray-500 ${
-        platform == "Guesstimate" || options.length > 2 ? " hidden" : ""
-      }`}
-    >
-      {displayMarkdown(description, platform)}
-    </div>
+      {platform !== "Guesstimate" && options.length < 3 && (
+        <div className={"text-gray-500 opacity-60"}>
+          {displayMarkdown(description, platform)}
+        </div>
+      )}
 
-    <div className={platform == "Guesstimate" ? "" : "hidden"}>
-      <img src={visualization} alt="Guesstimate Screenshot" />
+      {platform === "Guesstimate" && (
+        <img
+          className="rounded-sm mb-1"
+          src={visualization}
+          alt="Guesstimate Screenshot"
+        />
+      )}
     </div>
-    {forecastFooter(stars, platform, numforecasts)}
+    <div className="flex">{forecastFooter(stars, platform, numforecasts)}</div>
   </a>
 );
 
