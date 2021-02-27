@@ -44,10 +44,31 @@ let displayMarkdown = (description, platform) => {
 
 let formatProbability = (probability) => (probability * 100).toFixed(0) + "%";
 
+let chooseColor = (probability) => {
+  if (probability < 0.1) {
+    return "bg-blue-50 text-blue-500";
+  } else if (probability < 0.3) {
+    return "bg-blue-100 text-blue-600";
+  } else if (probability < 0.7) {
+    return "bg-blue-200 text-blue-700";
+  } else {
+    return "bg-blue-300 text-blue-800";
+  }
+};
+
 let generateRow = (option, numOptions) => {
+  const color = () => {
+    if (option.probability < 0.3) {
+      ("sdf");
+    }
+  };
   return (
     <div className="items-center flex">
-      <div className="w-14 flex-none text-blue-700 bg-blue-100 rounded-md py-0.5 my-1 text-sm text-center">
+      <div
+        className={`${chooseColor(
+          option.probability
+        )} w-14 flex-none rounded-md py-0.5 my-1 text-sm text-center`}
+      >
         {formatProbability(option.probability)}
       </div>
       <div className="flex-auto text-gray-700 pl-3 leading-snug text-sm">
