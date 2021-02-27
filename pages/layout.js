@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Head from "next/head";
+import { GiDiceEightFacesEight } from "react-icons/gi";
 
 const classNameSelected = (isSelected) =>
   `py-4 px-2 ml-4 text-md font-medium cursor-pointer border-b-2 border-transparent ${
@@ -21,8 +22,11 @@ export default function Layout(props) {
             <div className="items-center justify-between flex">
               <div className="flex">
                 <Link href={`/`} passHref className="font-bold">
-                  <a className="no-underline text-blue-500 font-semibold text-xl">
-                    Metaforecast
+                  <a className="no-underline text-blue-800 font-md justify-center items-center flex">
+                    <span className="mr-2 text-2xl text-blue-800">
+                      <GiDiceEightFacesEight />
+                    </span>
+                    <span className="text-xl">Metaforecast</span>
                   </a>
                 </Link>
               </div>
