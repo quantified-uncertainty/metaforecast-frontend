@@ -313,74 +313,72 @@ export default function Home({ items }) {
   /* Final return */
   return (
     <Layout key="index" page="search">
-      <div className="m-5">
-        <h1 className="text-4xl text-gray-800 tracking-tight mb-2 text-center font-normal ">
-          Metaforecast
-        </h1>
-        <div className="invisible">{processState(queryParameters)}</div>
+      <div className="invisible">{processState(queryParameters)}</div>
 
-        <label className="block mb-1">
+      <label className="mb-4 mt-4 flex flex-row justify-center items-center">
+        <div className="w-10/12 mb-2">
           <Form value={queryParameters.query} onChange={onChangeSearchBar} />
-        </label>
-
-        <div className="flex flex-col mx-auto justify-center items-center">
+        </div>
+        <div className="w-2/12 flex justify-center">
           <button
-            className="text-center text-gray-600 text-sm mb-2"
+            className="text-gray-500 text-sm mb-2"
             onClick={() => showAdvancedOptions(!advancedOptions)}
           >
             Advanced options ▼
           </button>
+        </div>
+      </label>
 
-          <div
-            className={`flex-1 flex-col mx-auto justify-center items-center w-full ${
-              advancedOptions ? "" : "hidden"
-            }`}
-          >
-            <div className="grid grid-cols-3 grid-rows-2 items-center content-center">
-              <div className="flex row-span-1 col-start-1 col-end-1 row-start-1 row-end-1 items-center justify-center mb-4">
-                <SliderElement
-                  onChange={onChangeSliderForNumForecasts}
-                  value={queryParameters.forecastsThreshold}
-                  displayFunction={displayFunctionNumForecasts}
-                />
-              </div>
-              <div className="flex col-start-2 col-end-2 row-start-1 row-end-1 items-center justify-center mb-4">
-                <ButtonsForStars
-                  onChange={onChangeStars}
-                  value={queryParameters.starsThreshold}
-                />
-              </div>
-              <div className="flex col-start-3 col-end-3 row-start-1 row-end-1 items-center justify-center mb-4">
-                <SliderElement
-                  value={queryParameters.numDisplay}
-                  onChange={onChangeSliderForNumDisplay}
-                  displayFunction={displayFunctionNumDisplaySlider}
-                />
-              </div>
-              <div className="flex col-span-3 items-center justify-center mb-4">
-                <MultiSelectPlatform
-                  value={queryParameters.forecastingPlatforms}
-                  onChange={onChangeSelectedPlatforms}
-                />
-              </div>
+      <div className="flex flex-col mx-auto justify-center items-center">
+        <div
+          className={`flex-1 flex-col mx-auto justify-center items-center w-full ${
+            advancedOptions ? "" : "hidden"
+          }`}
+        >
+          <div className="grid grid-cols-3 grid-rows-2 items-center content-center bg-gray-50 rounded-md px-8 pt-4 pb-1 shadow mb-4">
+            <div className="flex row-span-1 col-start-1 col-end-1 row-start-1 row-end-1 items-center justify-center mb-4">
+              <SliderElement
+                onChange={onChangeSliderForNumForecasts}
+                value={queryParameters.forecastsThreshold}
+                displayFunction={displayFunctionNumForecasts}
+              />
+            </div>
+            <div className="flex col-start-2 col-end-2 row-start-1 row-end-1 items-center justify-center mb-4">
+              <ButtonsForStars
+                onChange={onChangeStars}
+                value={queryParameters.starsThreshold}
+              />
+            </div>
+            <div className="flex col-start-3 col-end-3 row-start-1 row-end-1 items-center justify-center mb-4">
+              <SliderElement
+                value={queryParameters.numDisplay}
+                onChange={onChangeSliderForNumDisplay}
+                displayFunction={displayFunctionNumDisplaySlider}
+              />
+            </div>
+            <div className="flex col-span-3 items-center justify-center">
+              <MultiSelectPlatform
+                value={queryParameters.forecastingPlatforms}
+                onChange={onChangeSelectedPlatforms}
+              />
             </div>
           </div>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {displayForecastsWrapper(results)}
-        </div>
-        <span
-          className="mr-1 cursor-pointer"
-          onClick={() => {
-            setSettings({ ...settings, numDisplay: settings.numDisplay * 2 });
-          }}
-        >
-          {results.length != 0 && settings.numDisplay < results.length
-            ? "Show more"
-            : ""}
-        </span>
       </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {displayForecastsWrapper(results)}
+      </div>
+      <span
+        className="mr-1 cursor-pointer"
+        onClick={() => {
+          setSettings({ ...settings, numDisplay: settings.numDisplay * 2 });
+        }}
+      >
+        {results.length != 0 && settings.numDisplay < results.length
+          ? "Show more"
+          : ""}
+      </span>
     </Layout>
   );
 }

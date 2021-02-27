@@ -157,7 +157,7 @@ let forecastFooter = (stars, platform, numforecasts) => {
   // flex grid w-full align-bottom items-end self-end text-center mt-2 align-self-end bg-black self-end
   // grid text-center flex-col align-bottom
   return (
-    <div className="flex-1 text-gray-600">
+    <div className="flex-1 text-gray-500">
       <div className="inline-block mr-5 text-yellow-400 opacity-80">
         {getstars(stars)}
       </div>
@@ -206,21 +206,21 @@ let textColor = (probability) => {
   } else if (probability < 0.1) {
     return "text-red-600 opacity-80";
   } else if (probability < 0.2) {
-    return "text-red-600 opacity-70";
+    return "text-red-600 opacity-80";
   } else if (probability < 0.3) {
-    return "text-red-600 opacity-60";
+    return "text-red-600 opacity-70";
   } else if (probability < 0.4) {
-    return "text-red-600 opacity-50";
+    return "text-red-600 opacity-70";
   } else if (probability < 0.5) {
     return "text-gray-500";
   } else if (probability < 0.6) {
     return "text-gray-500";
   } else if (probability < 0.7) {
-    return "text-green-600 opacity-50";
-  } else if (probability < 0.8) {
-    return "text-green-600 opacity-60";
-  } else if (probability < 0.9) {
     return "text-green-600 opacity-70";
+  } else if (probability < 0.8) {
+    return "text-green-600 opacity-70";
+  } else if (probability < 0.9) {
+    return "text-green-600 opacity-80";
   } else if (probability < 0.97) {
     return "text-green-600 opacity-80";
   } else {
@@ -233,20 +233,19 @@ let primaryEstimateAsText = (probability) => {
     return "Exceptionally unlikely";
   } else if (probability < 0.1) {
     return "Very unlikely";
-  } else if (probability < 0.3) {
-    return "Unlikely";
   } else if (probability < 0.4) {
     return "Unlikely";
   } else if (probability < 0.6) {
     return "About Even";
   } else if (probability < 0.9) {
-    return "likely";
+    return "Likely";
   } else if (probability < 0.97) {
     return "Very likely";
   } else {
     return "Virtually certain";
   }
 };
+
 let displayForecast = ({
   title,
   url,
@@ -260,7 +259,7 @@ let displayForecast = ({
   <a
     key={title}
     href={url}
-    className="hover:bg-gray-100 hover:no-underline cursor-pointbler flex flex-col px-4 py-3 bg-white rounded-md shadow place-content-stretch flex-grow no-underline"
+    className="hover:bg-gray-100 hover:no-underline cursor-pointer flex flex-col px-4 py-3 bg-white rounded-md shadow place-content-stretch flex-grow no-underline"
   >
     <div className="flex-grow">
       <div className="text-gray-900 text-lg mb-2 font-medium justify-self-start">
@@ -271,14 +270,14 @@ let displayForecast = ({
           <span
             className={`${primaryForecastColor(
               options[0].probability
-            )} text-white w-16 rounded-md inline-block text-lg font-bold text-center `}
+            )} text-white w-16 rounded-md px-1.5 py-0.5 font-bold text-center `}
           >
             {formatProbability(options[0].probability)}
           </span>
           <span
             className={`${textColor(
               options[0].probability
-            )} font-bold ml-2 text-gray-500 inline-block`}
+            )} ml-2 text-gray-500 inline-block`}
           >
             {primaryEstimateAsText(options[0].probability)}
           </span>
