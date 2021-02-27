@@ -1,12 +1,12 @@
 import Link from "next/link";
 import Head from "next/head";
-import { GiDiceEightFacesEight } from "react-icons/gi";
-
+import { AiOutlineCompass } from "react-icons/ai";
+// import { GiDiceEightFacesEight } from "react-icons/gi";
+const IconElement = AiOutlineCompass
 const classNameSelected = (isSelected) =>
-  `py-4 px-2 ml-4 text-md font-medium cursor-pointer border-b-2 border-transparent ${
-    isSelected
-      ? "text-blue-700 border-blue-700"
-      : "text-gray-400 hover:text-blue-500 hover:border-blue-500"
+  `py-4 px-2 ml-4 text-md font-medium cursor-pointer border-b-2 border-transparent ${isSelected
+    ? "text-blue-700 border-blue-700"
+    : "text-gray-400 hover:text-blue-500 hover:border-blue-500"
   }`;
 
 export default function Layout(props) {
@@ -14,7 +14,7 @@ export default function Layout(props) {
     <div>
       <Head>
         <title>Metaforecast</title>
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/favicon.svg" />
       </Head>
       <div>
         <nav className="bg-white shadow">
@@ -24,7 +24,7 @@ export default function Layout(props) {
                 <Link href={`/`} passHref className="font-bold">
                   <a className="no-underline font-md justify-center items-center flex">
                     <span className="mr-2 text-2xl text-blue-800">
-                      <GiDiceEightFacesEight />
+                      <IconElement />
                     </span>
                     <span className="text-lg text-gray-700">Metaforecast</span>
                   </a>

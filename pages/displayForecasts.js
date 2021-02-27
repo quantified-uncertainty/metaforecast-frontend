@@ -34,12 +34,12 @@ let displayMarkdown = (description, platform) => {
   return formatted === "" ? (
     ""
   ) : (
-    <div className="overflow-clip">
-      <ReactMarkdown linkTarget="_blank" className="font-normal">
-        {formatted}
-      </ReactMarkdown>
-    </div>
-  );
+      <div className="overflow-clip">
+        <ReactMarkdown linkTarget="_blank" className="font-normal">
+          {formatted}
+        </ReactMarkdown>
+      </div>
+    );
 };
 
 let formatProbability = (probability) => (probability * 100).toFixed(0) + "%";
@@ -126,9 +126,8 @@ let metaculusEmbed = (item) => {
     >
       <div className="justify-self-center place-self-center">
         <iframe
-          className={`h-${
-            item.title.length > 80 ? 72 : 60
-          } justify-self-center self-center`}
+          className={`h-${item.title.length > 80 ? 72 : 60
+            } justify-self-center self-center`}
           src={embedurl}
         />
       </div>
@@ -260,6 +259,7 @@ let displayForecast = ({
     key={title}
     href={url}
     className="hover:bg-gray-100 hover:no-underline cursor-pointer flex flex-col px-4 py-3 bg-white rounded-md shadow place-content-stretch flex-grow no-underline"
+    target="_blank"
   >
     <div className="flex-grow">
       <div className="text-gray-900 text-lg mb-2 font-medium justify-self-start">
