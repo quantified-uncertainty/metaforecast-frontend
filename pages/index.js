@@ -135,8 +135,7 @@ export default function Home({ items }) {
           item.stars >= starsThreshold &&
           (item.numforecasts >= forecastsThreshold ||
             forecastsThreshold == 0) &&
-          forecastingPlatforms.includes(item.platform) &&
-          true
+          forecastingPlatforms.includes(item.platform)
       );
 
       let fuse = new Fuse(itemsFiltered, opts);
