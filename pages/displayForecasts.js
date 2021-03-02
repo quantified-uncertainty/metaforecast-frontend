@@ -245,6 +245,22 @@ let primaryEstimateAsText = (probability) => {
   }
 };
 
+let textColorFromScore = (score) => {
+  if (score < 0.4) {
+    return ["text-gray-900", "text-gray-900"];
+  } else {
+    return ["text-gray-400", "text-gray-400"];
+  }
+}
+
+let opacityFromScore = (score) => {
+  if (score < 0.4) {
+    return "opacity-100";
+  } else {
+    return "opacity-50";
+  }
+}
+
 let displayForecast = ({
   title,
   url,
@@ -254,6 +270,7 @@ let displayForecast = ({
   numforecasts,
   stars,
   visualization,
+  score
 }) => (
   <a
     key={title}
@@ -262,7 +279,7 @@ let displayForecast = ({
     target="_blank"
   >
     <div className="flex-grow">
-      <div className="text-gray-900 text-lg mb-2 font-medium justify-self-start">
+      <div className={`text-gray-900 ${opacityFromScore(score)} text-lg mb-2 font-medium justify-self-start`}>
         {title.replace("</a>", "")}
       </div>
       {options.length == 2 && (
@@ -284,13 +301,13 @@ let displayForecast = ({
         </div>
       )}
       {options.length != 2 && (
-        <div className="mb-2 mt-2">
+        <div className={`mb-2 mt-2 ${opacityFromScore(score)}`}>
           {options.map((option) => generateRow(option, options.length))}
         </div>
       )}
 
       {platform !== "Guesstimate" && options.length < 3 && (
-        <div className={"text-gray-500 opacity-60"}>
+        <div className={`text-gray-500 ${opacityFromScore(score)}`}>
           {displayMarkdown(description, platform)}
         </div>
       )}
@@ -303,7 +320,7 @@ let displayForecast = ({
         />
       )}
     </div>
-    <div className="flex">{forecastFooter(stars, platform, numforecasts)}</div>
+    <div className={`flex ${opacityFromScore(score)}`}>{forecastFooter(stars, platform, numforecasts)}</div>
   </a>
 );
 
@@ -311,12 +328,12 @@ export default function displayForecasts(results, numDisplay) {
   return (
     !!results.slice &&
     results.slice(0, numDisplay).map((fuseSearchResult) => {
-      let display =
+      let displayWithMetaculusEmbed =
         fuseSearchResult.item.platform == "Metaculus"
           ? metaculusEmbed(fuseSearchResult.item)
           : displayForecast({ ...fuseSearchResult.item });
-      let displayOld = displayForecast({ ...fuseSearchResult.item });
-      return displayOld;
+      let display = displayForecast({ ...fuseSearchResult.item, score: fuseSearchResult.score });
+      return display;
     })
   );
 }
