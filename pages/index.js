@@ -94,6 +94,7 @@ export default function Home({ items }) {
       // Excluding Elicit and Omen
       { value: "CSET-foretell", label: "CSET-foretell" },
       // { value: 'GiveWell', label: 'GiveWell' },
+      { value: "Foretold", label: "Foretold" },
       { value: "Good Judgment", label: "Good Judgment" },
       { value: "Good Judgment Open", label: "Good Judgment Open" },
       { value: "Guesstimate", label: "Guesstimate" },
