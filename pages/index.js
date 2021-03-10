@@ -368,17 +368,21 @@ export default function Home({ items }) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {displayForecastsWrapper(results)}
+
       </div>
-      <span
-        className="mr-1 cursor-pointer"
+      <p className ={`mt-4 mb-4 ${results.length != 0 && queryParameters.numDisplay < results.length? "": "hidden"}`}>
+        {"Can't find what you were looking for? "}
+        <span
+        className="cursor-pointer text-blue-800"
         onClick={() => {
-          setSettings({ ...settings, numDisplay: settings.numDisplay * 2 });
+        setQueryParameters({ ...queryParameters, numDisplay: queryParameters.numDisplay * 2 });
         }}
-      >
-        {results.length != 0 && settings.numDisplay < results.length
-          ? "Show more"
-          : ""}
-      </span>
+        >
+          {"Show more,"}
+        </span>
+        {" or "}
+        <a href="https://www.metaculus.com/questions/create/" className="cursor-pointer text-blue-800 no-underline" target="_blank" >suggest a question on Metaculus</a> 
+      </p>
     </Layout>
   );
 }
