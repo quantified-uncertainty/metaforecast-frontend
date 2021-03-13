@@ -99,10 +99,12 @@ export default function Home({ items }) {
       { value: "Good Judgment Open", label: "Good Judgment Open" },
       { value: "Guesstimate", label: "Guesstimate" },
       { value: "Hypermind", label: "Hypermind" },
+      { value: "Ladbrokes", label: "Ladbrokes" },
       { value: "Metaculus", label: "Metaculus" },
       { value: "PolyMarket", label: "PolyMarket" },
       { value: "PredictIt", label: "PredictIt" },
       { value: "Smarkets", label: "Smarkets" },
+      { value: 'WilliamHill', label: 'WilliamHill' }
     ],
   };
   const [queryParameters, setQueryParameters] = useState(
