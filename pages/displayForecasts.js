@@ -73,16 +73,11 @@ let generateRow = (option, numOptions) => {
   );
 };
 
-let forecastOptions = (options) => {
-  return (
-    <div className="flex-1 w-full self-end mb-2 mt-2">
-      <table className="flex-1 justify-self-center self-center w-full ">
-        <tbody className="flex-1 justify-self-center">
-          {options.map((option) => generateRow(option, options.length))}
-        </tbody>
-      </table>
-    </div>
-  );
+let formatForecastOptions = (options) => {
+  let optionsSorted = options.sort((a,b) => b.probability - a.probability)
+  let optionsMax5 = optionsSorted.slice(0,5) // display max 5 options.
+  let result = optionsMax5.map((option) => generateRow(option, options.length))
+  return result;
 };
 
 export function getstars(numstars) {
@@ -302,7 +297,7 @@ let displayForecast = ({
       )}
       {options.length != 2 && (
         <div className={`mb-2 mt-2 ${opacityFromScore(score)}`}>
-          {options.map((option) => generateRow(option, options.length))}
+          {formatForecastOptions(options)}
         </div>
       )}
 
