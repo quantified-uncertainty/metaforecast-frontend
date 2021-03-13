@@ -277,7 +277,7 @@ let displayForecast = ({
       <div className={`text-gray-900 ${opacityFromScore(score)} text-lg mb-2 font-medium justify-self-start`}>
         {title.replace("</a>", "")}
       </div>
-      {options.length == 2 && (
+      {(options.length == 2 && (options[0].name == "Yes" || options[0].name == "No")) && (
         <div className="mb-5 mt-2 block">
           <span
             className={`${primaryForecastColor(
@@ -295,7 +295,7 @@ let displayForecast = ({
           </span>
         </div>
       )}
-      {options.length != 2 && (
+      {( options.length != 2 || (options[0].name != "Yes" && options[0].name != "No")) && (
         <div className={`mb-2 mt-2 ${opacityFromScore(score)}`}>
           {formatForecastOptions(options)}
         </div>
