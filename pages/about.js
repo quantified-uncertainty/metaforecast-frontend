@@ -13,21 +13,9 @@ If your initial search doesn't succeed, you might want to try tinkering with the
 
 ## What are stars, and how are they computed?
 
-Star ratings—e.g. ★★★☆☆—are an indicator of the quality of an aggregate forecast for a question. These ratings currently try to reflect my own best judgment based on my experience forecasting on these platforms. Thus, stars have a strong subjective component which could be formalized and refined in the future. 
+Star ratings—e.g. ★★★☆☆—are an indicator of the quality of an aggregate forecast for a question. These ratings currently try to reflect my own best judgment and the best judgment of forecasting experts I've asked, based on our collective experience forecasting on these platforms. Thus, stars have a strong subjective component which could be formalized and refined in the future. You can see the code used to decide how many stars to assign [here](https://github.com/QURIresearch/metaforecasts/blob/master/src/stars.js)
 
-Currently, stars are computed using a simple rule dependent on both the platform and the number of forecasts:
-- CSET-foretell: ★★☆☆☆, but ★☆☆☆☆ if a question has less than 100 forecasts
-- Elicit: ★☆☆☆☆
-- Good Judgment (various superforecaster dashboards): ★★★★☆
-- Good Judgment Open: ★★★☆☆, ★★☆☆☆ if a question has less than 100 forecasts
-- Hypermind: ★★★☆☆
-- Metaculus: ★★★★☆ if a question has more than 300 forecasts, ★★★☆☆ if it has more than 100, ★★☆☆☆ otherwise.
-- Omen: ★☆☆☆☆
-- Polymarket: ★★☆☆☆
-- PredictIt: ★★☆☆☆
-- Smarkets: ★★☆☆☆
-
-Of these, I am most uncertain about Smarkets and Hypermind, as I haven't used them as much. Also note that, whatever other redeeming features they might have, prediction markets rarely go above 95% or below 5%.
+With regards the quality, I am most uncertain about Smarkets and Hypermind, Ladbrokes and WilliamHill, as I haven't used them as much. Also note that, whatever other redeeming features they might have, prediction markets rarely go above 95% or below 5%.
 
 ## Who is behind this?
 [Nuño Sempere](https://nunosempere.github.io), with help from Ozzie Gooen, from the [Quantified Uncertainty Research Institute](https://quantifieduncertainty.org/). We both have several other forecasting-related projects, but one which might be particularly worth highlighting is this [forecasting newsletter](http://forecasting.substack.com/).
