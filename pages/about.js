@@ -4,7 +4,7 @@ import gfm from "remark-gfm";
 import Layout from "./layout.js";
 let readmeMarkdownText = `# About
 
-This is a search engine for probabilities. Given a query, it searches for relevant questions in various prediction markets and forecasting platforms (namely CSET-foretell, Elicit, Good Judgment, Good Judgment Open, Guesstimate, Hypermind, Metaculus, Omen, Polymarket, PredictIt and Smarkets). For example, try searching for "China", "North Korea", "Semiconductors", "COVID", or "Trump".
+This is a search engine for probabilities. Given a query, it searches for relevant questions in various prediction markets and forecasting platforms (namely CSET-foretell, Elicit, Foretold, Good Judgment, Good Judgment Open, Guesstimate, GiveWell & OpenPhilanthropy blogposts as of early 2021, Hypermind, Ladbrokes, Metaculus, Omen, Polymarket, PredictIt, Smarkets, William Hill, and Michael Aird's database of existential risk estimates). For example, try searching for "China", "North Korea", "Semiconductors", "COVID", "Trump", or "X-risk".
 
 You can read a longer writeup with thoughts and motivations [here](https://forum.effectivealtruism.org/posts/tEo5oXeSNcB3sYr8m/introducing-metaforecast-a-forecast-aggregator-and-search). You can see the code for the back-end used to fetch probabilities [here](https://github.com/QURIresearch/metaforecasts/blob/multipleOptions/README.md), or view the source for the front-end [here](https://github.com/QURIresearch/metaforecast-website-nextjs). 
 
