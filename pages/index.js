@@ -23,7 +23,7 @@ import ButtonsForStars from "../lib/buttonsForStars.js";
 // https://github.com/krisk/Fuse/
 const opts = {
   includeScore: true,
-  keys: ["title", "platform", " "],
+  keys: ["title", "platform", "author"],
   ignoreLocation: true,
   //threshold: 0.4
 };
