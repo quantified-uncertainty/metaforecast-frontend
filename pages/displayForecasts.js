@@ -260,6 +260,7 @@ let displayForecast = ({
   title,
   url,
   platform,
+  author,
   description,
   options,
   numforecasts,
@@ -315,7 +316,7 @@ let displayForecast = ({
         />
       )}
     </div>
-    <div className={`flex ${opacityFromScore(score)}`}>{forecastFooter(stars, platform, numforecasts)}</div>
+    <div className={`flex ${opacityFromScore(score)}`}>{forecastFooter(stars, author || platform, numforecasts)}</div>
   </a>
 );
 
