@@ -92,6 +92,7 @@ export default function Home({ items }) {
     forecastsThreshold: 0,
     forecastingPlatforms: [
       // Excluding Elicit and Omen
+      { value: "Estimize", label: "Estimize" },
       { value: "CSET-foretell", label: "CSET-foretell" },
       // { value: 'GiveWell', label: 'GiveWell' },
       { value: "Foretold", label: "Foretold" },
