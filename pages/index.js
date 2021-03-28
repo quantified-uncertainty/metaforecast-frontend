@@ -176,15 +176,6 @@ export default function Home({ items }) {
           return results.reduce((a,b) => a || b)
         }
 
-        /*
-        let resultsExactMatch = results.filter((r) => exactMatchDetector(r));
-        resultsPseudoExactMatchAND = results.filter((r) => !exactMatchDetector(r) && pseudoExactMatchDetectorAND(r));
-        let resultsNotExactMatch = results.filter(
-          (r) => !r.item.title.toLowerCase().includes(querylowercase)
-          //&& r.score < 0.4
-        );
-        */
-
         if(queriesSplit[0] != querylowercase){
           results.forEach(result => {
             if(exactMatchDetector(result)){
@@ -217,13 +208,14 @@ export default function Home({ items }) {
               (Number(b.item.numforecasts) || 20)
               ? 1
               : -1;
-            // undefined => equivalent to 20 forecasts (not that many) for the purposes of sorting
+              // undefined number of forecasts => equivalent to 20 forecasts (not that many) for the purposes of sorting
           } else {
             return Number(a.score) > Number(b.score) ? 1 : -1;
           }
         }
         resultsExactMatch.sort(sortByStarsThenNumForecastsThenScore);                
-        resultsPseudoExactMatchAND = resultsPseudoExactMatchAND.map(result => ({...result, score: result.score < 0.4 ? result.score : 0.39}))
+        resultsPseudoExactMatchAND = resultsPseudoExactMatchAND.map(result => ({...result, score: result.score < 0.4 ? result.score : 0.39})) // Results with a score lower than 0.4 get shown in grey, but shouldn't in this case.
+        resultsPseudoExactMatchAND.sort(sortByStarsThenNumForecastsThenScore)
 
         results = [...resultsExactMatch, ...resultsPseudoExactMatchAND, ...resultsPseudoExactMatchOR, ...resultsNotExactMatch];
         console.log("Executing search");
