@@ -95,6 +95,7 @@ export default function Home({ items }) {
       { value: "CSET-foretell", label: "CSET-foretell" },
       { value: "Estimize", label: "Estimize" },
       // { value: 'GiveWell', label: 'GiveWell' },
+      { value: "FantasySCOTUS", label: "FantasySCOTUS" },
       { value: "Foretold", label: "Foretold" },
       { value: "Good Judgment", label: "Good Judgment" },
       { value: "Good Judgment Open", label: "Good Judgment Open" },
