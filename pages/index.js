@@ -9,6 +9,7 @@ import Fuse from "fuse.js";
 import { getForecasts } from "../lib/get-forecasts.js";
 import displayForecasts from "./displayForecasts.js";
 import searchGuesstimate from "../lib/searchGuesstimate.js";
+
 // Parts
 import Layout from "./layout.js";
 import Form from "../lib/form.js";
@@ -23,13 +24,12 @@ import ButtonsForStars from "../lib/buttonsForStars.js";
 // https://github.com/krisk/Fuse/
 const opts = {
   includeScore: true,
-  keys: ["title", "platform", "author"],
+  keys: ["title", "platform", "author", "optionsstringforsearch"],
   ignoreLocation: true,
   //threshold: 0.4
 };
 
 // Helper functions
-
 export async function getStaticProps() {
   //getServerSideProps
   // const { metaforecasts } = await getForecasts();
@@ -121,6 +121,7 @@ export default function Home({ items }) {
   const [settings, setSettings] = useState(initialSettings);
   let initialResults = [];
   const [results, setResults] = useState(initialResults);
+
   /* Functions which I want to have access to the Home namespace */
   // I don't want to create an "items" object for each search.
   let executeSearch = (queryData) => {
@@ -146,19 +147,22 @@ export default function Home({ items }) {
 
       let fuse = new Fuse(itemsFiltered, opts);
       if (query != undefined) {
-        results = fuse.search(query).map((result) => {
-          if (result.item.platform == "Elicit") {
-            result.score = result.score * 2 + 0.1; // Higher scores are worse
-          } else if (result.item.platform == "Guesstimate") {
-            result.score = result.score + 0.1; // Higher scores are worse
-          }
+
+        results = fuse.search(query)
+        
+        // Adjust for search quality
+        // Elicit results are so bad but so numerous that I need to make an adjustment here.
+        // (Higher scores are worse)
+        results = results.map((result) => {
+          result.score = result.item.platform == "Elicit" ? result.score * 2 + 0.1 : result.score 
+          result.score = result.item.platform == "Guesstimate" ? result.score + 0.1 : result.score
           return result;
         });
         results.sort((a, b) => {
-          return Number(a.score) > Number(b.score) ? 1 : -1; // Higher scores are worse
+          return Number(a.score) > Number(b.score) ? 1 : -1;
         });
         
-        // Sort exact matches by forecast quality, rather than by string match.
+        // Catch stray exact matches
         let querylowercase = query.toLowerCase();
         let queriesSplit = querylowercase.split(" ")
         let resultsExactMatch = []
@@ -177,7 +181,7 @@ export default function Home({ items }) {
         }
 
         if(queriesSplit[0] != querylowercase){
-          results.forEach(result => {
+          for(let result of results){
             if(exactMatchDetector(result)){
               resultsExactMatch.push(result)
             }else if(pseudoExactMatchDetectorAND(result)){
@@ -187,19 +191,20 @@ export default function Home({ items }) {
             }else{
               resultsNotExactMatch.push(result)
             }
-          })
+          }
         }
         
         if(queriesSplit[0] == querylowercase){
-          results.forEach(result => {
+          for(let result of results){
             if(exactMatchDetector(result)){
               resultsExactMatch.push(result)
             }else{
               resultsNotExactMatch.push(result)
             }
-          })
+          }
         }
 
+        // Sort exact matches by forecast quality, rather than by string match.
         let sortByStarsThenNumForecastsThenScore = (a, b) => {
           if (a.item.stars != b.item.stars) {
             return Number(a.item.stars) < Number(b.item.stars) ? 1 : -1;
@@ -217,20 +222,22 @@ export default function Home({ items }) {
         resultsPseudoExactMatchAND = resultsPseudoExactMatchAND.map(result => ({...result, score: result.score < 0.4 ? result.score : 0.39})) // Results with a score lower than 0.4 get shown in grey, but shouldn't in this case.
         resultsPseudoExactMatchAND.sort(sortByStarsThenNumForecastsThenScore)
 
+        // Conclude
         results = [...resultsExactMatch, ...resultsPseudoExactMatchAND, ...resultsPseudoExactMatchOR, ...resultsNotExactMatch];
+
         console.log("Executing search");
         console.log("executeSearch/query", query);
         console.log("executeSearch/items  ", itemsTotal);
         console.log("executeSearch/starsThreshold", starsThreshold);
         console.log("executeSearch/forecastsThreshold", forecastsThreshold);
         console.log("executeSearch/forecastingPlatforms", forecastingPlatforms);
-
         console.log(settings);
       }
       console.log(results);
       setResults(results);
     });
   };
+
   // I don't want display forecasts to change with a change in queryParameters, but I want it to have access to the queryParameters, in particular the numDisplay. Hence why this function lives inside Home.
   let displayForecastsWrapper = (results) => {
     let numDisplayRounded =
@@ -298,7 +305,7 @@ export default function Home({ items }) {
   };
 
   /* Change the stars threshold */
-  const starOptions = ["≥ ★☆☆☆☆", "≥ ★★☆☆☆", "≥ ★★★☆☆", "≥ ★★★★☆"];
+  // const starOptions = ["≥ ★☆☆☆☆", "≥ ★★☆☆☆", "≥ ★★★☆☆", "≥ ★★★★☆"];
   let onChangeStars = (value) => {
     console.log("onChangeStars/buttons", value);
     let newQueryParameters = { ...queryParameters, starsThreshold: value };
@@ -350,7 +357,7 @@ export default function Home({ items }) {
     onChangeSearchInputs(newQueryParameters);
   };
 
-  /* Show advanced */
+  /* Show advanced options */
   let [advancedOptions, showAdvancedOptions] = useState(false);
 
   /* Final return */
