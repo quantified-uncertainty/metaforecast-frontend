@@ -156,12 +156,59 @@ export default function Home({ items }) {
         results.sort((a, b) => {
           return Number(a.score) > Number(b.score) ? 1 : -1; // Higher scores are worse
         });
+        
         // Sort exact matches by forecast quality, rather than by string match.
         let querylowercase = query.toLowerCase();
-        let resultsExactMatch = results.filter((r) =>
-          r.item.title.toLowerCase().includes(querylowercase)
+        let queriesSplit = querylowercase.split(" ")
+        let resultsExactMatch = []
+        let resultsPseudoExactMatchAND = []
+        let resultsPseudoExactMatchOR = []
+        let resultsNotExactMatch = []
+
+        let exactMatchDetector = obj => obj.item.title.toLowerCase().includes(querylowercase)
+        let pseudoExactMatchDetectorAND = obj => {
+          let results = queriesSplit.map(querySplit => obj.item.title.toLowerCase().includes(querySplit))
+          return results.reduce((a,b) => a && b)
+        }
+        let pseudoExactMatchDetectorOR = obj => {
+          let results = queriesSplit.map(querySplit => obj.item.title.toLowerCase().includes(querySplit))
+          return results.reduce((a,b) => a || b)
+        }
+
+        /*
+        let resultsExactMatch = results.filter((r) => exactMatchDetector(r));
+        resultsPseudoExactMatchAND = results.filter((r) => !exactMatchDetector(r) && pseudoExactMatchDetectorAND(r));
+        let resultsNotExactMatch = results.filter(
+          (r) => !r.item.title.toLowerCase().includes(querylowercase)
+          //&& r.score < 0.4
         );
-        resultsExactMatch.sort((a, b) => {
+        */
+
+        if(queriesSplit[0] != querylowercase){
+          results.forEach(result => {
+            if(exactMatchDetector(result)){
+              resultsExactMatch.push(result)
+            }else if(pseudoExactMatchDetectorAND(result)){
+              resultsPseudoExactMatchAND.push(result)
+            }else if(pseudoExactMatchDetectorOR(result)){
+              resultsPseudoExactMatchOR.push(result)
+            }else{
+              resultsNotExactMatch.push(result)
+            }
+          })
+        }
+        
+        if(queriesSplit[0] == querylowercase){
+          results.forEach(result => {
+            if(exactMatchDetector(result)){
+              resultsExactMatch.push(result)
+            }else{
+              resultsNotExactMatch.push(result)
+            }
+          })
+        }
+
+        let sortByStarsThenNumForecastsThenScore = (a, b) => {
           if (a.item.stars != b.item.stars) {
             return Number(a.item.stars) < Number(b.item.stars) ? 1 : -1;
           } else if (a.item.numforecasts != b.item.numforecasts) {
@@ -173,12 +220,11 @@ export default function Home({ items }) {
           } else {
             return Number(a.score) > Number(b.score) ? 1 : -1;
           }
-        });
-        let resultsNotExactMatch = results.filter(
-          (r) => !r.item.title.toLowerCase().includes(querylowercase)
-          //&& r.score < 0.4
-        );
-        results = resultsExactMatch.concat(resultsNotExactMatch);
+        }
+        resultsExactMatch.sort(sortByStarsThenNumForecastsThenScore);                
+        resultsPseudoExactMatchAND = resultsPseudoExactMatchAND.map(result => ({...result, score: result.score < 0.4 ? result.score : 0.39}))
+
+        results = [...resultsExactMatch, ...resultsPseudoExactMatchAND, ...resultsPseudoExactMatchOR, ...resultsNotExactMatch];
         console.log("Executing search");
         console.log("executeSearch/query", query);
         console.log("executeSearch/items  ", itemsTotal);
