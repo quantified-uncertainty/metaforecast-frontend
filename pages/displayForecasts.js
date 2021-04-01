@@ -42,7 +42,12 @@ let displayMarkdown = (description, platform) => {
     );
 };
 
-let formatProbability = (probability) => (probability * 100).toFixed(0) + "%";
+let formatProbability = (probability) => {
+  let percentage = (probability * 100)
+  let percentageCapped = percentage < 1 ? "< 1%" : (percentage > 99 ? "> 99%" : percentage.toFixed(0) + "%")
+  return percentageCapped
+
+}
 
 let generateRow = (option, numOptions) => {
   let chooseColor = (probability) => {
