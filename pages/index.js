@@ -139,8 +139,8 @@ export default function Home({ items }) {
 
       let itemsFiltered = itemsTotal.filter(
         (item) =>
-          item.stars >= starsThreshold &&
-          (item.numforecasts >= forecastsThreshold ||
+          item.qualityindicators.stars >= starsThreshold &&
+          (item.qualityindicators.numforecasts >= forecastsThreshold ||
             forecastsThreshold == 0) &&
           forecastingPlatforms.includes(item.platform)
       );
@@ -206,11 +206,11 @@ export default function Home({ items }) {
 
         // Sort exact matches by forecast quality, rather than by string match.
         let sortByStarsThenNumForecastsThenScore = (a, b) => {
-          if (a.item.stars != b.item.stars) {
-            return Number(a.item.stars) < Number(b.item.stars) ? 1 : -1;
-          } else if (a.item.numforecasts != b.item.numforecasts) {
-            return (Number(a.item.numforecasts) || 20) <
-              (Number(b.item.numforecasts) || 20)
+          if (a.item.qualityindicators.stars != b.item.qualityindicators.stars) {
+            return Number(a.item.qualityindicators.stars) < Number(b.item.qualityindicators.stars) ? 1 : -1;
+          } else if (a.item.qualityindicators.numforecasts != b.item.qualityindicators.numforecasts) {
+            return (Number(a.item.qualityindicators.numforecasts) || 20) <
+              (Number(b.item.qualityindicators.numforecasts) || 20)
               ? 1
               : -1;
               // undefined number of forecasts => equivalent to 20 forecasts (not that many) for the purposes of sorting

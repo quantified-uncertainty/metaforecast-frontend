@@ -26,11 +26,9 @@ let cleanText = (text) => {
 let truncateText = (length, text) =>
   text.length > length ? text.slice(0, length) + "..." : text;
 
-let displayMarkdown = (description, platform) => {
+let displayMarkdown = (description) => {
   let formatted = truncateText(250, cleanText(description));
-  // description = platform == "GiveWell"?"Internal forecasts by the GiveWell team":description
   // overflow-hidden overflow-ellipsis h-24
-  // console.log(formatted)
   return formatted === "" ? (
     ""
   ) : (
@@ -49,7 +47,7 @@ let formatProbability = (probability) => {
 
 }
 
-let generateRow = (option, numOptions) => {
+let generateRow = (option) => {
   let chooseColor = (probability) => {
     if (probability < 0.1) {
       return "bg-blue-50 text-blue-500";
@@ -81,7 +79,7 @@ let generateRow = (option, numOptions) => {
 let formatForecastOptions = (options) => {
   let optionsSorted = options.sort((a,b) => b.probability - a.probability)
   let optionsMax5 = optionsSorted.slice(0,5) // display max 5 options.
-  let result = optionsMax5.map((option) => generateRow(option, options.length))
+  let result = optionsMax5.map((option) => generateRow(option))
   return result;
 };
 
@@ -132,7 +130,7 @@ let metaculusEmbed = (item) => {
         />
       </div>
 
-      {forecastFooter(item.stars, item.platform, item.numforecasts)}
+      {forecastFooter(item.qualityindicators.stars, item.platform, item.qualityindicators.numforecasts)}
     </div>
   );
 };
@@ -268,8 +266,7 @@ let displayForecast = ({
   author,
   description,
   options,
-  numforecasts,
-  stars,
+  qualityindicators,
   visualization,
   score
 }) => (
@@ -309,7 +306,7 @@ let displayForecast = ({
 
       {platform !== "Guesstimate" && options.length < 3 && (
         <div className={`text-gray-500 ${opacityFromScore(score)}`}>
-          {displayMarkdown(description, platform)}
+          {displayMarkdown(description)}
         </div>
       )}
 
@@ -321,7 +318,7 @@ let displayForecast = ({
         />
       )}
     </div>
-    <div className={`flex ${opacityFromScore(score)}`}>{forecastFooter(stars, author || platform, numforecasts)}</div>
+    <div className={`flex ${opacityFromScore(score)}`}>{forecastFooter(qualityindicators.stars, author || platform, qualityindicators.numforecasts)}</div>
   </a>
 );
 
