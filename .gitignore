@@ -34,3 +34,6 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+# yarn vs npm conflict
+package-lock.json ## use yarn.lock instead
