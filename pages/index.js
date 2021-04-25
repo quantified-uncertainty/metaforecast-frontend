@@ -369,7 +369,7 @@ export default function Home({ items }) {
         <div className="w-10/12 mb-2">
           <Form value={queryParameters.query} onChange={onChangeSearchBar} />
         </div>
-        <div className="w-2/12 flex justify-center">
+        <div className="w-2/12 flex justify-center ml-4 md:ml-2 lg:ml-0">
           <button
             className="text-gray-500 text-sm mb-2"
             onClick={() => showAdvancedOptions(!advancedOptions)}
@@ -385,21 +385,22 @@ export default function Home({ items }) {
             advancedOptions ? "" : "hidden"
           }`}
         >
-          <div className="grid grid-cols-3 grid-rows-2 items-center content-center bg-gray-50 rounded-md px-8 pt-4 pb-1 shadow mb-4">
-            <div className="flex row-span-1 col-start-1 col-end-1 row-start-1 row-end-1 items-center justify-center mb-4">
+          <div className="grid sm:grid-rows-4 sm:grid-cols-1 md:grid-rows-2 lg:grid-rows-2 grid-cols-1 md:grid-cols-3 lg:grid-cols-3 items-center content-center bg-gray-50 rounded-md px-8 pt-4 pb-1 shadow mb-4">
+            <div className="flex row-start-1 row-end-1  col-start-1 col-end-4 md:row-span-1 md:col-start-1 md:col-end-1 md:row-start-1 md:row-end-1 lg:row-span-1 lg:col-start-1 lg:col-end-1 lg:row-start-1 lg:row-end-1 items-center justify-center mb-4">
               <SliderElement
+                className="flex items-center justify-center"
                 onChange={onChangeSliderForNumForecasts}
                 value={queryParameters.forecastsThreshold}
                 displayFunction={displayFunctionNumForecasts}
               />
             </div>
-            <div className="flex col-start-2 col-end-2 row-start-1 row-end-1 items-center justify-center mb-4">
+            <div className="flex row-start-2 row-end-2  col-start-1 col-end-4 md:row-start-1 md:row-end-1 md:col-start-2 md:col-end-2 lg:row-start-1 lg:row-end-1 lg:col-start-2 md:col-end-2 items-center justify-center mb-4">
               <ButtonsForStars
                 onChange={onChangeStars}
                 value={queryParameters.starsThreshold}
               />
             </div>
-            <div className="flex col-start-3 col-end-3 row-start-1 row-end-1 items-center justify-center mb-4">
+            <div className="flex row-start-3 row-end-3  col-start-1 col-end-4 md:col-start-3 md:col-end-3 md:row-start-1 md:row-end-1 lg:col-start-3 lg:col-end-3 lg:row-start-1 lg:row-end-1 items-center justify-center mb-4">
               <SliderElement
                 value={queryParameters.numDisplay}
                 onChange={onChangeSliderForNumDisplay}
