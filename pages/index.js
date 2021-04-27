@@ -92,6 +92,8 @@ export default function Home({ items }) {
     forecastsThreshold: 0,
     forecastingPlatforms: [
       // Excluding Elicit and Omen
+      { value: "AstralCodexTen", label: "AstralCodexTen" },
+      { value: "CoupCast", label: "CoupCast" },
       { value: "CSET-foretell", label: "CSET-foretell" },
       { value: "Estimize", label: "Estimize" },
       // { value: 'GiveWell', label: 'GiveWell' },
