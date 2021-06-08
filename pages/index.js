@@ -170,7 +170,7 @@ export default function Home({ items, lastUpdated }) {
         // Catch stray exact matches
         let querylowercase = query.toLowerCase();
         let queriesSplit = querylowercase.split(" ")
-        let queriesSplitlength = querylowercase.length()
+        let queriesSplitlength = querylowercase.length
         let resultsExactMatch = []
         let resultsPseudoExactMatchAND = []
         let resultsPseudoExactMatchOR = []
