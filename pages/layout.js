@@ -23,23 +23,25 @@ export default function Layout(props) {
               <div className="flex">
                 <Link href={`/`} passHref className="font-bold">
                   <a className="no-underline font-md justify-center items-center flex">
-                    <span className="mr-2 text-2xl text-blue-800">
+                    <span className="mr-2 text-lg text-blue-800">
                       <IconElement />
                     </span>
-                    <span className="text-lg text-gray-700">Metaforecast</span>
+                    <span className="text-2xl text-gray-700">Metaforecast</span>
                   </a>
                 </Link>
-                <div className={`flex py-4 px-2 ml-4 text-md font-medium text-gray-400 ${props.lastUpdated || "hidden"}`}>
-                <button className="inline-flex items-center text-gray-700">
-                  <svg className="mr-1 mt-1" height="10" width="10">
-                    <circle cx="4" cy="4" r="4" fill="rgb(29, 78, 216)" />
-                  </svg>
-                  <span>{`Last updated: ${props.lastUpdated ? props.lastUpdated.slice(0,10) : "unknown" }`}</span>
-                  </button>
+                <div className={`flex py-4 px-2 ml-4 text-base text-gray-400 ${props.lastUpdated || "hidden"}`}>
+                  <div className="inline-flex items-center text-gray-700 sm:invisible md:visible lg:visible">
+                    
+                    <svg className="ml-4 mr-1 mt-1" height="10" width="16">
+                      <circle cx="4" cy="4" r="4" fill="rgb(29, 78, 216)" />
+                    </svg>
+                    
+                    <span>{`Last updated: ${props.lastUpdated ? props.lastUpdated.slice(0,10) : "unknown" }`}</span>
+                  </div>
               </div>
               </div>
               
-              <div className="flex flex-row-reverse items-start space-x-4">
+              <div className="flex flex-row-reverse items-start space-x-4 lg:text-base md:text-sm sm:text-sm">
                 <Link href={`/about`} passHref>
                   <span className={classNameSelected(props.page === "about")}>
                     About
