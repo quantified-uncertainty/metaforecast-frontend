@@ -170,6 +170,7 @@ export default function Home({ items, lastUpdated }) {
         // Catch stray exact matches
         let querylowercase = query.toLowerCase();
         let queriesSplit = querylowercase.split(" ")
+        let queriesSplitlength = querylowercase.length()
         let resultsExactMatch = []
         let resultsPseudoExactMatchAND = []
         let resultsPseudoExactMatchOR = []
@@ -177,12 +178,20 @@ export default function Home({ items, lastUpdated }) {
 
         let exactMatchDetector = obj => obj.item.title.toLowerCase().includes(querylowercase)
         let pseudoExactMatchDetectorAND = obj => {
-          let results = queriesSplit.map(querySplit => obj.item.title.toLowerCase().includes(querySplit))
-          return results.reduce((a,b) => a && b)
+          if(queriesSplitlength < 3){
+            let results = queriesSplit.map(querySplit => obj.item.title.toLowerCase().includes(querySplit))
+            return results.reduce((a,b) => a && b)
+          }else{
+            return []
+          }
         }
         let pseudoExactMatchDetectorOR = obj => {
-          let results = queriesSplit.map(querySplit => obj.item.title.toLowerCase().includes(querySplit))
-          return results.reduce((a,b) => a || b)
+          if(queriesSplitlength < 3){
+            let results = queriesSplit.map(querySplit => obj.item.title.toLowerCase().includes(querySplit))
+            return results.reduce((a,b) => a || b)
+          }else{
+            return []
+          }
         }
 
         if(queriesSplit[0] != querylowercase){
