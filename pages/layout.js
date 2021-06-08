@@ -20,17 +20,17 @@ export default function Layout(props) {
         <nav className="bg-white shadow">
           <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="items-center justify-between flex">
-              <div className="flex">
+              <div className="flex sm:flex-row">
                 <Link href={`/`} passHref className="font-bold">
                   <a className="no-underline font-md justify-center items-center flex">
                     <span className="mr-2 text-lg text-blue-800">
                       <IconElement />
                     </span>
-                    <span className="text-2xl text-gray-700">Metaforecast</span>
+                    <span className="text-xl sm:text-2xl text-gray-700">Metaforecast</span>
                   </a>
                 </Link>
                 <div className={`flex py-4 px-2 ml-4 text-base text-gray-400 ${props.lastUpdated || "hidden"}`}>
-                  <div className="inline-flex items-center text-gray-700 sm:invisible md:visible lg:visible">
+                  <div className="hidden sm:inline-flex items-center text-gray-700">
                     
                     <svg className="ml-4 mr-1 mt-1" height="10" width="16">
                       <circle cx="4" cy="4" r="4" fill="rgb(29, 78, 216)" />
@@ -41,7 +41,7 @@ export default function Layout(props) {
               </div>
               </div>
               
-              <div className="flex flex-row-reverse items-start space-x-4 lg:text-base md:text-sm sm:text-sm">
+              <div className="flex flex-row-reverse items-start space-x-4 text-base sm:text-lg md:text-lg lg:text-lg">
                 <Link href={`/about`} passHref>
                   <span className={classNameSelected(props.page === "about")}>
                     About
