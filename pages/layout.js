@@ -29,7 +29,16 @@ export default function Layout(props) {
                     <span className="text-lg text-gray-700">Metaforecast</span>
                   </a>
                 </Link>
+                <div className={`flex py-4 px-2 ml-4 text-md font-medium text-gray-400 ${props.lastUpdated || "hidden"}`}>
+                <button className="inline-flex items-center text-gray-700">
+                  <svg class="mr-1 mt-1" height="10" width="10">
+                    <circle cx="4" cy="4" r="4" fill="rgb(29, 78, 216)" />
+                  </svg>
+                  <span>{`Last updated: ${props.lastUpdated ? props.lastUpdated.slice(0,10) : "unknown" }`}</span>
+                  </button>
               </div>
+              </div>
+              
               <div className="flex flex-row-reverse items-start space-x-4">
                 <Link href={`/about`} passHref>
                   <span className={classNameSelected(props.page === "about")}>

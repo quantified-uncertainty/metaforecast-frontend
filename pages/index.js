@@ -34,10 +34,13 @@ export async function getStaticProps() {
   //getServerSideProps
   // const { metaforecasts } = await getForecasts();
   let metaforecasts = await getForecasts();
+  let lastUpdated = metaforecasts.find(forecast => forecast.platform == "Good Judgment Open").timestamp
+  console.log(lastUpdated)
   //console.log("metaforecasts", metaforecasts)
   return {
     props: {
       items: metaforecasts,
+      lastUpdated
     },
   };
 }
@@ -77,7 +80,7 @@ let transformObjectIntoUrlSlug = (obj) => {
 };
 
 /* Body */
-export default function Home({ items }) {
+export default function Home({ items, lastUpdated }) {
   //, urlQuery }) {
   console.log("===============");
   console.log("New page render");
@@ -364,7 +367,7 @@ export default function Home({ items }) {
 
   /* Final return */
   return (
-    <Layout key="index" page="search">
+    <Layout key="index" page="search" lastUpdated={lastUpdated}>
       <div className="invisible">{processState(queryParameters)}</div>
 
       <label className="mb-4 mt-4 flex flex-row justify-center items-center">
