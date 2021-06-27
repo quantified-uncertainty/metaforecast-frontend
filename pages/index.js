@@ -110,6 +110,7 @@ export default function Home({ items, lastUpdated }) {
       { value: "Metaculus", label: "Metaculus" },
       { value: "PolyMarket", label: "PolyMarket" },
       { value: "PredictIt", label: "PredictIt" },
+      { value: 'Rootclaim', label: 'Rootclaim' },
       { value: "Smarkets", label: "Smarkets" },
       { value: 'WilliamHill', label: 'WilliamHill' },
       { value: 'X-risk estimates', label: 'X-risk estimates' }
