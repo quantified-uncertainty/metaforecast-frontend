@@ -21,7 +21,7 @@
     "mongodb": "^3.6.6",
     "mongodb-client-encryption": "^1.2.3",
     "multiselect-react-dropdown": "^1.6.7",
-    "next": "^10.2.3",
+    "next": "10.0.4",
     "postcss": "^8.2.1",
     "postcss-flexbugs-fixes": "^5.0.2",
     "postcss-preset-env": "^6.7.0",
