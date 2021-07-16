@@ -159,7 +159,8 @@ let forecastFooter = (stars, platform, numforecasts) => {
         {getstars(stars)}
       </div>
       <div className="inline-block font-bold mr-4 text-sm">
-        {platform.replaceAll(" ", "\u00a0")}
+        {platform.replace(/ /g, "\u00a0")  // replaceAll(" ", "\u00a0")
+        }
       </div>
       {platform !== ""}
       <div className="inline-block text-sm">

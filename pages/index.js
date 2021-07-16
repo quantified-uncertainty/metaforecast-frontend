@@ -29,7 +29,7 @@ const opts = {
   //threshold: 0.4
 };
 
-// Helper functions
+/* Helper functions */
 export async function getStaticProps() {
   //getServerSideProps
   // const { metaforecasts } = await getForecasts();
@@ -56,6 +56,16 @@ export async function getServerSideProps(context) { //getServerSideProps
   };
 }
 */
+
+// Shuffle
+let shuffleArray = (array) => {
+  let newArray = array
+  for (let i = newArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+  }
+  return newArray
+}
 
 // Stars
 let howmanystars = (string) => {
