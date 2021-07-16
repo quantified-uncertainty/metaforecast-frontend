@@ -260,12 +260,13 @@ export default function Home({ items, lastUpdated }) {
           console.log(settings);
         
         console.log(results);
-        setResults(results);
       });
     } else if (query == ""){
-      let randomResults = shuffleArray(items.filter(item => item.qualityindicators.stars >= 3)).slice(0,100).map(item => ({score: 0, item: item}))
+      let results = shuffleArray(items.filter(item => item.qualityindicators.stars >= 3)).slice(0,100).map(item => ({score: 0, item: item}))
       setResults(randomResults);
     }
+    setResults(results);
+
   };
 
   // I don't want display forecasts to change with a change in queryParameters, but I want it to have access to the queryParameters, in particular the numDisplay. Hence why this function lives inside Home.
