@@ -116,6 +116,7 @@ export default function Home({ items, lastUpdated }) {
       { value: "Good Judgment Open", label: "Good Judgment Open" },
       { value: "Guesstimate", label: "Guesstimate" },
       { value: "Hypermind", label: "Hypermind" },
+      { value: "Kalshi", label: "Kalshi" },
       { value: "Ladbrokes", label: "Ladbrokes" },
       { value: "Metaculus", label: "Metaculus" },
       { value: "PolyMarket", label: "PolyMarket" },
@@ -261,9 +262,9 @@ export default function Home({ items, lastUpdated }) {
         console.log(results);
         setResults(results);
       });
-    }else if(query == ""){
-      let randomResults = shuffleArray(items.filter(item => item.qualityindicators.stars >= 3)).slice(0,100).map(item => ({score: 0, item: item}))
-      setResults(randomResults);
+    //}else if(query == ""){
+      //let randomResults = shuffleArray(items.filter(item => item.qualityindicators.stars >= 3)).slice(0,100).map(item => ({score: 0, item: item}))
+      //setResults(randomResults);
     }else{
       setResults(results)
     }
