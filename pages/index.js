@@ -136,7 +136,7 @@ export default function Home({ items, lastUpdated }) {
     time: Date.now(),
   };
   const [settings, setSettings] = useState(initialSettings);
-  let initialResults = shuffleArray(items.filter(item => item.qualityindicators.stars >= 3)).slice(0,100).map(item => ({score: 0, item: item}))//[];
+  let initialResults = []; // shuffleArray(items.filter(item => item.qualityindicators.stars >= 3)).slice(0,100).map(item => ({score: 0, item: item}))
   const [results, setResults] = useState(initialResults);
 
   /* Functions which I want to have access to the Home namespace */
