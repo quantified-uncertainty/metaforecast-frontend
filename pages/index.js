@@ -106,6 +106,7 @@ export default function Home({ items, lastUpdated }) {
     forecastingPlatforms: [
       // Excluding Elicit and Omen
       { value: "AstralCodexTen", label: "AstralCodexTen" },
+      { value: 'Betfair', label: 'Betfair' },
       { value: "CoupCast", label: "CoupCast" },
       { value: "CSET-foretell", label: "CSET-foretell" },
       { value: "Estimize", label: "Estimize" },
