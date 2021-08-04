@@ -71,7 +71,7 @@ let generateSource = (result, imgSrc, displayEmbed) => {
   }
 }
 
-export default function displayOneForecast (result, displayEmbed, setDisplayEmbed){
+export function displayOneForecast (result, displayEmbed, setDisplayEmbed){
   const containerRef = useRef(null);
   //const imgRef = useRef(null);
   const [imgSrc, setImgSrc] = useState("");
