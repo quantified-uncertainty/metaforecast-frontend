@@ -7,7 +7,7 @@ import { useRouter } from "next/router"; // https://nextjs.org/docs/api-referenc
 // Utilities
 import Fuse from "fuse.js";
 import { getForecasts } from "../lib/get-forecasts.js";
-import displayForecasts from "./displayForecasts.js";
+import displayForecasts from "../lib/displayForecasts.js";
 import searchGuesstimate from "../lib/searchGuesstimate.js";
 
 // Parts
