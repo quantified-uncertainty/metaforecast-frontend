@@ -7,7 +7,7 @@ import { useRouter } from "next/router"; // https://nextjs.org/docs/api-referenc
 // Utilities
 import Fuse from "fuse.js";
 import { getForecasts } from "../lib/get-forecasts.js";
-import displayForecasts from "./displayForecasts.js";
+import DisplayOneForecast from "./displayOneForecastForEmbed.js";
 import searchGuesstimate from "../lib/searchGuesstimate.js";
 
 // Parts
@@ -270,17 +270,9 @@ export default function Home({ items, lastUpdated }) {
       setResults(results)
     }
   };
-
-  // I don't want display forecasts to change with a change in queryParameters, but I want it to have access to the queryParameters, in particular the numDisplay. Hence why this function lives inside Home.
+ 
   let displayForecastsWrapper = (results) => {
-    let numDisplayRounded =
-      queryParameters.numDisplay % 3 != 0
-        ? queryParameters.numDisplay +
-          (3 - (Math.round(queryParameters.numDisplay) % 3))
-        : queryParameters.numDisplay;
-    console.log("numDisplay", queryParameters.numDisplay);
-    console.log("numDisplayRounded", numDisplayRounded);
-    return displayForecasts(results, numDisplayRounded);
+    return displayForecasts(results, 1);
   };
 
   /* State controllers */
@@ -395,12 +387,12 @@ export default function Home({ items, lastUpdated }) {
 
   /* Final return */
   return (
-    <Layout key="index" page="search" lastUpdated={lastUpdated}>
+    <Layout key="index" page="embed" lastUpdated={lastUpdated}>
       <div className="invisible">{processState(queryParameters)}</div>
 
       <label className="mb-4 mt-4 flex flex-row justify-center items-center">
         <div className="w-10/12 mb-2">
-          <Form value={queryParameters.query} onChange={onChangeSearchBar} placeholder="Find forecasts about..."/>
+        <Form value={queryParameters.query} onChange={onChangeSearchBar} placeholder="Get best title match"/>
         </div>
         <div className="w-2/12 flex justify-center ml-4 md:ml-2 lg:ml-0">
           <button
@@ -449,24 +441,16 @@ export default function Home({ items, lastUpdated }) {
           </div>
         </div>
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {displayForecastsWrapper(results)}
-
+      <div className="flex justify-center">
+      <div className="grid grid-cols-1 gap-4 w-1/3  ">
+        {DisplayOneForecast(results[0])}
       </div>
-      <p className ={`mt-4 mb-4 ${results.length != 0 && queryParameters.numDisplay < results.length? "": "hidden"}`}>
-        {"Can't find what you were looking for? "}
-        <span
-        className="cursor-pointer text-blue-800"
-        onClick={() => {
-        setQueryParameters({ ...queryParameters, numDisplay: queryParameters.numDisplay * 2 });
-        }}
-        >
-          {"Show more,"}
-        </span>
-        {" or "}
-        <a href="https://www.metaculus.com/questions/create/" className="cursor-pointer text-blue-800 no-underline" target="_blank" >suggest a question on Metaculus</a> 
-      </p>
+      <div>
+        {
+            
+        }
+      </div>
+      </div>
     </Layout>
   );
 }

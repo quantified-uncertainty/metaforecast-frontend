@@ -136,6 +136,29 @@ let metaculusEmbed = (item) => {
 };
 
 let numerateForecasts = (number, platform) => {
+  if (!!number) {
+    return (
+      <>
+        <span className="font-bold">{number}</span>
+        <span>{` ${number == 1 ? "Forecast" : "Forecasts"}`}</span>
+        
+      </>
+    );
+  }
+};
+
+/*
+let numerateForecastsOld = (number, platform) => {
+  if (!!number) {
+    return (
+      <>
+        {`${number} ${number == 1 ? "Forecast" : "Forecasts"}`}
+      </>
+    );
+  }
+};
+
+let numerateForecastsOld2 = (number, platform) => {
   if (!!number && platform !== "Guesstimate") {
     return (
       <>
@@ -149,8 +172,29 @@ let numerateForecasts = (number, platform) => {
     return <span className="text-gray-400">1 Model</span>;
   }
 };
+*/
 
 let forecastFooter = (stars, platform, numforecasts) => {
+  // flex grid w-full align-bottom items-end self-end text-center mt-2 align-self-end bg-black self-end
+  // grid text-center flex-col align-bottom
+  return (
+    <div className="grid grid-cols-3 grid-rows-1 items-center content-center text-gray-500 w-full">
+      <div className="text-yellow-400 opacity-80">
+        {getstars(stars)}
+      </div>
+      <div className="font-bold text-sm">
+        {platform.replace(/ /g, "\u00a0")  // replaceAll(" ", "\u00a0")
+        }
+      </div>
+      <div className="text-sm">
+        {numerateForecasts(numforecasts, platform)}
+      </div>
+    </div>
+  );
+};
+
+/*
+let forecastFooterOld = (stars, platform, numforecasts) => {
   // flex grid w-full align-bottom items-end self-end text-center mt-2 align-self-end bg-black self-end
   // grid text-center flex-col align-bottom
   return (
@@ -169,6 +213,7 @@ let forecastFooter = (stars, platform, numforecasts) => {
     </div>
   );
 };
+*/
 
 /* Body */
 let primaryForecastColor = (probability) => {
@@ -260,7 +305,7 @@ let opacityFromScore = (score) => {
   }
 }
 
-let displayForecast = ({
+export function displayForecast({
   title,
   url,
   platform,
@@ -269,59 +314,61 @@ let displayForecast = ({
   options,
   qualityindicators,
   visualization,
-  score
-}) => (
-  <a
-    key={title}
-    href={url}
-    className="hover:bg-gray-100 hover:no-underline cursor-pointer flex flex-col px-4 py-3 bg-white rounded-md shadow place-content-stretch flex-grow no-underline"
-    target="_blank"
-  >
-    <div className="flex-grow">
-      <div className={`text-gray-900 ${opacityFromScore(score)} text-lg mb-2 font-medium justify-self-start`}>
-        {title.replace("</a>", "")}
+  score,
+}){
+  return(
+    <a
+      key={title}
+      href={url}
+      className="hover:bg-gray-100 hover:no-underline cursor-pointer flex flex-col px-4 py-3 bg-white rounded-md shadow place-content-stretch flex-grow no-underline"
+      target="_blank"
+    >
+      <div className="flex-grow">
+        <div className={`text-gray-900 ${opacityFromScore(score)} text-lg mb-2 font-medium justify-self-start`}>
+          {title.replace("</a>", "")}
+        </div>
+        {(options.length == 2 && (options[0].name == "Yes" || options[0].name == "No")) && (
+          <div className="mb-5 mt-2 block">
+            <span
+              className={`${primaryForecastColor(
+                options[0].probability
+              )} text-white w-16 rounded-md px-1.5 py-0.5 font-bold text-center `}
+            >
+              {formatProbability(options[0].probability)}
+            </span>
+            <span
+              className={`${textColor(
+                options[0].probability
+              )} ml-2 text-gray-500 inline-block`}
+            >
+              {primaryEstimateAsText(options[0].probability)}
+            </span>
+          </div>
+        )}
+        {( options.length != 2 || (options[0].name != "Yes" && options[0].name != "No")) && (
+          <div className={`mb-2 mt-2 ${opacityFromScore(score)}`}>
+            {formatForecastOptions(options)}
+          </div>
+        )}
+
+        {platform !== "Guesstimate" && options.length < 3 && (
+          <div className={`text-gray-500 ${opacityFromScore(score)}`}>
+            {displayMarkdown(description)}
+          </div>
+        )}
+
+        {platform === "Guesstimate" && (
+          <img
+            className="rounded-sm mb-1"
+            src={visualization}
+            alt="Guesstimate Screenshot"
+          />
+        )}
       </div>
-      {(options.length == 2 && (options[0].name == "Yes" || options[0].name == "No")) && (
-        <div className="mb-5 mt-2 block">
-          <span
-            className={`${primaryForecastColor(
-              options[0].probability
-            )} text-white w-16 rounded-md px-1.5 py-0.5 font-bold text-center `}
-          >
-            {formatProbability(options[0].probability)}
-          </span>
-          <span
-            className={`${textColor(
-              options[0].probability
-            )} ml-2 text-gray-500 inline-block`}
-          >
-            {primaryEstimateAsText(options[0].probability)}
-          </span>
-        </div>
-      )}
-      {( options.length != 2 || (options[0].name != "Yes" && options[0].name != "No")) && (
-        <div className={`mb-2 mt-2 ${opacityFromScore(score)}`}>
-          {formatForecastOptions(options)}
-        </div>
-      )}
-
-      {platform !== "Guesstimate" && options.length < 3 && (
-        <div className={`text-gray-500 ${opacityFromScore(score)}`}>
-          {displayMarkdown(description)}
-        </div>
-      )}
-
-      {platform === "Guesstimate" && (
-        <img
-          className="rounded-sm mb-1"
-          src={visualization}
-          alt="Guesstimate Screenshot"
-        />
-      )}
-    </div>
-    <div className={`flex ${opacityFromScore(score)}`}>{forecastFooter(qualityindicators.stars, author || platform, qualityindicators.numforecasts)}</div>
-  </a>
-);
+      <div className={`flex ${opacityFromScore(score)}`}>{forecastFooter(qualityindicators.stars, author || platform, qualityindicators.numforecasts)}</div>
+    </a>
+  );
+}
 
 export default function displayForecasts(results, numDisplay) {
   return (
@@ -331,7 +378,7 @@ export default function displayForecasts(results, numDisplay) {
         fuseSearchResult.item.platform == "Metaculus"
           ? metaculusEmbed(fuseSearchResult.item)
           : displayForecast({ ...fuseSearchResult.item });
-      let display = displayForecast({ ...fuseSearchResult.item, score: fuseSearchResult.score });
+      let display = displayForecast({ ...fuseSearchResult.item, score: fuseSearchResult.score})
       return display;
     })
   );

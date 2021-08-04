@@ -42,6 +42,11 @@ export default function Layout(props) {
               </div>
               
               <div className="flex flex-row-reverse items-start space-x-4 text-base sm:text-lg md:text-lg lg:text-lg">
+                <Link href={`/embed`} passHref>
+                  <span className={classNameSelected(props.page === "embed")}>
+                    Embed
+                  </span>
+                </Link>
                 <Link href={`/about`} passHref>
                   <span className={classNameSelected(props.page === "about")}>
                     About
