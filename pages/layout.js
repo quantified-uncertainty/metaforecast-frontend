@@ -23,13 +23,13 @@ export default function Layout(props) {
               <div className="flex sm:flex-row">
                 <Link href={`/`} passHref className="font-bold">
                   <a className="no-underline font-md justify-center items-center flex">
-                    <span className="mr-2 text-lg text-blue-800">
+                    <span className="mr-2 sm:text-lg text-blue-800">
                       <IconElement />
                     </span>
-                    <span className="text-xl sm:text-2xl text-gray-700">Metaforecast</span>
+                    <span className="text-sm sm:text-2xl text-gray-700">Metaforecast</span>
                   </a>
                 </Link>
-                <div className={`flex py-4 px-2 ml-4 text-base text-gray-400 ${props.lastUpdated || "hidden"}`}>
+                <div className={`flex py-4 px-2 sm:ml-4 text-base text-gray-400 ${props.lastUpdated || "hidden"}`}>
                   <div className="hidden sm:inline-flex items-center text-gray-700">
                     
                     <svg className="ml-4 mr-1 mt-1" height="10" width="16">
@@ -41,7 +41,7 @@ export default function Layout(props) {
               </div>
               </div>
               
-              <div className="flex flex-row-reverse items-start space-x-4 text-base sm:text-lg md:text-lg lg:text-lg">
+              <div className="flex flex-row-reverse items-start space-x-4 text-sm sm:text-lg md:text-lg lg:text-lg">
                 <Link href={`/embed`} passHref>
                   <span className={classNameSelected(props.page === "embed")}>
                     Embed
