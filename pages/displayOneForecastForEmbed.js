@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import domtoimage from 'dom-to-image'; // https://github.com/tsayen/dom-to-image
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { displayForecast } from "./displayForecasts.js";
