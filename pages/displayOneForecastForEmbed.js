@@ -29,7 +29,7 @@ function constructImage(imgRef, imgSrc){
   }
 }
 
-export default function DisplayOneForecast (result){
+export default function displayOneForecast (result){
   const containerRef = useRef(null);
   const imgRef = useRef(null);
   const [imgSrc, setImgSrc] = useState("")
@@ -45,6 +45,7 @@ export default function DisplayOneForecast (result){
         if(dataUrl){
           uploadToImgur()
         }
+        
         setImgSrc(dataUrl)
     })
     .catch(function (error) {

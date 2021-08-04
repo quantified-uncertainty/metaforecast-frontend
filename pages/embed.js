@@ -443,7 +443,7 @@ export default function Home({ items, lastUpdated }) {
       </div>
       <div className="flex justify-center">
       <div className="grid grid-cols-1 gap-4 w-1/3  ">
-        {DisplayOneForecast(results[0])}
+        {displayOneForecast(results[0])}
       </div>
       <div>
         {
