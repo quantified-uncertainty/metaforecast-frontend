@@ -40,3 +40,4 @@ package-lock.json ## use yarn.lock instead
 
 # private files
 FutureSteps.md
+imgurAPI.md
