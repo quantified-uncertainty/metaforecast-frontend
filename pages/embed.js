@@ -7,7 +7,7 @@ import { useRouter } from "next/router"; // https://nextjs.org/docs/api-referenc
 // Utilities
 import Fuse from "fuse.js";
 import { getForecasts } from "../lib/get-forecasts.js";
-import DisplayOneForecast from "./displayOneForecastForEmbed.js";
+import displayOneForecast from "./displayOneForecastForEmbed.js";
 import searchGuesstimate from "../lib/searchGuesstimate.js";
 
 // Parts
@@ -139,6 +139,7 @@ export default function Home({ items, lastUpdated }) {
   const [settings, setSettings] = useState(initialSettings);
   let initialResults = []; // shuffleArray(items.filter(item => item.qualityindicators.stars >= 3)).slice(0,100).map(item => ({score: 0, item: item}))
   const [results, setResults] = useState(initialResults);
+  let [displayEmbed, setDisplayEmbed] = useState(false);
 
   /* Functions which I want to have access to the Home namespace */
   // I don't want to create an "items" object for each search.
@@ -281,6 +282,7 @@ export default function Home({ items, lastUpdated }) {
     console.log("onChangeSearchInputs/newQueryParameters", newQueryParameters);
 
     setResults([]);
+    setDisplayEmbed(false)
     clearTimeout(settings.timeoutId);
     let newtimeoutId = setTimeout(async () => {
       console.log(
@@ -442,9 +444,7 @@ export default function Home({ items, lastUpdated }) {
         </div>
       </div>
       <div className="flex justify-center">
-      <div className="grid grid-cols-1 gap-4 w-1/3  ">
-        {displayOneForecast(results[0])}
-      </div>
+      {displayOneForecast(results[0], displayEmbed, setDisplayEmbed)}
       <div>
         {
             

@@ -135,7 +135,7 @@ let metaculusEmbed = (item) => {
   );
 };
 
-let numerateForecasts = (number, platform) => {
+let numerateForecasts = (number, timestamp) => {
   if (!!number) {
     return (
       <>
@@ -144,6 +144,15 @@ let numerateForecasts = (number, platform) => {
         
       </>
     );
+  }else{
+    return(
+      <span className={`flex col-start-2 col-end-2 row-start-1 row-end-1  items-center justify-center text-gray-600 ml-5 ${true ? "" : "hidden"}`}>
+        <svg className="ml-4 mr-1 mt-1" height="10" width="16">
+          <circle cx="4" cy="4" r="4" fill="rgb(29, 78, 216)" />
+        </svg>
+        {`Last updated: ${timestamp ? timestamp.slice(0,10) : "unknown" }`}
+      </span>
+    )
   }
 };
 
@@ -174,7 +183,7 @@ let numerateForecastsOld2 = (number, platform) => {
 };
 */
 
-let forecastFooter = (stars, platform, numforecasts) => {
+let forecastFooter = (stars, platform, numforecasts, timestamp) => {
   // flex grid w-full align-bottom items-end self-end text-center mt-2 align-self-end bg-black self-end
   // grid text-center flex-col align-bottom
   return (
@@ -187,7 +196,7 @@ let forecastFooter = (stars, platform, numforecasts) => {
         }
       </div>
       <div className="text-sm">
-        {numerateForecasts(numforecasts, platform)}
+        {numerateForecasts(numforecasts, timestamp)}
       </div>
     </div>
   );
@@ -313,9 +322,11 @@ export function displayForecast({
   description,
   options,
   qualityindicators,
+  timestamp,
   visualization,
   score,
-}){
+}, showTimeStamp = false
+){
   return(
     <a
       key={title}
@@ -328,31 +339,67 @@ export function displayForecast({
           {title.replace("</a>", "")}
         </div>
         {(options.length == 2 && (options[0].name == "Yes" || options[0].name == "No")) && (
-          <div className="mb-5 mt-2 block">
-            <span
-              className={`${primaryForecastColor(
-                options[0].probability
-              )} text-white w-16 rounded-md px-1.5 py-0.5 font-bold text-center `}
-            >
-              {formatProbability(options[0].probability)}
-            </span>
-            <span
-              className={`${textColor(
-                options[0].probability
-              )} ml-2 text-gray-500 inline-block`}
-            >
-              {primaryEstimateAsText(options[0].probability)}
-            </span>
+          <div>
+            {/*<div className="mb-5 mt-2 block">
+              <span
+                className={`${primaryForecastColor(
+                  options[0].probability
+                )} text-white w-16 rounded-md px-1.5 py-0.5 font-bold text-center `}
+              >
+                {formatProbability(options[0].probability)}
+              </span>
+              <span
+                className={`${textColor(
+                  options[0].probability
+                )} ml-2 text-gray-500 inline-block`}
+              >
+                {primaryEstimateAsText(options[0].probability)}
+              </span>
+            </div>*/}
+            <div className="grid mb-5 mt-4 mb-5 grid-cols-2 grid-rows-1">
+              <div
+                className="block col-start-1 col-end-1 row-start-1 row-end-1 items-center justify-center"
+              >
+                <span
+                  className={`${primaryForecastColor(
+                    options[0].probability
+                  )} text-white w-16 rounded-md px-1.5 py-0.5 font-bold text-center `}
+                >
+                  {formatProbability(options[0].probability)}
+                </span>
+                <span
+                  className={`${textColor(
+                    options[0].probability
+                  )} ml-2 text-gray-500 inline-block`}
+                >
+                  {primaryEstimateAsText(options[0].probability)}
+                </span>
+              </div>
+              <div className={`flex col-start-2 col-end-2 row-start-1 row-end-1  items-center justify-center text-gray-600 ml-2 ${showTimeStamp && qualityindicators.numforecasts ? "" : "hidden"}`}>
+                <svg className="ml-4 mr-1 mt-1" height="10" width="16">
+                  <circle cx="4" cy="4" r="4" fill="rgb(29, 78, 216)" />
+                </svg>
+                {`Last updated: ${timestamp ? timestamp.slice(0,10) : "unknown" }`}
+              </div>
+            </div>
           </div>
         )}
         {( options.length != 2 || (options[0].name != "Yes" && options[0].name != "No")) && (
-          <div className={`mb-2 mt-2 ${opacityFromScore(score)}`}>
-            {formatForecastOptions(options)}
-          </div>
+          <>
+            <div className={`mb-2 mt-2 ${opacityFromScore(score)}`}>
+              {formatForecastOptions(options)}
+            </div>
+            <div className={`flex col-start-2 col-end-2 row-start-1 row-end-1 text-gray-600 mt-3 ${showTimeStamp && qualityindicators.numforecasts ? "" : "hidden"}`}>
+              <svg className="ml-6 mr-1 mt-2" height="10" width="16">
+                <circle cx="4" cy="4" r="4" fill="rgb(29, 78, 216)" />
+              </svg>
+              {`Last updated: ${timestamp ? timestamp.slice(0,10) : "unknown" }`}
+            </div>
+          </>
         )}
 
         {platform !== "Guesstimate" && options.length < 3 && (
-          <div className={`text-gray-500 ${opacityFromScore(score)}`}>
+          <div className={`text-gray-500 ${opacityFromScore(score)} mt-4`}>
             {displayMarkdown(description)}
           </div>
         )}
@@ -365,7 +412,7 @@ export function displayForecast({
           />
         )}
       </div>
-      <div className={`flex ${opacityFromScore(score)}`}>{forecastFooter(qualityindicators.stars, author || platform, qualityindicators.numforecasts)}</div>
+      <div className={`flex ${opacityFromScore(score)}`}>{forecastFooter(qualityindicators.stars, author || platform, qualityindicators.numforecasts, timestamp)}</div>      
     </a>
   );
 }
