@@ -6,21 +6,30 @@ import { useRouter } from "next/router"; // https://nextjs.org/docs/api-referenc
 
 // Utilities
 import Fuse from "fuse.js";
-import { getForecasts } from "../lib/get-forecasts.js";
-import { displayOneForecast } from "../lib/displayOneForecastForEmbed.js";
-import searchGuesstimate from "../lib/searchGuesstimate.js";
+import { getForecasts } from "../lib/worker/getForecasts.js";
+import searchGuesstimate from "../lib/worker/searchGuesstimate.js";
+import { displayForecastsWrapperForEmbed } from "../lib/display/displayForecastsWrappers.js";
 
 // Parts
 import Layout from "./layout.js";
-import Form from "../lib/form.js";
-import DropdownForStars from "../lib/dropdown.js";
-import { SliderElement, SliderForNumForecasts } from "../lib/slider.js";
-import MultiSelectPlatform from "../lib/multiSelectPlatforms.js";
-import ButtonsForStars from "../lib/buttonsForStars.js";
+import Form from "../lib/display/form.js";
+import { SliderElement } from "../lib/display/slider.js";
+import MultiSelectPlatform from "../lib/display/multiSelectPlatforms.js";
+import ButtonsForStars from "../lib/display/buttonsForStars.js";
+
 
 /* Definitions */
 
-// Search options for:
+/* Abstracted Away */
+const pageName = "embed"
+const processDisplayOnSearchBegin = () => false
+const placeholder = "Get best title match"
+const displaySeeMoreHint = false
+const displayForecastsWrapper = displayForecastsWrapperForEmbed
+// Everything below is the same as in index.js,
+// but I haven't figured out how I want to abstract it away yet
+
+// Search options for Fuse
 // https://github.com/krisk/Fuse/
 const opts = {
   includeScore: true,
@@ -30,9 +39,35 @@ const opts = {
 };
 
 /* Helper functions */
+// Shuffle
+let shuffleArray = (array) => {
+  let newArray = array
+  for (let i = newArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+  }
+  return newArray
+}
+
+// URL slugs
+let transformObjectIntoUrlSlug = (obj) => {
+  let results = [];
+  for (let key in obj) {
+    if (typeof obj[key] == "number" || typeof obj[key] == "string") {
+      results.push(`${key}=${obj[key]}`);
+    } else if (key == "forecastingPlatforms") {
+      let arr = obj[key].map((x) => x.value);
+      let arrstring = arr.join("|");
+      results.push(`${key}=${arrstring}`);
+    }
+  }
+  let string = "?" + results.join("&");
+  return string;
+};
+
+/* get Props */
 export async function getStaticProps() {
   //getServerSideProps
-  // const { metaforecasts } = await getForecasts();
   let metaforecasts = await getForecasts();
   let lastUpdated = metaforecasts.find(forecast => forecast.platform == "Good Judgment Open").timestamp
   console.log(lastUpdated)
@@ -57,43 +92,10 @@ export async function getServerSideProps(context) { //getServerSideProps
 }
 */
 
-// Shuffle
-let shuffleArray = (array) => {
-  let newArray = array
-  for (let i = newArray.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-  }
-  return newArray
-}
-
-// Stars
-let howmanystars = (string) => {
-  let matches = string.match(/★/g);
-  return matches ? matches.length : 0;
-};
-
-// URL slugs
-let transformObjectIntoUrlSlug = (obj) => {
-  let results = [];
-  for (let key in obj) {
-    if (typeof obj[key] == "number" || typeof obj[key] == "string") {
-      results.push(`${key}=${obj[key]}`);
-    } else if (key == "forecastingPlatforms") {
-      let arr = obj[key].map((x) => x.value);
-      let arrstring = arr.join("|");
-      results.push(`${key}=${arrstring}`);
-    }
-  }
-  let string = "?" + results.join("&");
-  return string;
-};
-
 /* Body */
 export default function Home({ items, lastUpdated }) {
   //, urlQuery }) {
-  console.log("===============");
-  console.log("New page render");
+  console.log("===============\nNew page render");
 
   /* States */
   const router = useRouter();
@@ -131,14 +133,15 @@ export default function Home({ items, lastUpdated }) {
   const [queryParameters, setQueryParameters] = useState(
     initialQueryParameters
   );
-  let initialSettings = {
+  let initialSearchSpeedSettings = {
     timeoutId: null,
     awaitEndTyping: 500,
     time: Date.now(),
   };
-  const [settings, setSettings] = useState(initialSettings);
-  let initialResults = []; // shuffleArray(items.filter(item => item.qualityindicators.stars >= 3)).slice(0,100).map(item => ({score: 0, item: item}))
-  const [results, setResults] = useState(initialResults);
+  const [searchSpeedSettings, setSearchSpeedSettings] = useState(initialSearchSpeedSettings);
+  //let initialResults = []; // shuffleArray(items.filter(item => item.qualityindicators.stars >= 3)).slice(0,100).map(item => ({score: 0, item: item}))
+  const [results, setResults] = useState([])//useState(initialResults);
+  let [advancedOptions, showAdvancedOptions] = useState(false);
   let [displayEmbed, setDisplayEmbed] = useState(false);
 
   /* Functions which I want to have access to the Home namespace */
@@ -259,7 +262,7 @@ export default function Home({ items, lastUpdated }) {
           console.log("executeSearch/starsThreshold", starsThreshold);
           console.log("executeSearch/forecastsThreshold", forecastsThreshold);
           console.log("executeSearch/forecastingPlatforms", forecastingPlatforms);
-          console.log(settings);
+          console.log(searchSpeedSettings);
         
         console.log(results);
         setResults(results);
@@ -271,19 +274,26 @@ export default function Home({ items, lastUpdated }) {
       setResults(results)
     }
   };
- 
-  let displayForecastsWrapper = (results) => {
-    return displayForecasts(results, 1);
+
+  // I don't want display forecasts to change with a change in queryParameters, but I want it to have access to the queryParameters, in particular the numDisplay. Hence why this function lives inside Home.
+  let getInfoToDisplayForecastsFunction = (displayForecastsFunction, {results, displayEmbed, setDisplayEmbed}) => {
+    let numDisplayRounded =
+      queryParameters.numDisplay % 3 != 0
+        ? queryParameters.numDisplay +
+          (3 - (Math.round(queryParameters.numDisplay) % 3))
+        : queryParameters.numDisplay;
+    console.log("numDisplay", queryParameters.numDisplay);
+    console.log("numDisplayRounded", numDisplayRounded);
+    return displayForecastsFunction({results, numDisplay: numDisplayRounded, displayEmbed, setDisplayEmbed});
   };
 
   /* State controllers */
   let onChangeSearchInputs = (newQueryParameters) => {
     setQueryParameters({ ...newQueryParameters, processedUrlYet: true });
     console.log("onChangeSearchInputs/newQueryParameters", newQueryParameters);
-
     setResults([]);
-    setDisplayEmbed(false)
-    clearTimeout(settings.timeoutId);
+    setDisplayEmbed(processDisplayOnSearchBegin())
+    clearTimeout(searchSpeedSettings.timeoutId);
     let newtimeoutId = setTimeout(async () => {
       console.log(
         "onChangeSearchInputs/timeout/newQueryParameters",
@@ -292,9 +302,9 @@ export default function Home({ items, lastUpdated }) {
       let urlSlug = transformObjectIntoUrlSlug(newQueryParameters);
       router.push(urlSlug);
       executeSearch(newQueryParameters);
-      setSettings({ ...settings, timeoutId: null });
-    }, settings.awaitEndTyping);
-    setSettings({ ...settings, timeoutId: newtimeoutId });
+      setSearchSpeedSettings({ ...searchSpeedSettings, timeoutId: null });
+    }, searchSpeedSettings.awaitEndTyping);
+    setSearchSpeedSettings({ ...searchSpeedSettings, timeoutId: newtimeoutId });
   };
 
   let processState = (queryParameters) => {
@@ -304,7 +314,7 @@ export default function Home({ items, lastUpdated }) {
     // However, it has the disadvantage that it produces static webpages
     // In particular, parsing the url for parameters proves to be somewhat difficult
     // I do it by having a state variable
-
+    // Maybe doable with useEffect?
     // Process the URL on initial page load
     if (queryParameters.processedUrlYet == false) {
       let urlQuery = router.query;
@@ -384,68 +394,79 @@ export default function Home({ items, lastUpdated }) {
     onChangeSearchInputs(newQueryParameters);
   };
 
-  /* Show advanced options */
-  let [advancedOptions, showAdvancedOptions] = useState(false);
-
   /* Final return */
   return (
-    <Layout key="index" page="embed" lastUpdated={lastUpdated}>
-      <div className="">
-        <div className="invisible">{processState(queryParameters)}</div>
-        <label className="mb-4 mt-4 flex flex-row justify-center items-center">
-          <div className="w-10/12 mb-2">
-          <Form value={queryParameters.query} onChange={onChangeSearchBar} placeholder="Get best title match"/>
-          </div>
-          <div className="w-2/12 flex justify-center ml-4 md:ml-2 lg:ml-0">
-            <button
-              className="text-gray-500 text-sm mb-2"
-              onClick={() => showAdvancedOptions(!advancedOptions)}
-            >
-              Advanced options ▼
-            </button>
-          </div>
-        </label>
+    <Layout key="index" page={pageName} lastUpdated={lastUpdated}>
+      <div className="invisible">{processState(queryParameters)}</div>
 
-        <div className="flex flex-col mx-auto justify-center items-center">
-          <div
-            className={`flex-1 flex-col mx-auto justify-center items-center w-full ${
-              advancedOptions ? "" : "hidden"
-            }`}
+      <label className="mb-4 mt-4 flex flex-row justify-center items-center">
+        <div className="w-10/12 mb-2">
+          <Form value={queryParameters.query} onChange={onChangeSearchBar} placeholder={placeholder}/>
+        </div>
+        <div className="w-2/12 flex justify-center ml-4 md:ml-2 lg:ml-0">
+          <button
+            className="text-gray-500 text-sm mb-2"
+            onClick={() => showAdvancedOptions(!advancedOptions)}
           >
-            <div className="grid sm:grid-rows-4 sm:grid-cols-1 md:grid-rows-2 lg:grid-rows-2 grid-cols-1 md:grid-cols-3 lg:grid-cols-3 items-center content-center bg-gray-50 rounded-md px-8 pt-4 pb-1 shadow mb-4">
-              <div className="flex row-start-1 row-end-1  col-start-1 col-end-4 md:row-span-1 md:col-start-1 md:col-end-1 md:row-start-1 md:row-end-1 lg:row-span-1 lg:col-start-1 lg:col-end-1 lg:row-start-1 lg:row-end-1 items-center justify-center mb-4">
-                <SliderElement
-                  className="flex items-center justify-center"
-                  onChange={onChangeSliderForNumForecasts}
-                  value={queryParameters.forecastsThreshold}
-                  displayFunction={displayFunctionNumForecasts}
-                />
-              </div>
-              <div className="flex row-start-2 row-end-2  col-start-1 col-end-4 md:row-start-1 md:row-end-1 md:col-start-2 md:col-end-2 lg:row-start-1 lg:row-end-1 lg:col-start-2 md:col-end-2 items-center justify-center mb-4">
-                <ButtonsForStars
-                  onChange={onChangeStars}
-                  value={queryParameters.starsThreshold}
-                />
-              </div>
-              <div className="flex row-start-3 row-end-3  col-start-1 col-end-4 md:col-start-3 md:col-end-3 md:row-start-1 md:row-end-1 lg:col-start-3 lg:col-end-3 lg:row-start-1 lg:row-end-1 items-center justify-center mb-4">
-                <SliderElement
-                  value={queryParameters.numDisplay}
-                  onChange={onChangeSliderForNumDisplay}
-                  displayFunction={displayFunctionNumDisplaySlider}
-                />
-              </div>
-              <div className="flex col-span-3 items-center justify-center">
-                <MultiSelectPlatform
-                  value={queryParameters.forecastingPlatforms}
-                  onChange={onChangeSelectedPlatforms}
-                />
-              </div>
+            Advanced options ▼
+          </button>
+        </div>
+      </label>
+
+      {/*<div className="flex flex-col mx-auto justify-center items-center">*/}
+        <div
+          className={`flex-1 flex-col mx-auto justify-center items-center w-full ${
+            advancedOptions ? "" : "hidden"
+          }`}
+        >
+          <div className="grid sm:grid-rows-4 sm:grid-cols-1 md:grid-rows-2 lg:grid-rows-2 grid-cols-1 md:grid-cols-3 lg:grid-cols-3 items-center content-center bg-gray-50 rounded-md px-8 pt-4 pb-1 shadow mb-4">
+            <div className="flex row-start-1 row-end-1  col-start-1 col-end-4 md:row-span-1 md:col-start-1 md:col-end-1 md:row-start-1 md:row-end-1 lg:row-span-1 lg:col-start-1 lg:col-end-1 lg:row-start-1 lg:row-end-1 items-center justify-center mb-4">
+              <SliderElement
+                className="flex items-center justify-center"
+                onChange={onChangeSliderForNumForecasts}
+                value={queryParameters.forecastsThreshold}
+                displayFunction={displayFunctionNumForecasts}
+              />
+            </div>
+            <div className="flex row-start-2 row-end-2  col-start-1 col-end-4 md:row-start-1 md:row-end-1 md:col-start-2 md:col-end-2 lg:row-start-1 lg:row-end-1 lg:col-start-2 md:col-end-2 items-center justify-center mb-4">
+              <ButtonsForStars
+                onChange={onChangeStars}
+                value={queryParameters.starsThreshold}
+              />
+            </div>
+            <div className="flex row-start-3 row-end-3  col-start-1 col-end-4 md:col-start-3 md:col-end-3 md:row-start-1 md:row-end-1 lg:col-start-3 lg:col-end-3 lg:row-start-1 lg:row-end-1 items-center justify-center mb-4">
+              <SliderElement
+                value={queryParameters.numDisplay}
+                onChange={onChangeSliderForNumDisplay}
+                displayFunction={displayFunctionNumDisplaySlider}
+              />
+            </div>
+            <div className="flex col-span-3 items-center justify-center">
+              <MultiSelectPlatform
+                value={queryParameters.forecastingPlatforms}
+                onChange={onChangeSelectedPlatforms}
+              />
             </div>
           </div>
         </div>
-        <div className="flex justify-center">
-          {displayOneForecast(results[0], displayEmbed, setDisplayEmbed)}
-        </div>
+      {/*</div>*/}
+
+      {getInfoToDisplayForecastsFunction(displayForecastsWrapper, {results, displayEmbed, setDisplayEmbed})}
+
+      <div className={`${displaySeeMoreHint ? "" : "hidden"}`}>
+        <p className ={`mt-4 mb-4 ${results.length != 0 && queryParameters.numDisplay < results.length? "": "hidden"}`}>
+          {"Can't find what you were looking for? "}
+          <span
+            className="cursor-pointer text-blue-800"
+            onClick={() => {
+            setQueryParameters({ ...queryParameters, numDisplay: queryParameters.numDisplay * 2 });
+            }}
+          >
+            {"Show more,"}
+          </span>
+          {" or "}
+          <a href="https://www.metaculus.com/questions/create/" className="cursor-pointer text-blue-800 no-underline" target="_blank" >suggest a question on Metaculus</a> 
+        </p>
       </div>
     </Layout>
   );
