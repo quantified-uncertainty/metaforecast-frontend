@@ -170,101 +170,100 @@ export default function Home({ items, lastUpdated }) {
 
         let fuse = new Fuse(itemsFiltered, opts);
 
-          results = fuse.search(query)
-          
-          // Adjust for search quality
-          // Elicit results are so bad but so numerous that I need to make an adjustment here.
-          // (Higher scores are worse)
-          results = results.map((result) => {
-            result.score = result.item.platform == "Elicit" ? result.score * 2 + 0.1 : result.score 
-            result.score = result.item.platform == "Guesstimate" ? result.score + 0.1 : result.score
-            return result;
-          });
-          results.sort((a, b) => {
-            return Number(a.score) > Number(b.score) ? 1 : -1;
-          });
-          
-          // Catch stray exact matches
-          let querylowercase = query.toLowerCase();
-          let queriesSplit = querylowercase.split(" ")
-          let queriesSplitlength = queriesSplit.length
-          let resultsExactMatch = []
-          let resultsPseudoExactMatchAND = []
-          let resultsPseudoExactMatchOR = []
-          let resultsNotExactMatch = []
-
-          let exactMatchDetector = obj => obj.item.title.toLowerCase().includes(querylowercase)
-          let pseudoExactMatchDetectorAND = obj => {
-            if(queriesSplitlength <= 3){
-              let results = queriesSplit.map(querySplit => obj.item.title.toLowerCase().includes(querySplit))
-              return results.reduce((a,b) => a && b)
-            }else{
-              return []
-            }
-          }
-          let pseudoExactMatchDetectorOR = obj => {
-            if(queriesSplitlength < 3){
-              let results = queriesSplit.map(querySplit => obj.item.title.toLowerCase().includes(querySplit))
-              return results.reduce((a,b) => a || b)
-            }else{
-              return []
-            }
-          }
-
-          if(queriesSplit[0] != querylowercase){
-            for(let result of results){
-              if(exactMatchDetector(result)){
-                resultsExactMatch.push(result)
-              }else if(pseudoExactMatchDetectorAND(result)){
-                resultsPseudoExactMatchAND.push(result)
-              }else if(pseudoExactMatchDetectorOR(result)){
-                resultsPseudoExactMatchOR.push(result)
-              }else{
-                resultsNotExactMatch.push(result)
-              }
-            }
-          }
-          
-          if(queriesSplit[0] == querylowercase){
-            for(let result of results){
-              if(exactMatchDetector(result)){
-                resultsExactMatch.push(result)
-              }else{
-                resultsNotExactMatch.push(result)
-              }
-            }
-          }
-
-          // Sort exact matches by forecast quality, rather than by string match.
-          let sortByStarsThenNumForecastsThenScore = (a, b) => {
-            if (a.item.qualityindicators.stars != b.item.qualityindicators.stars) {
-              return Number(a.item.qualityindicators.stars) < Number(b.item.qualityindicators.stars) ? 1 : -1;
-            } else if (a.item.qualityindicators.numforecasts != b.item.qualityindicators.numforecasts) {
-              return (Number(a.item.qualityindicators.numforecasts) || 20) <
-                (Number(b.item.qualityindicators.numforecasts) || 20)
-                ? 1
-                : -1;
-                // undefined number of forecasts => equivalent to 20 forecasts (not that many) for the purposes of sorting
-            } else {
-              return Number(a.score) > Number(b.score) ? 1 : -1;
-            }
-          }
-          resultsExactMatch.sort(sortByStarsThenNumForecastsThenScore);                
-          resultsPseudoExactMatchAND = resultsPseudoExactMatchAND.map(result => ({...result, score: result.score < 0.4 ? result.score : 0.39})) // Results with a score lower than 0.4 get shown in grey, but shouldn't in this case.
-          resultsPseudoExactMatchAND.sort(sortByStarsThenNumForecastsThenScore)
-
-          // Conclude
-          results = [...resultsExactMatch, ...resultsPseudoExactMatchAND, ...resultsPseudoExactMatchOR, ...resultsNotExactMatch];
-
-          console.log("Executing search");
-          console.log("executeSearch/query", query);
-          console.log("executeSearch/items  ", itemsTotal);
-          console.log("executeSearch/starsThreshold", starsThreshold);
-          console.log("executeSearch/forecastsThreshold", forecastsThreshold);
-          console.log("executeSearch/forecastingPlatforms", forecastingPlatforms);
-          console.log(searchSpeedSettings);
+        results = fuse.search(query)
         
-        console.log(results);
+        // Adjust for search quality
+        // Elicit results are so bad but so numerous that I need to make an adjustment here.
+        // (Higher scores are worse)
+        results = results.map((result) => {
+          result.score = result.item.platform == "Elicit" ? result.score * 2 + 0.1 : result.score 
+          result.score = result.item.platform == "Guesstimate" ? result.score + 0.1 : result.score
+          return result;
+        });
+        results.sort((a, b) => {
+          return Number(a.score) > Number(b.score) ? 1 : -1;
+        });
+        
+        // Catch stray exact matches
+        let querylowercase = query.toLowerCase();
+        let queriesSplit = querylowercase.split(" ")
+        let queriesSplitlength = queriesSplit.length
+        let resultsExactMatch = []
+        let resultsPseudoExactMatchAND = []
+        let resultsPseudoExactMatchOR = []
+        let resultsNotExactMatch = []
+
+        let exactMatchDetector = obj => obj.item.title.toLowerCase().includes(querylowercase)
+        let pseudoExactMatchDetectorAND = obj => {
+          if(queriesSplitlength <= 3){
+            let results = queriesSplit.map(querySplit => obj.item.title.toLowerCase().includes(querySplit))
+            return results.reduce((a,b) => a && b)
+          }else{
+            return []
+          }
+        }
+        let pseudoExactMatchDetectorOR = obj => {
+          if(queriesSplitlength < 3){
+            let results = queriesSplit.map(querySplit => obj.item.title.toLowerCase().includes(querySplit))
+            return results.reduce((a,b) => a || b)
+          }else{
+            return []
+          }
+        }
+
+        if(queriesSplit[0] != querylowercase){
+          for(let result of results){
+            if(exactMatchDetector(result)){
+              resultsExactMatch.push(result)
+            }else if(pseudoExactMatchDetectorAND(result)){
+              resultsPseudoExactMatchAND.push(result)
+            }else if(pseudoExactMatchDetectorOR(result)){
+              resultsPseudoExactMatchOR.push(result)
+            }else{
+              resultsNotExactMatch.push(result)
+            }
+          }
+        }
+        
+        if(queriesSplit[0] == querylowercase){
+          for(let result of results){
+            if(exactMatchDetector(result)){
+              resultsExactMatch.push(result)
+            }else{
+              resultsNotExactMatch.push(result)
+            }
+          }
+        }
+
+        // Sort exact matches by forecast quality, rather than by string match.
+        let sortByStarsThenNumForecastsThenScore = (a, b) => {
+          if (a.item.qualityindicators.stars != b.item.qualityindicators.stars) {
+            return Number(a.item.qualityindicators.stars) < Number(b.item.qualityindicators.stars) ? 1 : -1;
+          } else if (a.item.qualityindicators.numforecasts != b.item.qualityindicators.numforecasts) {
+            return (Number(a.item.qualityindicators.numforecasts) || 20) <
+              (Number(b.item.qualityindicators.numforecasts) || 20)
+              ? 1
+              : -1;
+              // undefined number of forecasts => equivalent to 20 forecasts (not that many) for the purposes of sorting
+          } else {
+            return Number(a.score) > Number(b.score) ? 1 : -1;
+          }
+        }
+        resultsExactMatch.sort(sortByStarsThenNumForecastsThenScore);                
+        resultsPseudoExactMatchAND = resultsPseudoExactMatchAND.map(result => ({...result, score: result.score < 0.4 ? result.score : 0.39})) // Results with a score lower than 0.4 get shown in grey, but shouldn't in this case.
+        resultsPseudoExactMatchAND.sort(sortByStarsThenNumForecastsThenScore)
+
+        // Conclude
+        results = [...resultsExactMatch, ...resultsPseudoExactMatchAND, ...resultsPseudoExactMatchOR, ...resultsNotExactMatch];
+
+        console.log("Executing search");
+        console.log("executeSearch/query", query);
+        console.log("executeSearch/items  ", itemsTotal);
+        console.log("executeSearch/starsThreshold", starsThreshold);
+        console.log("executeSearch/forecastsThreshold", forecastsThreshold);
+        console.log("executeSearch/forecastingPlatforms", forecastingPlatforms);
+        console.log("executeSearch/searchSpeedSettings", searchSpeedSettings);
+        console.log("executeSearch/results", results);
         setResults(results);
       });
     //}else if(query == ""){
@@ -468,6 +467,7 @@ export default function Home({ items, lastUpdated }) {
           <a href="https://www.metaculus.com/questions/create/" className="cursor-pointer text-blue-800 no-underline" target="_blank" >suggest a question on Metaculus</a> 
         </p>
       </div>
+      <br></br>
     </Layout>
   );
 }
