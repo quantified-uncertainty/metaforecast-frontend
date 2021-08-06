@@ -9,6 +9,7 @@ import Fuse from "fuse.js";
 import { getForecasts } from "../lib/worker/getForecasts.js";
 import searchGuesstimate from "../lib/worker/searchGuesstimate.js";
 import { displayForecastsWrapperForSearch } from "../lib/display/displayForecastsWrappers.js";
+import { displayForecastsWrapperForEmbed } from "../lib/display/displayForecastsWrappers.js";
 
 // Parts
 import Layout from "./layout.js";
@@ -17,14 +18,33 @@ import { SliderElement } from "../lib/display/slider.js";
 import MultiSelectPlatform from "../lib/display/multiSelectPlatforms.js";
 import ButtonsForStars from "../lib/display/buttonsForStars.js";
 
+/* Toggle options */
+// For search
+const search = ({
+  pageName: "search",
+  processDisplayOnSearchBegin: () => null,
+  placeholder: "Find forecasts about...",
+  displaySeeMoreHint: true,
+  displayForecastsWrapper: displayForecastsWrapperForSearch
+})
+
+// For embed
+const embed = ({
+  pageName: "embed",
+  processDisplayOnSearchBegin: () => false,
+  placeholder: "Get best title match",
+  displaySeeMoreHint: false,
+  displayForecastsWrapper: displayForecastsWrapperForEmbed
+})
+
+const pageName = "embed"
+const processDisplayOnSearchBegin = () => false
+const placeholder = "Get best title match"
+const displaySeeMoreHint = false
+const displayForecastsWrapper = displayForecastsWrapperForEmbed
+
 /* Definitions */
 
-/* Abstracted Away */
-const pageName = "search"
-const processDisplayOnSearchBegin = () => true
-const placeholder = "Find forecasts about..."
-const displaySeeMoreHint = true
-const displayForecastsWrapper = displayForecastsWrapperForSearch
 // Everything below is the same as in embed.js, 
 // but I haven't figured out how I want to abstract it away yet
 
@@ -141,6 +161,7 @@ export default function Home({ items, lastUpdated }) {
   //let initialResults = []; // shuffleArray(items.filter(item => item.qualityindicators.stars >= 3)).slice(0,100).map(item => ({score: 0, item: item}))
   const [results, setResults] = useState([])//useState(initialResults);
   let [advancedOptions, showAdvancedOptions] = useState(false);
+  let [embeddToggle, switchEmbedToggle] = useState("search")  // embed
   let [displayEmbed, setDisplayEmbed] = useState(false);
 
   /* Functions which I want to have access to the Home namespace */
@@ -290,7 +311,7 @@ export default function Home({ items, lastUpdated }) {
     setQueryParameters({ ...newQueryParameters, processedUrlYet: true });
     console.log("onChangeSearchInputs/newQueryParameters", newQueryParameters);
     setResults([]);
-    setDisplayEmbed(processDisplayOnSearchBegin())
+    setDisplayEmbed(embeddToggle == "search" ? search.processDisplayOnSearchBegin() : embed.processDisplayOnSearchBegin())
     clearTimeout(searchSpeedSettings.timeoutId);
     let newtimeoutId = setTimeout(async () => {
       console.log(
@@ -394,12 +415,12 @@ export default function Home({ items, lastUpdated }) {
 
   /* Final return */
   return (
-    <Layout key="index" page={pageName} lastUpdated={lastUpdated}>
+    <Layout key="index" page={embeddToggle == "search" ? search.pageName : embed.pageName} lastUpdated={lastUpdated} embeddToggle={embeddToggle} switchEmbedToggle={switchEmbedToggle}>
       <div className="invisible">{processState(queryParameters)}</div>
 
       <label className="mb-4 mt-4 flex flex-row justify-center items-center">
         <div className="w-10/12 mb-2">
-          <Form value={queryParameters.query} onChange={onChangeSearchBar} placeholder={placeholder}/>
+          <Form value={queryParameters.query} onChange={onChangeSearchBar} placeholder={embeddToggle == "search" ? search.placeholder : embed.placeholder}/>
         </div>
         <div className="w-2/12 flex justify-center ml-4 md:ml-2 lg:ml-0">
           <button
@@ -448,10 +469,15 @@ export default function Home({ items, lastUpdated }) {
           </div>
         </div>
       {/*</div>*/}
+      
+      <div className={embeddToggle == "search" ? "" : "hidden"}> 
+        {getInfoToDisplayForecastsFunction((search.displayForecastsWrapper), {results, displayEmbed, setDisplayEmbed})}
+      </div>
+      <div className={embeddToggle == "embed" ? "" : "hidden"}> 
+        {getInfoToDisplayForecastsFunction((embed.displayForecastsWrapper), {results, displayEmbed, setDisplayEmbed})}
+      </div>
 
-      {getInfoToDisplayForecastsFunction(displayForecastsWrapper, {results, displayEmbed, setDisplayEmbed})}
-
-      <div className={`${displaySeeMoreHint ? "" : "hidden"}`}>
+      <div className={`${(embeddToggle == "search" ? search.displaySeeMoreHint : embed.displaySeeMoreHint) ? "" : "hidden"/*Fairly barroque, but keeps to the overall toggle-based scheme */}`}>
         <p className ={`mt-4 mb-4 ${results.length != 0 && queryParameters.numDisplay < results.length? "": "hidden"}`}>
           {"Can't find what you were looking for? "}
           <span

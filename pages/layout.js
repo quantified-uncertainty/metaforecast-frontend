@@ -2,14 +2,22 @@ import Link from "next/link";
 import Head from "next/head";
 import { AiOutlineCompass } from "react-icons/ai";
 // import { GiDiceEightFacesEight } from "react-icons/gi";
+
+/* Utilities */
 const IconElement = AiOutlineCompass
 const classNameSelected = (isSelected) =>
   `py-4 px-2 ml-4 text-md font-medium cursor-pointer border-b-2 border-transparent ${isSelected
     ? "text-blue-700 border-blue-700"
     : "text-gray-400 hover:text-blue-500 hover:border-blue-500"
   }`;
+const isEmbedSelected = (embedToggle) =>  `py-4 px-2 ml-4 text-md font-medium cursor-pointer border-2 border-transparent ${embedToggle == "embed"
+  ? "text-blue-700 border-blue-700"
+  : "text-gray-400 hover:text-blue-500 hover:border-blue-500"
+}`;
+const changeEmbedToggle = (embedToggle) => embedToggle == "embed" ? "search"  : "embed"
 
-export default function Layout(props) {
+/* Main */
+export default function Layout({page, lastUpdated, children, embeddToggle, switchEmbedToggle}) {
   return (
     <div>
       <Head>
@@ -29,41 +37,43 @@ export default function Layout(props) {
                     <span className="text-sm sm:text-2xl text-gray-700">Metaforecast</span>
                   </a>
                 </Link>
-                <div className={`flex py-4 px-2 sm:ml-4 text-base text-gray-400 ${props.lastUpdated || "hidden"}`}>
+                <div className={`flex py-4 px-2 sm:ml-4 text-base text-gray-400 ${lastUpdated || "hidden"}`}>
                   <div className="hidden sm:inline-flex items-center text-gray-700">
                     
                     <svg className="ml-4 mr-1 mt-1" height="10" width="16">
                       <circle cx="4" cy="4" r="4" fill="rgb(29, 78, 216)" />
                     </svg>
                     
-                    <span>{`Last updated: ${props.lastUpdated ? props.lastUpdated.slice(0,10) : "unknown" }`}</span>
+                    <span>{`Last updated: ${lastUpdated ? lastUpdated.slice(0,10) : "unknown" }`}</span>
                   </div>
               </div>
               </div>
               
               <div className="flex flex-row-reverse items-start space-x-4 text-sm sm:text-lg md:text-lg lg:text-lg">
-                <Link href={`/embed`} passHref>
-                  <span className={classNameSelected(props.page === "embed")}>
+                <button className="mt-4" onClick={() => switchEmbedToggle(changeEmbedToggle(embeddToggle)) }> 
+                  <span className={`${(page === "search" || page == "embed") ? "" : "hidden"} ${isEmbedSelected(embeddToggle)}`}>
                     Embed
                   </span>
-                </Link>
+                </button>
                 <Link href={`/about`} passHref>
-                  <span className={classNameSelected(props.page === "about")}>
+                  <span className={classNameSelected(page === "about")}>
                     About
                   </span>
                 </Link>
-                <Link href={`/`} passHref>
-                  <span className={classNameSelected(props.page === "search")}>
+                <button onClick={() => switchEmbedToggle("search")} className="mt-4">
+                <Link href={`/`} passHref >
+                  <span className={classNameSelected(page === "search")}>
                     Search
                   </span>
                 </Link>
+                </button>
               </div>
             </div>
           </div>
         </nav>
         <main>
           <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-left pt-5">
-            {props.children}
+            {children}
           </div>
         </main>
       </div>

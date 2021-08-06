@@ -24,7 +24,7 @@ With regards the quality, I am most uncertain about Smarkets, Hypermind, Ladbrok
 
 export default function About() {
   return (
-    <Layout key="index" page="about" lastUpdated={0}>
+    <Layout key="index" page="about" lastUpdated={null} embeddToggle={null} switchEmbedToggle={() => null}>
       <div className="px-2 py-2 bg-white rounded-md shadow place-content-stretch flex-grow place-self-center">
         <ReactMarkdown
           plugins={[gfm]}
