@@ -91,6 +91,8 @@ export async function getServerSideProps(context) { //getServerSideProps
 }
 */
 
+
+
 /* Body */
 export default function Home({ items, lastUpdated }) {
   //, urlQuery }) {
@@ -467,6 +469,7 @@ export default function Home({ items, lastUpdated }) {
           <a href="https://www.metaculus.com/questions/create/" className="cursor-pointer text-blue-800 no-underline" target="_blank" >suggest a question on Metaculus</a> 
         </p>
       </div>
+      <br></br>
     </Layout>
   );
 }
