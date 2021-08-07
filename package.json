@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "echo http://imgurtester:3000/ && next dev ",
     "build": "next build",
     "start": "next start",
     "export": "next export"
@@ -12,6 +12,7 @@
     "@tailwindcss/forms": "^0.2.1",
     "@tailwindcss/typography": "^0.4.0",
     "airtable": "^0.10.1",
+    "algoliasearch": "^4.10.3",
     "autoprefixer": "^10.1.0",
     "axios": "^0.21.1",
     "critters": "^0.0.6",

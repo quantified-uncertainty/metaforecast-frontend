@@ -5,9 +5,10 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router"; // https://nextjs.org/docs/api-reference/next/router
 
 // Utilities
-import Fuse from "fuse.js";
-import { getForecasts } from "../lib/worker/getForecasts.js";
+// import Fuse from "fuse.js";
+// import { getForecasts } from "../lib/worker/getForecasts.js"; // This throws an error if it's loader but not used.
 import searchGuesstimate from "../lib/worker/searchGuesstimate.js";
+import searchWithAlgolia from "../lib/worker/searchWithAlgolia.js";
 import { displayForecastsWrapperForSearch } from "../lib/display/displayForecastsWrappers.js";
 import { displayForecastsWrapperForEmbed } from "../lib/display/displayForecastsWrappers.js";
 
@@ -37,11 +38,13 @@ const embed = ({
   displayForecastsWrapper: displayForecastsWrapperForEmbed
 })
 
+/*
 const pageName = "embed"
 const processDisplayOnSearchBegin = () => false
 const placeholder = "Get best title match"
 const displaySeeMoreHint = false
 const displayForecastsWrapper = displayForecastsWrapperForEmbed
+*/
 
 /* Definitions */
 
@@ -84,16 +87,33 @@ let transformObjectIntoUrlSlug = (obj) => {
   return string;
 };
 
+// Calculate last updated
+// rather than checking it from the data; the data is now first fetched on search
+// The principled way to do this might be to create a document in mongo
+// with just the date of last update
+let calculateLastUpdate = () => {
+  let today = new Date().toISOString()
+  let yesterdayObj = new Date(); 
+  yesterdayObj.setDate(yesterdayObj.getDate() -1)
+  let yesterday = yesterdayObj.toISOString()
+  if(today.slice(11,16) > "02:00"){
+    return today.slice(0,10)
+  }else{
+    return yesterday.slice(0,10)
+  }
+}
+
+
 /* get Props */
 export async function getStaticProps() {
   //getServerSideProps
-  let metaforecasts = await getForecasts();
-  let lastUpdated = metaforecasts.find(forecast => forecast.platform == "Good Judgment Open").timestamp
-  console.log(lastUpdated)
+  let items = []//await getForecasts();
+  let lastUpdated = calculateLastUpdate() // metaforecasts.find(forecast => forecast.platform == "Good Judgment Open").timestamp
+  // console.log(lastUpdated)
   //console.log("metaforecasts", metaforecasts)
   return {
     props: {
-      items: metaforecasts,
+      items,
       lastUpdated
     },
   };
@@ -122,7 +142,7 @@ export default function Home({ items, lastUpdated }) {
     query: "",
     processedUrlYet: false,
     starsThreshold: 2,
-    numDisplay: 20, // 20
+    numDisplay: 21, // 20
     forecastsThreshold: 0,
     forecastingPlatforms: [
       // Excluding Elicit and Omen
@@ -166,7 +186,7 @@ export default function Home({ items, lastUpdated }) {
 
   /* Functions which I want to have access to the Home namespace */
   // I don't want to create an "items" object for each search.
-  let executeSearch = (queryData) => {
+  let  executeSearch = async (queryData) => {
     let results = [];
     let query = queryData.query;
     let forecastsThreshold = queryData.forecastsThreshold;
@@ -176,8 +196,35 @@ export default function Home({ items, lastUpdated }) {
     );
 
     if (query != undefined && query != "") {
+      if(forecastingPlatforms.includes("Guesstimate") && starsThreshold <= 1){
+        let responses = await Promise.all([
+          searchWithAlgolia({queryString: query, hitsPerPage: queryParameters.numDisplay + 50, starsThreshold, filterByPlatforms: forecastingPlatforms, forecastsThreshold}), 
+          searchGuesstimate(query)
+        ])
+        let responsesNotGuesstimate = responses[0].hits.map((result, index) => ({...result, ranking: index}))
+        let responsesGuesstimate  = responses[1]
+        let results = [...responsesNotGuesstimate, ...responsesGuesstimate]
+        results.sort((x,y)=> x.ranking > y.ranking)
+        console.log(results)
+        let resultsCompatibilityWithFuse = results.map(result => ({item: result, score:0}))
+        setResults(resultsCompatibilityWithFuse);
+      }else{
+        let response = await searchWithAlgolia({queryString: query, hitsPerPage: queryParameters.numDisplay +50, starsThreshold, filterByPlatforms: forecastingPlatforms, forecastsThreshold})
+        let results = response.hits
+        let resultsCompatibilityWithFuse = results.map(result => ({item: result, score:0}))
+        setResults(resultsCompatibilityWithFuse);
+      }
+      
+    }else{
+      setResults([])
+    
+    }
+  }
+      /*, (results) => {
+        
       searchGuesstimate(query).then((itemsGuesstimate) => {
         // We enter the first level of asynchronous hell.
+        
         let itemsTotal = items.concat(itemsGuesstimate);
 
         let itemsFiltered = itemsTotal.filter(
@@ -275,25 +322,29 @@ export default function Home({ items, lastUpdated }) {
 
         // Conclude
         results = [...resultsExactMatch, ...resultsPseudoExactMatchAND, ...resultsPseudoExactMatchOR, ...resultsNotExactMatch];
+        
 
         console.log("Executing search");
         console.log("executeSearch/query", query);
-        console.log("executeSearch/items  ", itemsTotal);
+        // console.log("executeSearch/items  ", itemsTotal);
         console.log("executeSearch/starsThreshold", starsThreshold);
         console.log("executeSearch/forecastsThreshold", forecastsThreshold);
         console.log("executeSearch/forecastingPlatforms", forecastingPlatforms);
         console.log("executeSearch/searchSpeedSettings", searchSpeedSettings);
         console.log("executeSearch/results", results);
-        setResults(results);
+        let newResultsCompatibilityWithFuse = results.map(result => ({item: result, score:0}))
+        setResults(newResultsCompatibilityWithFuse);
       });
+      
     //}else if(query == ""){
       //let randomResults = shuffleArray(items.filter(item => item.qualityindicators.stars >= 3)).slice(0,100).map(item => ({score: 0, item: item}))
       //setResults(randomResults);
     }else{
       setResults(results)
+    
     }
   };
-
+  */
   // I don't want display forecasts to change with a change in queryParameters, but I want it to have access to the queryParameters, in particular the numDisplay. Hence why this function lives inside Home.
   let getInfoToDisplayForecastsFunction = (displayForecastsFunction, {results, displayEmbed, setDisplayEmbed}) => {
     let numDisplayRounded =
