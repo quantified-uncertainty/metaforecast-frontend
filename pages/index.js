@@ -208,7 +208,7 @@ export default function Home({ items, lastUpdated }) {
         results = resultsCompatibilityWithFuse
       }else{
         let response = await searchWithAlgolia({queryString: query, hitsPerPage: queryParameters.numDisplay +50, starsThreshold, filterByPlatforms: forecastingPlatforms, forecastsThreshold})
-        let resultsCompatibilityWithFuse = response.map((result, index) => ({item: result, score:(0.5-1/(index+1))}))
+        let resultsCompatibilityWithFuse = response.map((result, index) => ({item: result, score:0.4-(0.4/(index+1))}))
         results = resultsCompatibilityWithFuse
       }
       
