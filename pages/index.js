@@ -187,38 +187,44 @@ export default function Home({ items, lastUpdated }) {
   /* Functions which I want to have access to the Home namespace */
   // I don't want to create an "items" object for each search.
   let  executeSearch = async (queryData) => {
-    let results = [];
     let query = queryData.query;
     let forecastsThreshold = queryData.forecastsThreshold;
     let starsThreshold = queryData.starsThreshold;
     let forecastingPlatforms = queryData.forecastingPlatforms.map(
       (x) => x.value
     );
-
+    let results = []
     if (query != undefined && query != "") {
       if(forecastingPlatforms.includes("Guesstimate") && starsThreshold <= 1){
         let responses = await Promise.all([
           searchWithAlgolia({queryString: query, hitsPerPage: queryParameters.numDisplay + 50, starsThreshold, filterByPlatforms: forecastingPlatforms, forecastsThreshold}), 
           searchGuesstimate(query)
         ])
-        let responsesNotGuesstimate = responses[0].hits.map((result, index) => ({...result, ranking: index}))
+        let responsesNotGuesstimate = responses[0]
         let responsesGuesstimate  = responses[1]
-        let results = [...responsesNotGuesstimate, ...responsesGuesstimate]
-        results.sort((x,y)=> x.ranking > y.ranking)
-        console.log(results)
-        let resultsCompatibilityWithFuse = results.map(result => ({item: result, score:0}))
-        setResults(resultsCompatibilityWithFuse);
+        let resultsUnprocessed = [...responsesNotGuesstimate, ...responsesGuesstimate]
+        //results.sort((x,y)=> x.ranking < y.ranking ? -1: 1)
+        let resultsCompatibilityWithFuse = resultsUnprocessed.map(result => ({item: result, score:0}))
+        results = resultsCompatibilityWithFuse
       }else{
         let response = await searchWithAlgolia({queryString: query, hitsPerPage: queryParameters.numDisplay +50, starsThreshold, filterByPlatforms: forecastingPlatforms, forecastsThreshold})
-        let results = response.hits
-        let resultsCompatibilityWithFuse = results.map(result => ({item: result, score:0}))
-        setResults(resultsCompatibilityWithFuse);
+        let resultsCompatibilityWithFuse = response.map((result, index) => ({item: result, score:(0.5-1/(index+1))}))
+        results = resultsCompatibilityWithFuse
       }
       
     }else{
-      setResults([])
-    
+      results = [] // redundant
     }
+
+    console.log("Executing search");
+    console.log("executeSearch/query", query);
+    // console.log("executeSearch/items  ", itemsTotal);
+    console.log("executeSearch/starsThreshold", starsThreshold);
+    console.log("executeSearch/forecastsThreshold", forecastsThreshold);
+    console.log("executeSearch/forecastingPlatforms", forecastingPlatforms);
+    console.log("executeSearch/searchSpeedSettings", searchSpeedSettings);
+    console.log("executeSearch/results", results);
+    setResults(results)
   }
       /*, (results) => {
         
