@@ -14,9 +14,13 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Project structure
 
-- Main file: `pages/index.js`
-- `lib/display/displayForecasts.js` displays the individual forecasts
-- Various files in `/lib/` provide components
-- `lib/getForecasts.js` gets forecasts when the static site is generated.
+- The main file is `pages/index.js`. 
+- `lib/display/` contains files which produce display elements. Of these, `displayForecasts.js` is the most important one.
+- `lib/workers/` contains files which interact with outside servers, or which are particularly computation intensive
 
-In general we want things from both getStaticProps/static site generation (speed; getting everything on initial page load) and getServerSideProps (being able to make queries right after the initial page load, to e.g. parse the url). The way I deal with this right now is with the somewhat clunky processState function in index.js, which keeps track of whether initial page load has been dealt with and of whether the number of stars is being changed. However, this feels clunky.
+In general, there is a tradeoff between:
+- Using getStaticProps. Pros: Static site generation, getting everything on initial page load
+- Using: getServerSideProps. Pros: Being able to make queries right after the initial page load, to e.g. parse the url 
+- Using neither. Pros: Page is much lighter. Cons: Searches take slightly slower.
+
+The way I deal with this right now is with the somewhat clunky processState function in index.js, which keeps track of whether initial page load has been dealt with and of whether the search parameters have been changed.
