@@ -10,7 +10,7 @@ import { useRouter } from "next/router"; // https://nextjs.org/docs/api-referenc
 import searchGuesstimate from "../lib/worker/searchGuesstimate.js";
 import searchWithAlgolia from "../lib/worker/searchWithAlgolia.js";
 import { displayForecastsWrapperForSearch } from "../lib/display/displayForecastsWrappers.js";
-import { displayForecastsWrapperForEmbed } from "../lib/display/displayForecastsWrappers.js";
+import { displayForecastsWrapperForCapture } from "../lib/display/displayForecastsWrappers.js";
 
 // Parts
 import Layout from "./layout.js";
@@ -29,26 +29,26 @@ const search = ({
   displayForecastsWrapper: displayForecastsWrapperForSearch
 })
 
-// For embed
-const embed = ({
-  pageName: "embed",
+// For capture
+const capture = ({
+  pageName: "capture",
   processDisplayOnSearchBegin: () => false,
   placeholder: "Get best title match",
   displaySeeMoreHint: false,
-  displayForecastsWrapper: displayForecastsWrapperForEmbed
+  displayForecastsWrapper: displayForecastsWrapperForCapture
 })
 
 /*
-const pageName = "embed"
+const pageName = "capture"
 const processDisplayOnSearchBegin = () => false
 const placeholder = "Get best title match"
 const displaySeeMoreHint = false
-const displayForecastsWrapper = displayForecastsWrapperForEmbed
+const displayForecastsWrapper = displayForecastsWrapperForCapture
 */
 
 /* Definitions */
 
-// Everything below is the same as in embed.js, 
+// Everything below is the same as in capture.js, 
 // but I haven't figured out how I want to abstract it away yet
 
 // Search options for Fuse
@@ -183,9 +183,9 @@ export default function Home({ items, lastUpdated }) {
   //let initialResults = []; // shuffleArray(items.filter(item => item.qualityindicators.stars >= 3)).slice(0,100).map(item => ({score: 0, item: item}))
   const [results, setResults] = useState([])//useState(initialResults);
   let [advancedOptions, showAdvancedOptions] = useState(false);
-  let [embeddToggle, switchEmbedToggle] = useState("search")  // embed
-  let [displayEmbed, setDisplayEmbed] = useState(false);
-  let [whichToDisplayEmbed, setWhichToDisplayEmbed] = useState(0);
+  let [captureToggle, switchCaptureToggle] = useState("search")  // capture
+  let [displayCapture, setDisplayCapture] = useState(false);
+  let [whichToDisplayCapture, setWhichToDisplayCapture] = useState(0);
 
   /* Functions which I want to have access to the Home namespace */
   // I don't want to create an "items" object for each search.
@@ -355,7 +355,7 @@ export default function Home({ items, lastUpdated }) {
   };
   */
   // I don't want display forecasts to change with a change in queryParameters, but I want it to have access to the queryParameters, in particular the numDisplay. Hence why this function lives inside Home.
-  let getInfoToDisplayForecastsFunction = (displayForecastsFunction, {results, displayEmbed, setDisplayEmbed, whichToDisplayEmbed}) => {
+  let getInfoToDisplayForecastsFunction = (displayForecastsFunction, {results, displayCapture, setDisplayCapture, whichToDisplayCapture}) => {
     let numDisplayRounded =
       queryParameters.numDisplay % 3 != 0
         ? queryParameters.numDisplay +
@@ -363,7 +363,7 @@ export default function Home({ items, lastUpdated }) {
         : queryParameters.numDisplay;
     console.log("numDisplay", queryParameters.numDisplay);
     console.log("numDisplayRounded", numDisplayRounded);
-    return displayForecastsFunction({results, numDisplay: numDisplayRounded, displayEmbed, setDisplayEmbed, whichToDisplayEmbed});
+    return displayForecastsFunction({results, numDisplay: numDisplayRounded, displayCapture, setDisplayCapture, whichToDisplayCapture});
   };
 
   /* State controllers */
@@ -371,7 +371,7 @@ export default function Home({ items, lastUpdated }) {
     setQueryParameters({ ...newQueryParameters, processedUrlYet: true });
     console.log("onChangeSearchInputs/newQueryParameters", newQueryParameters);
     setResults([]);
-    setDisplayEmbed(embeddToggle == "search" ? search.processDisplayOnSearchBegin() : embed.processDisplayOnSearchBegin())
+    setDisplayCapture(captureToggle == "search" ? search.processDisplayOnSearchBegin() : capture.processDisplayOnSearchBegin())
     clearTimeout(searchSpeedSettings.timeoutId);
     let newtimeoutId = setTimeout(async () => {
       console.log(
@@ -474,25 +474,25 @@ export default function Home({ items, lastUpdated }) {
   };
 
   let onClickBack = () => {
-    setWhichToDisplayEmbed(decreaseUntil0(whichToDisplayEmbed))
-    setDisplayEmbed(false)
+    setWhichToDisplayCapture(decreaseUntil0(whichToDisplayCapture))
+    setDisplayCapture(false)
   }
-  let onClickForward = (whichToDisplayEmbed) => {
-    setWhichToDisplayEmbed(whichToDisplayEmbed+1)
-    setDisplayEmbed(false)
-    // setTimeout(()=> {onClickForward(whichToDisplayEmbed+1)}, 5000)
+  let onClickForward = (whichToDisplayCapture) => {
+    setWhichToDisplayCapture(whichToDisplayCapture+1)
+    setDisplayCapture(false)
+    // setTimeout(()=> {onClickForward(whichToDisplayCapture+1)}, 5000)
   }
 
   /* Final return */
   return (
-    <Layout key="index" page={embeddToggle == "search" ? search.pageName : embed.pageName} lastUpdated={lastUpdated} embeddToggle={embeddToggle} switchEmbedToggle={switchEmbedToggle}>
+    <Layout key="index" page={captureToggle == "search" ? search.pageName : capture.pageName} lastUpdated={lastUpdated} captureToggle={captureToggle} switchCaptureToggle={switchCaptureToggle}>
       <div className="invisible">{processState(queryParameters)}</div>
 
       <label className="mb-4 mt-4 flex flex-row justify-center items-center">
         <div className="w-10/12 mb-2">
-          <Form value={queryParameters.query} onChange={onChangeSearchBar} placeholder={embeddToggle == "search" ? search.placeholder : embed.placeholder}/>
+          <Form value={queryParameters.query} onChange={onChangeSearchBar} placeholder={captureToggle == "search" ? search.placeholder : capture.placeholder}/>
         </div>
-        <div className={`w-2/12 flex justify-center ml-4 md:ml-2 lg:ml-0 ${embeddToggle == "search" ? "" : "hidden"}`}>
+        <div className={`w-2/12 flex justify-center ml-4 md:ml-2 lg:ml-0 ${captureToggle == "search" ? "" : "hidden"}`}>
           <button
             className="text-gray-500 text-sm mb-2"
             onClick={() => showAdvancedOptions(!advancedOptions)}
@@ -500,14 +500,14 @@ export default function Home({ items, lastUpdated }) {
             Advanced options ▼
           </button>
         </div>
-        <div className={`w-2/12 flex justify-center ml-4 md:ml-2 gap-1 lg:ml-0 ${embeddToggle == "embed" ? "" : "hidden"}`}>
+        <div className={`w-2/12 flex justify-center ml-4 md:ml-2 gap-1 lg:ml-0 ${captureToggle == "capture" ? "" : "hidden"}`}>
           <button className="text-blue-500 cursor-pointer text-xl mb-3 pr-3 hover:text-blue-600"
             onClick={() => onClickBack()}
           >
             ◀
           </button>
           <button className="text-blue-500 cursor-pointer text-xl mb-3 pl-3 hover:text-blue-600"
-            onClick={() => onClickForward(whichToDisplayEmbed)}>
+            onClick={() => onClickForward(whichToDisplayCapture)}>
             ▶
           </button>
         </div>
@@ -516,7 +516,7 @@ export default function Home({ items, lastUpdated }) {
       {/*<div className="flex flex-col mx-auto justify-center items-center">*/}
         <div
           className={`flex-1 flex-col mx-auto justify-center items-center w-full ${
-            advancedOptions && (embeddToggle == "search") ? "" : "hidden"
+            advancedOptions && (captureToggle == "search") ? "" : "hidden"
           }`}
         >
           <div className="grid sm:grid-rows-4 sm:grid-cols-1 md:grid-rows-2 lg:grid-rows-2 grid-cols-1 md:grid-cols-3 lg:grid-cols-3 items-center content-center bg-gray-50 rounded-md px-8 pt-4 pb-1 shadow mb-4">
@@ -551,14 +551,14 @@ export default function Home({ items, lastUpdated }) {
         </div>
       {/*</div>*/}
       
-      <div className={embeddToggle == "search" ? "" : "hidden"}> 
-        {getInfoToDisplayForecastsFunction((search.displayForecastsWrapper), {results, displayEmbed, setDisplayEmbed, whichToDisplayEmbed})}
+      <div className={captureToggle == "search" ? "" : "hidden"}> 
+        {getInfoToDisplayForecastsFunction((search.displayForecastsWrapper), {results, displayCapture, setDisplayCapture, whichToDisplayCapture})}
       </div>
-      <div className={embeddToggle == "embed" ? "" : "hidden"}> 
-        {getInfoToDisplayForecastsFunction((embed.displayForecastsWrapper), {results, displayEmbed, setDisplayEmbed, whichToDisplayEmbed})}
+      <div className={captureToggle == "capture" ? "" : "hidden"}> 
+        {getInfoToDisplayForecastsFunction((capture.displayForecastsWrapper), {results, displayCapture, setDisplayCapture, whichToDisplayCapture})}
       </div>
 
-      <div className={`${(embeddToggle == "search" ? search.displaySeeMoreHint : embed.displaySeeMoreHint) ? "" : "hidden"/*Fairly barroque, but keeps to the overall toggle-based scheme */}`}>
+      <div className={`${(captureToggle == "search" ? search.displaySeeMoreHint : capture.displaySeeMoreHint) ? "" : "hidden"/*Fairly barroque, but keeps to the overall toggle-based scheme */}`}>
         <p className ={`mt-4 mb-4 ${results.length != 0 && queryParameters.numDisplay < results.length? "": "hidden"}`}>
           {"Can't find what you were looking for? "}
           <span

@@ -10,14 +10,14 @@ const classNameSelected = (isSelected) =>
     ? "text-blue-700 border-blue-700"
     : "text-gray-400 hover:text-blue-500 hover:border-blue-500"
   }`;
-const isEmbedSelected = (embedToggle) =>  `py-4 px-2 ml-4 text-md font-medium cursor-pointer border-2 border-transparent ${embedToggle == "embed"
+const isCaptureSelected = (captureToggle) =>  `py-4 px-2 ml-4 text-md font-medium cursor-pointer border-2 border-transparent ${captureToggle == "capture"
   ? "text-blue-700 border-blue-700"
   : "text-gray-400 hover:text-blue-500 hover:border-blue-500"
 }`;
-const changeEmbedToggle = (embedToggle) => embedToggle == "embed" ? "search"  : "embed"
+const changeCaptureToggle = (captureToggle) => captureToggle == "capture" ? "search"  : "capture"
 
 /* Main */
-export default function Layout({page, lastUpdated, children, embeddToggle, switchEmbedToggle}) {
+export default function Layout({page, lastUpdated, children, captureToggle, switchCaptureToggle}) {
   return (
     <div>
       <Head>
@@ -50,9 +50,9 @@ export default function Layout({page, lastUpdated, children, embeddToggle, switc
               </div>
               
               <div className="flex flex-row-reverse items-start space-x-4 text-sm sm:text-lg md:text-lg lg:text-lg">
-                <button className="mt-4" onClick={() => switchEmbedToggle(changeEmbedToggle(embeddToggle)) }> 
-                  <span className={`${(page === "search" || page == "embed") ? "" : "hidden"} ${isEmbedSelected(embeddToggle)}`}>
-                    Embed
+                <button className="mt-4" onClick={() => switchCaptureToggle(changeCaptureToggle(captureToggle)) }> 
+                  <span className={`${(page === "search" || page == "capture") ? "" : "hidden"} ${isCaptureSelected(captureToggle)}`}>
+                    Capture
                   </span>
                 </button>
                 <Link href={`/about`} passHref>
@@ -60,7 +60,7 @@ export default function Layout({page, lastUpdated, children, embeddToggle, switc
                     About
                   </span>
                 </Link>
-                <button onClick={() => switchEmbedToggle("search")} className="mt-4">
+                <button onClick={() => switchCaptureToggle("search")} className="mt-4">
                 <Link href={`/`} passHref >
                   <span className={classNameSelected(page === "search")}>
                     Search
