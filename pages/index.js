@@ -71,6 +71,8 @@ let shuffleArray = (array) => {
   return newArray
 }
 
+let decreaseUntil0 = (num) => ((num-1) > 0) ? (num -1) : 0
+
 // URL slugs
 let transformObjectIntoUrlSlug = (obj) => {
   let results = [];
@@ -183,6 +185,7 @@ export default function Home({ items, lastUpdated }) {
   let [advancedOptions, showAdvancedOptions] = useState(false);
   let [embeddToggle, switchEmbedToggle] = useState("search")  // embed
   let [displayEmbed, setDisplayEmbed] = useState(false);
+  let [whichToDisplayEmbed, setWhichToDisplayEmbed] = useState(0);
 
   /* Functions which I want to have access to the Home namespace */
   // I don't want to create an "items" object for each search.
@@ -352,7 +355,7 @@ export default function Home({ items, lastUpdated }) {
   };
   */
   // I don't want display forecasts to change with a change in queryParameters, but I want it to have access to the queryParameters, in particular the numDisplay. Hence why this function lives inside Home.
-  let getInfoToDisplayForecastsFunction = (displayForecastsFunction, {results, displayEmbed, setDisplayEmbed}) => {
+  let getInfoToDisplayForecastsFunction = (displayForecastsFunction, {results, displayEmbed, setDisplayEmbed, whichToDisplayEmbed}) => {
     let numDisplayRounded =
       queryParameters.numDisplay % 3 != 0
         ? queryParameters.numDisplay +
@@ -360,7 +363,7 @@ export default function Home({ items, lastUpdated }) {
         : queryParameters.numDisplay;
     console.log("numDisplay", queryParameters.numDisplay);
     console.log("numDisplayRounded", numDisplayRounded);
-    return displayForecastsFunction({results, numDisplay: numDisplayRounded, displayEmbed, setDisplayEmbed});
+    return displayForecastsFunction({results, numDisplay: numDisplayRounded, displayEmbed, setDisplayEmbed, whichToDisplayEmbed});
   };
 
   /* State controllers */
@@ -470,6 +473,16 @@ export default function Home({ items, lastUpdated }) {
     onChangeSearchInputs(newQueryParameters);
   };
 
+  let onClickBack = () => {
+    setWhichToDisplayEmbed(decreaseUntil0(whichToDisplayEmbed))
+    setDisplayEmbed(false)
+  }
+  let onClickForward = (whichToDisplayEmbed) => {
+    setWhichToDisplayEmbed(whichToDisplayEmbed+1)
+    setDisplayEmbed(false)
+    // setTimeout(()=> {onClickForward(whichToDisplayEmbed+1)}, 5000)
+  }
+
   /* Final return */
   return (
     <Layout key="index" page={embeddToggle == "search" ? search.pageName : embed.pageName} lastUpdated={lastUpdated} embeddToggle={embeddToggle} switchEmbedToggle={switchEmbedToggle}>
@@ -479,7 +492,7 @@ export default function Home({ items, lastUpdated }) {
         <div className="w-10/12 mb-2">
           <Form value={queryParameters.query} onChange={onChangeSearchBar} placeholder={embeddToggle == "search" ? search.placeholder : embed.placeholder}/>
         </div>
-        <div className="w-2/12 flex justify-center ml-4 md:ml-2 lg:ml-0">
+        <div className={`w-2/12 flex justify-center ml-4 md:ml-2 lg:ml-0 ${embeddToggle == "search" ? "" : "hidden"}`}>
           <button
             className="text-gray-500 text-sm mb-2"
             onClick={() => showAdvancedOptions(!advancedOptions)}
@@ -487,12 +500,23 @@ export default function Home({ items, lastUpdated }) {
             Advanced options ▼
           </button>
         </div>
+        <div className={`w-2/12 flex justify-center ml-4 md:ml-2 gap-1 lg:ml-0 ${embeddToggle == "embed" ? "" : "hidden"}`}>
+          <button className="text-blue-500 cursor-pointer text-xl mb-3 pr-3 hover:text-blue-600"
+            onClick={() => onClickBack()}
+          >
+            ◀
+          </button>
+          <button className="text-blue-500 cursor-pointer text-xl mb-3 pl-3 hover:text-blue-600"
+            onClick={() => onClickForward(whichToDisplayEmbed)}>
+            ▶
+          </button>
+        </div>
       </label>
 
       {/*<div className="flex flex-col mx-auto justify-center items-center">*/}
         <div
           className={`flex-1 flex-col mx-auto justify-center items-center w-full ${
-            advancedOptions ? "" : "hidden"
+            advancedOptions && (embeddToggle == "search") ? "" : "hidden"
           }`}
         >
           <div className="grid sm:grid-rows-4 sm:grid-cols-1 md:grid-rows-2 lg:grid-rows-2 grid-cols-1 md:grid-cols-3 lg:grid-cols-3 items-center content-center bg-gray-50 rounded-md px-8 pt-4 pb-1 shadow mb-4">
@@ -528,10 +552,10 @@ export default function Home({ items, lastUpdated }) {
       {/*</div>*/}
       
       <div className={embeddToggle == "search" ? "" : "hidden"}> 
-        {getInfoToDisplayForecastsFunction((search.displayForecastsWrapper), {results, displayEmbed, setDisplayEmbed})}
+        {getInfoToDisplayForecastsFunction((search.displayForecastsWrapper), {results, displayEmbed, setDisplayEmbed, whichToDisplayEmbed})}
       </div>
       <div className={embeddToggle == "embed" ? "" : "hidden"}> 
-        {getInfoToDisplayForecastsFunction((embed.displayForecastsWrapper), {results, displayEmbed, setDisplayEmbed})}
+        {getInfoToDisplayForecastsFunction((embed.displayForecastsWrapper), {results, displayEmbed, setDisplayEmbed, whichToDisplayEmbed})}
       </div>
 
       <div className={`${(embeddToggle == "search" ? search.displaySeeMoreHint : embed.displaySeeMoreHint) ? "" : "hidden"/*Fairly barroque, but keeps to the overall toggle-based scheme */}`}>
