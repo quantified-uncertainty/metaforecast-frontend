@@ -1,6 +1,6 @@
 {
   "name": "metaforecast-webpage-nextjs",
-  "version": "0.1.0",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
     "dev": "echo http://imgurtester:3000/ && next dev ",
