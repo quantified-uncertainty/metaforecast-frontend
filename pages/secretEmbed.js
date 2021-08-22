@@ -316,7 +316,7 @@ export default function Home({ items, lastUpdated }) {
   <div className="invisible">{processState(queryParameters)}</div>
 
   <div className="mb-4 mt-8 flex flex-row justify-center items-center ">
-    <div className="w-4/12 place-self-center" id="secretEmbed"> 
+    <div className="w-6/12 place-self-center" id="secretEmbed"> 
       {getInfoToDisplayForecastsFunction((secretEmbed.displayForecastsWrapper), {results, displayCapture, setDisplayCapture, whichToDisplayCapture})}
     </div>
   </div>
