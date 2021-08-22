@@ -19,7 +19,10 @@ import { SliderElement } from "../lib/display/slider.js";
 import MultiSelectPlatform from "../lib/display/multiSelectPlatforms.js";
 import ButtonsForStars from "../lib/display/buttonsForStars.js";
 
-/* Toggle options */
+
+/* Definitions */
+
+// Toggle options
 // For search
 const search = ({
   pageName: "search",
@@ -46,12 +49,7 @@ const displaySeeMoreHint = false
 const displayForecastsWrapper = displayForecastsWrapperForCapture
 */
 
-/* Definitions */
-
-// Everything below is the same as in capture.js, 
-// but I haven't figured out how I want to abstract it away yet
-
-// Search options for Fuse
+// Search options for Fuse (no longer needed)
 // https://github.com/krisk/Fuse/
 const opts = {
   includeScore: true,
@@ -59,6 +57,9 @@ const opts = {
   ignoreLocation: true,
   //threshold: 0.4
 };
+
+// Default parameters to not push to url (because they are default)
+const defaultTrailingUrl="&starsThreshold=2&numDisplay=21&forecastsThreshold=0&forecastingPlatforms=AstralCodexTen|Betfair|CoupCast|CSET-foretell|Estimize|FantasySCOTUS|Foretold|Good Judgment|Good Judgment Open|Guesstimate|Hypermind|Kalshi|Ladbrokes|Metaculus|PolyMarket|PredictIt|Rootclaim|Smarkets|WilliamHill|X-risk estimates"
 
 /* Helper functions */
 // Shuffle
@@ -379,7 +380,8 @@ export default function Home({ items, lastUpdated }) {
         newQueryParameters
       );
       let urlSlug = transformObjectIntoUrlSlug(newQueryParameters);
-      router.push(urlSlug);
+      let urlWithoutDefaultParameters=urlSlug.replace(defaultTrailingUrl, "")
+      router.push(urlWithoutDefaultParameters);
       executeSearch(newQueryParameters);
       setSearchSpeedSettings({ ...searchSpeedSettings, timeoutId: null });
     }, searchSpeedSettings.awaitEndTyping);
