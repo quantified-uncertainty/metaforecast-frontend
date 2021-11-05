@@ -19,6 +19,8 @@ import { SliderElement } from "../lib/display/slider.js";
 import MultiSelectPlatform from "../lib/display/multiSelectPlatforms.js";
 import ButtonsForStars from "../lib/display/buttonsForStars.js";
 
+// Data
+import frontPageForecasts from "../lib/data/frontpage.json"
 
 /* Definitions */
 
@@ -59,7 +61,7 @@ const opts = {
 };
 
 // Default parameters to not push to url (because they are default)
-const defaultTrailingUrl="&starsThreshold=2&numDisplay=21&forecastsThreshold=0&forecastingPlatforms=AstralCodexTen|Betfair|CoupCast|CSET-foretell|Estimize|FantasySCOTUS|Foretold|Good Judgment|Good Judgment Open|Guesstimate|Hypermind|Kalshi|Ladbrokes|Metaculus|PolyMarket|PredictIt|Rootclaim|Smarkets|WilliamHill|X-risk estimates"
+const defaultTrailingUrl="&starsThreshold=2&numDisplay=21&forecastsThreshold=0&forecastingPlatforms=AstralCodexTen|Betfair|CoupCast|CSET-foretell|Estimize|FantasySCOTUS|Foretold|Good Judgment|Good Judgment Open|Guesstimate|Hypermind|Kalshi|Ladbrokes|Metaculus|PolyMarket|PredictIt|Rootclaim|Smarkets|Peter Wildeford|WilliamHill|X-risk estimates"
 
 /* Helper functions */
 // Shuffle
@@ -110,7 +112,8 @@ let calculateLastUpdate = () => {
 /* get Props */
 export async function getStaticProps() {
   //getServerSideProps
-  let items = []//await getForecasts();
+  let itemsCompatibleWithFuse = frontPageForecasts.map(result => ({item: result, score:0}))
+  let items = shuffleArray(itemsCompatibleWithFuse) //[]//await getForecasts();
   let lastUpdated = calculateLastUpdate() // metaforecasts.find(forecast => forecast.platform == "Good Judgment Open").timestamp
   // console.log(lastUpdated)
   //console.log("metaforecasts", metaforecasts)
@@ -168,7 +171,8 @@ export default function Home({ items, lastUpdated }) {
       { value: "PredictIt", label: "PredictIt" },
       { value: 'Rootclaim', label: 'Rootclaim' },
       { value: "Smarkets", label: "Smarkets" },
-      { value: 'WilliamHill', label: 'WilliamHill' },
+      { value: 'Peter Wildeford', label: 'Peter Wildeford' },
+			{ value: 'WilliamHill', label: 'WilliamHill' },
       { value: 'X-risk estimates', label: 'X-risk estimates' }
     ],
   };
@@ -181,8 +185,8 @@ export default function Home({ items, lastUpdated }) {
     time: Date.now(),
   };
   const [searchSpeedSettings, setSearchSpeedSettings] = useState(initialSearchSpeedSettings);
-  //let initialResults = []; // shuffleArray(items.filter(item => item.qualityindicators.stars >= 3)).slice(0,100).map(item => ({score: 0, item: item}))
-  const [results, setResults] = useState([])//useState(initialResults);
+  // let initialResults = items || [] // []; // shuffleArray(items.filter(item => item.qualityindicators.stars >= 3)).slice(0,100).map(item => ({score: 0, item: item}))
+  const [results, setResults] = useState(items); // useState([])//
   let [advancedOptions, showAdvancedOptions] = useState(false);
   let [captureToggle, switchCaptureToggle] = useState("search")  // capture
   let [displayCapture, setDisplayCapture] = useState(false);
@@ -217,7 +221,20 @@ export default function Home({ items, lastUpdated }) {
       }
       
     }else{
-      results = [] // redundant
+      results = items
+      if(forecastingPlatforms && forecastingPlatforms.length > 0){
+        results = results.filter(result => forecastingPlatforms.includes(result.item.platform))
+      }
+      if(starsThreshold == 4){
+        results = results.filter(result => result.item.qualityindicators.stars >= 4)
+      }
+      if(forecastsThreshold){
+        // results = results.filter(result => (result.qualityindicators && result.item.qualityindicators.numforecasts > forecastsThreshold)) 
+      }
+      // let resultsCompatibilityWithFuse = results.map((result, index) => ({item: result, score:0.4-(0.4/(index+1))}))
+      // results = resultsCompatibilityWithFuse
+      
+      // results = [] // redundant
     }
 
     console.log("Executing search");
