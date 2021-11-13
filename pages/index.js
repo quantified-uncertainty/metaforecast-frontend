@@ -167,11 +167,11 @@ export default function Home({ items, lastUpdated }) {
       { value: "Kalshi", label: "Kalshi" },
       { value: "Ladbrokes", label: "Ladbrokes" },
       { value: "Metaculus", label: "Metaculus" },
+      { value: 'Peter Wildeford', label: 'Peter Wildeford' },
       { value: "PolyMarket", label: "PolyMarket" },
       { value: "PredictIt", label: "PredictIt" },
       { value: 'Rootclaim', label: 'Rootclaim' },
       { value: "Smarkets", label: "Smarkets" },
-      { value: 'Peter Wildeford', label: 'Peter Wildeford' },
 			{ value: 'WilliamHill', label: 'WilliamHill' },
       { value: 'X-risk estimates', label: 'X-risk estimates' }
     ],
