@@ -2,7 +2,7 @@ import Link from "next/link";
 import Head from "next/head";
 import { AiOutlineCompass } from "react-icons/ai";
 // import { GiDiceEightFacesEight } from "react-icons/gi";
-
+import { Logo2 } from '../lib/icons/index.js';
 /* Utilities */
 const IconElement = AiOutlineCompass
 const classNameSelected = (isSelected) =>
@@ -22,7 +22,7 @@ export default function Layout({page, lastUpdated, children, captureToggle, swit
     <div>
       <Head>
         <title>Metaforecast</title>
-        <link rel="icon" href="/favicon.svg" />
+        <link rel="icon" href="/icons/logo.svg" />
       </Head>
       <div>
         <nav className="bg-white shadow">
@@ -30,9 +30,10 @@ export default function Layout({page, lastUpdated, children, captureToggle, swit
             <div className="items-center justify-between flex">
               <div className="flex sm:flex-row">
                 <Link href={`/`} passHref className="font-bold">
+
                   <a className="no-underline font-md justify-center items-center flex">
                     <span className="mr-2 sm:text-lg text-blue-800">
-                      <IconElement />
+                      <Logo2 className="mt-1 mr-1 h-8 w-8" />
                     </span>
                     <span className="text-sm sm:text-2xl text-gray-700">Metaforecast</span>
                   </a>
