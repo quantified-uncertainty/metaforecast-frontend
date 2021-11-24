@@ -6,7 +6,11 @@ module.exports = {
   ],
   darkMode: false, // or 'media' or 'class'
   theme: {
-    extend: {},
+    extend: {
+      backgroundImage: {
+        'quri': "url('/icons/logo.svg')",
+       }
+    },
   },
   variants: {
     extend: {},

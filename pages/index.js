@@ -577,6 +577,7 @@ export default function Home({ items, lastUpdated }) {
         {getInfoToDisplayForecastsFunction((capture.displayForecastsWrapper), {results, displayCapture, setDisplayCapture, whichToDisplayCapture})}
       </div>
 
+
       <div className={`${(captureToggle == "search" ? search.displaySeeMoreHint : capture.displaySeeMoreHint) ? "" : "hidden"/*Fairly barroque, but keeps to the overall toggle-based scheme */}`}>
         <p className ={`mt-4 mb-4 ${results.length != 0 && queryParameters.numDisplay < results.length? "": "hidden"}`}>
           {"Can't find what you were looking for? "}
