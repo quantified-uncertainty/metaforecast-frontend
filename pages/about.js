@@ -4,7 +4,7 @@ import gfm from "remark-gfm";
 import Layout from "./layout.js";
 let readmeMarkdownText = `# About
 
-This is a search engine for probabilities. Given a query, it searches for relevant questions in various prediction markets and forecasting platforms (namely Betfair, CSET-foretell, Elicit, FantasySCOTUS Foretold, Good Judgment, Good Judgment Open, Guesstimate, GiveWell & OpenPhilanthropy blogposts as of early 2021, Hypermind, Kalshi, Ladbrokes, Metaculus, Omen, Polymarket, PredictIt, Smarkets, William Hill, and Michael Aird's database of existential risk estimates). For example, try searching for "China", "North Korea", "Semiconductors", "COVID", "Trump", or "X-risk".
+This is a search engine for probabilities. Given a query, it searches for relevant questions in various prediction markets and forecasting platforms (namely Betfair, CSET-foretell, Elicit, FantasySCOTUS Foretold, Good Judgment, Good Judgment Open, Guesstimate, GiveWell & OpenPhilanthropy blogposts as of early 2021, Hypermind, Kalshi, Ladbrokes, Manifold Markets, Metaculus, Omen, Polymarket, PredictIt, Smarkets, William Hill, and Michael Aird's database of existential risk estimates). For example, try searching for "China", "North Korea", "Semiconductors", "COVID", "Trump", or "X-risk".
 
 You can also call the metaforecast database from within Twitter by mentioning @metaforecast, [like so](https://twitter.com/NunoSempere/status/1433160907308294144).
 

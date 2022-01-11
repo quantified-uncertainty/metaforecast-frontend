@@ -167,6 +167,7 @@ export default function Home({ items, lastUpdated }) {
       { value: "Hypermind", label: "Hypermind" },
       { value: "Kalshi", label: "Kalshi" },
       { value: "Ladbrokes", label: "Ladbrokes" },
+      { value: "Manifold Markets", label: "Manifold Markets" },
       { value: "Metaculus", label: "Metaculus" },
       { value: "PolyMarket", label: "PolyMarket" },
       { value: "PredictIt", label: "PredictIt" },
