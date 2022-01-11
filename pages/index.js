@@ -61,7 +61,7 @@ const opts = {
 };
 
 // Default parameters to not push to url (because they are default)
-const defaultTrailingUrl="&starsThreshold=2&numDisplay=21&forecastsThreshold=0&forecastingPlatforms=AstralCodexTen|Betfair|CoupCast|CSET-foretell|Estimize|FantasySCOTUS|Foretold|Good Judgment|Good Judgment Open|Guesstimate|Hypermind|Kalshi|Ladbrokes|Metaculus|PolyMarket|PredictIt|Rootclaim|Smarkets|Peter Wildeford|WilliamHill|X-risk estimates"
+const defaultTrailingUrl="&starsThreshold=2&numDisplay=21&forecastsThreshold=0&forecastingPlatforms=AstralCodexTen|Betfair|CoupCast|CSET-foretell|Estimize|FantasySCOTUS|Foretold|Good Judgment|Good Judgment Open|Guesstimate|Hypermind|Kalshi|Ladbrokes|Manifold Markets|Metaculus|PolyMarket|PredictIt|Rootclaim|Smarkets|Peter Wildeford|WilliamHill|X-risk estimates"
 
 /* Helper functions */
 // Shuffle
@@ -398,7 +398,12 @@ export default function Home({ items, lastUpdated }) {
         newQueryParameters
       );
       let urlSlug = transformObjectIntoUrlSlug(newQueryParameters);
-      let urlWithoutDefaultParameters=urlSlug.replace(defaultTrailingUrl, "")
+      let urlWithoutDefaultParameters=urlSlug.replace("&starsThreshold=2", "")
+        .replace("&numDisplay=21", "")
+        .replace("&forecastsThreshold=0", "")
+        .replace("&forecastingPlatforms=AstralCodexTen|Betfair|CoupCast|CSET-foretell|Estimize|FantasySCOTUS|Foretold|Good Judgment|Good Judgment Open|Guesstimate|Hypermind|Kalshi|Ladbrokes|Metaculus|PolyMarket|PredictIt|Rootclaim|Smarkets|Peter Wildeford|WilliamHill|X-risk estimates")
+        // replace(defaultTrailingUrl, "")
+        // replace default parameters
       router.push(urlWithoutDefaultParameters);
       executeSearch(newQueryParameters);
       setSearchSpeedSettings({ ...searchSpeedSettings, timeoutId: null });
