@@ -401,7 +401,7 @@ export default function Home({ items, lastUpdated }) {
       let urlWithoutDefaultParameters=urlSlug.replace("&starsThreshold=2", "")
         .replace("&numDisplay=21", "")
         .replace("&forecastsThreshold=0", "")
-        .replace("&forecastingPlatforms=AstralCodexTen|Betfair|CoupCast|CSET-foretell|Estimize|FantasySCOTUS|Foretold|Good Judgment|Good Judgment Open|Guesstimate|Hypermind|Kalshi|Ladbrokes|Manifold Markets|Metaculus|PolyMarket|PredictIt|Rootclaim|Smarkets|Peter Wildeford|WilliamHill|X-risk estimates")
+				.replace("&forecastingPlatforms=AstralCodexTen|Betfair|CoupCast|CSET-foretell|Estimize|FantasySCOTUS|Foretold|Good Judgment|Good Judgment Open|Guesstimate|Hypermind|Kalshi|Ladbrokes|Manifold Markets|Metaculus|Peter Wildeford|PolyMarket|PredictIt|Rootclaim|Smarkets|WilliamHill|X-risk estimates", "")
         // replace(defaultTrailingUrl, "")
         // replace default parameters
       router.push(urlWithoutDefaultParameters);
