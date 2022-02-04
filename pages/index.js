@@ -18,6 +18,7 @@ import Form from "../lib/display/form.js";
 import { SliderElement } from "../lib/display/slider.js";
 import MultiSelectPlatform from "../lib/display/multiSelectPlatforms.js";
 import ButtonsForStars from "../lib/display/buttonsForStars.js";
+import { platforms } from "../lib/platforms.js"
 
 // Data
 import frontPageForecasts from "../lib/data/frontpage.json"
@@ -150,32 +151,7 @@ export default function Home({ items, lastUpdated }) {
     starsThreshold: 2,
     numDisplay: 21, // 20
     forecastsThreshold: 0,
-    forecastingPlatforms: [
-      // Excluding Elicit and Omen
-      { value: "AstralCodexTen", label: "AstralCodexTen" },
-      { value: 'Betfair', label: 'Betfair' },
-      { value: "CoupCast", label: "CoupCast" },
-      { value: "CSET-foretell", label: "CSET-foretell" },
-      { value: "Estimize", label: "Estimize" },
-      // { value: 'GiveWell', label: 'GiveWell' },
-      { value: "FantasySCOTUS", label: "FantasySCOTUS" },
-      { value: "Foretold", label: "Foretold" },
-      { value: "Good Judgment", label: "Good Judgment" },
-      { value: "Good Judgment Open", label: "Good Judgment Open" },
-      { value: "Guesstimate", label: "Guesstimate" },
-      { value: "Hypermind", label: "Hypermind" },
-      { value: "Kalshi", label: "Kalshi" },
-      { value: "Ladbrokes", label: "Ladbrokes" },
-      { value: "Manifold Markets", label: "Manifold Markets" },
-      { value: "Metaculus", label: "Metaculus" },
-      { value: 'Peter Wildeford', label: 'Peter Wildeford' },
-      { value: "PolyMarket", label: "PolyMarket" },
-      { value: "PredictIt", label: "PredictIt" },
-      { value: 'Rootclaim', label: 'Rootclaim' },
-      { value: "Smarkets", label: "Smarkets" },
-			{ value: 'WilliamHill', label: 'WilliamHill' },
-      { value: 'X-risk estimates', label: 'X-risk estimates' }
-    ],
+    forecastingPlatforms: platforms,
   };
   const [queryParameters, setQueryParameters] = useState(
     initialQueryParameters
