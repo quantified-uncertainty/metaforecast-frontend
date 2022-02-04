@@ -31,7 +31,12 @@ export default function Layout({
 }) {
   const refreshPage = () => {
     // window.location.reload(true);
-    window.location.replace(window.location.pathname);
+    // window.location.replace(window.location.pathname);
+    // window.location.reload();
+    // https://developer.mozilla.org/en-US/docs/Web/API/Location/reload
+    // https://developer.mozilla.org/en-US/docs/Web/API/Location/replace
+    // https://developer.mozilla.org/en-US/docs/Web/API/Location/assign
+    window.location.assign(window.location.pathname);
   };
   return (
     <div>
