@@ -262,7 +262,13 @@ export default function Home({ items, lastUpdated }) {
         newQueryParameters
       );
       let urlSlug = transformObjectIntoUrlSlug(newQueryParameters);
-      let urlWithoutDefaultParameters=urlSlug.replace(defaultTrailingUrl, "")
+      let urlWithoutDefaultParameters=urlSlug.replace("&starsThreshold=2", "")
+      .replace("&numDisplay=21", "")
+      .replace("&forecastsThreshold=0", "")
+      .replace("&forecastingPlatforms=Betfair|FantasySCOTUS|Foretold|GiveWell/OpenPhilanthropy|Good 20Judgment|Good Judgment Open|Guesstimate|Infer|Kalshi|Manifold Markets|Metaculus|Peter Wildeford|PolyMarket|PredictIt|Rootclaim|Smarkets|X-risk estimates", "")
+      // replace(defaultTrailingUrl, "")
+      // replace default parameters
+
       router.push(urlWithoutDefaultParameters);
       executeSearch(newQueryParameters);
       setSearchSpeedSettings({ ...searchSpeedSettings, timeoutId: null });
