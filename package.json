@@ -22,8 +22,6 @@
     "graphql": "^15.4.0",
     "graphql-request": "^3.4.0",
     "html-to-image": "^1.7.0",
-    "mongodb": "^3.6.6",
-    "mongodb-client-encryption": "^1.2.3",
     "multiselect-react-dropdown": "^1.6.7",
     "next": "12",
     "postcss": "^8.2.1",
