@@ -4,7 +4,7 @@
 import React from "react";
 import searchAccordingToQueryData from "../lib/worker/searchAccordingToQueryData.js";
 import { platformsWithLabels } from "../lib/platforms.js";
-import { displayForecastsWrapperForSecretEmbed } from "../lib/display/displayForecastsWrappers.js";
+import { displayForecast } from "../lib/display/displayForecasts.js";
 
 /* Helper functions */
 
@@ -39,11 +39,28 @@ export async function getServerSideProps(context) {
 /* Body */
 export default function Home({ results }) {
   /* Final return */
+  let result = results ? results[0] : null;
+
   return (
     <>
       <div className="mb-4 mt-8 flex flex-row justify-center items-center ">
         <div className="w-6/12 place-self-center">
-          {displayForecastsWrapperForSecretEmbed({ results })}
+          <div>
+            <div id="secretEmbed">
+              {result
+                ? displayForecast({
+                  ...result.item,
+                  score: result.score,
+                  showTimeStamp: true,
+                  expandFooterToFullWidth: true,
+                })
+                : null}
+            </div>
+            <br></br>
+            <div id="secretObject">
+              {result ? JSON.stringify(result.item, null, 4) : null}
+            </div>
+          </div>
         </div>
       </div>
     </>
