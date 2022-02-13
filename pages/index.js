@@ -6,7 +6,7 @@ import { useRouter } from "next/router"; // https://nextjs.org/docs/api-referenc
 
 // Utilities
 // import Fuse from "fuse.js";
-// import { getForecasts } from "../lib/worker/getForecasts.js"; // This throws an error if it's loader but not used.
+// import { getFrontpage } from "../lib/worker/getFrontpage.js"; // This throws an error if it's loader but not used.
 // import searchGuesstimate from "../lib/worker/searchGuesstimate.js";
 // import searchWithAlgolia from "../lib/worker/searchWithAlgolia.js";
 import searchAccordingToQueryData from "../lib/worker/searchAccordingToQueryData.js";
@@ -23,7 +23,7 @@ import { platforms, platformNames, distinctColors } from "../lib/platforms.js";
 
 // Data
 // import frontPageForecasts from "../lib/data/frontpage.json";
-import { getForecasts } from "../lib/worker/getForecasts.js";
+import { getFrontpage } from "../lib/worker/getFrontpage.js";
 
 /* Definitions */
 
@@ -137,7 +137,7 @@ export async function getStaticProps() {
     item: result,
     score: 0,
   }));
-  let items = shuffleArray(itemsCompatibleWithFuse); //[]//await getForecasts();
+  let items = shuffleArray(itemsCompatibleWithFuse); //[]//await getFrontpage();
   let lastUpdated = calculateLastUpdate(); // metaforecasts.find(forecast => forecast.platform == "Good Judgment Open").timestamp
   // console.log(lastUpdated)
   //console.log("metaforecasts", metaforecasts)
@@ -163,7 +163,7 @@ export async function getServerSideProps(context) {
     ...urlQuery,
   };
 
-  let frontPageForecasts = await getForecasts();
+  let frontPageForecasts = await getFrontpage();
   let frontPageForecastsCompatibleWithFuse = frontPageForecasts.map((result) => ({
     item: result,
     score: 0,
@@ -240,7 +240,7 @@ export default function Home({ items, lastUpdated, initialQueryParameters }) {
           (result) => result.item.qualityindicators.stars >= 4
         );
       }
-      if (forecastsThreshold) {
+      if (queryData.forecastsThreshold) {
         // results = results.filter(result => (result.qualityindicators && result.item.qualityindicators.numforecasts > forecastsThreshold))
       }
     };
