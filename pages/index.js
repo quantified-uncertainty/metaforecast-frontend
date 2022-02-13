@@ -7,8 +7,9 @@ import { useRouter } from "next/router"; // https://nextjs.org/docs/api-referenc
 // Utilities
 // import Fuse from "fuse.js";
 // import { getForecasts } from "../lib/worker/getForecasts.js"; // This throws an error if it's loader but not used.
-import searchGuesstimate from "../lib/worker/searchGuesstimate.js";
-import searchWithAlgolia from "../lib/worker/searchWithAlgolia.js";
+// import searchGuesstimate from "../lib/worker/searchGuesstimate.js";
+// import searchWithAlgolia from "../lib/worker/searchWithAlgolia.js";
+import searchAccordingToQueryData from "../lib/worker/searchAccordingToQueryData.js";
 import { displayForecastsWrapperForSearch } from "../lib/display/displayForecastsWrappers.js";
 import { displayForecastsWrapperForCapture } from "../lib/display/displayForecastsWrappers.js";
 
@@ -18,7 +19,7 @@ import Form from "../lib/display/form.js";
 import { SliderElement } from "../lib/display/slider.js";
 import MultiSelectPlatform from "../lib/display/multiSelectPlatforms.js";
 import ButtonsForStars from "../lib/display/buttonsForStars.js";
-import { platforms, distinctColors } from "../lib/platforms.js";
+import { platforms, platformNames, distinctColors } from "../lib/platforms.js";
 
 // Data
 // import frontPageForecasts from "../lib/data/frontpage.json";
@@ -63,8 +64,10 @@ const opts = {
 };
 
 // Default parameters to not push to url (because they are default)
-const defaultTrailingUrl =
-  "&starsThreshold=2&numDisplay=21&forecastsThreshold=0&forecastingPlatforms=Betfair|FantasySCOTUS|Foretold|Good Judgment|Good Judgment Open|Guesstimate|Hypermind|Infer|Kalshi|Manifold Markets|Metaculus|PolyMarket|PredictIt|Rootclaim|Smarkets|Peter Wildeford|X-risk estimates";
+const defaultTrailingUrl = `&starsThreshold=2&numDisplay=21&forecastsThreshold=0&forecastingPlatforms=${platformNames.join(
+  "|"
+)}`;
+// "&starsThreshold=2&numDisplay=21&forecastsThreshold=0&forecastingPlatforms=Betfair|FantasySCOTUS|Foretold|Good Judgment|Good Judgment Open|Guesstimate|Hypermind|Infer|Kalshi|Manifold Markets|Metaculus|PolyMarket|PredictIt|Rootclaim|Smarkets|Peter Wildeford|X-risk estimates";
 
 /* Helper functions */
 // Shuffle
@@ -147,7 +150,9 @@ export async function getStaticProps() {
 }
 */
 
-export async function getServerSideProps() {
+export async function getServerSideProps(context) {
+  let urlQuery = context.query; // this is an object, not a string which I have to parse!!
+  console.log(urlQuery);
   // context
   //getServerSideProps
   let frontPageForecasts = await getForecasts();
@@ -156,30 +161,43 @@ export async function getServerSideProps() {
     score: 0,
   }));
   let lastUpdated = calculateLastUpdate(); // metaforecasts.find(forecast => forecast.platform == "Good Judgment Open").timestamp
+
+  let initialQueryParameters = {
+    query: "",
+    // processedUrlYet: false,
+    starsThreshold: 2,
+    numDisplay: 21, // 20
+    forecastsThreshold: 0,
+    forecastingPlatforms: platforms, // weird key value format,
+    ...urlQuery,
+  };
+  console.log("initialQueryParameters:");
+  console.log(initialQueryParameters);
   return {
     props: {
+      initialQueryParameters: initialQueryParameters,
       items: itemsCompatibleWithFuse,
       lastUpdated: lastUpdated,
-      // urlQuery: context.query
+      urlQuery: urlQuery,
     },
   };
 }
 
 /* Body */
-export default function Home({ items, lastUpdated }) {
+export default function Home({ items, lastUpdated, initialQueryParameters }) {
   //, urlQuery }) {
   console.log("===============\nNew page render");
 
   /* States */
   const router = useRouter();
-  let initialQueryParameters = {
+  /* let initialQueryParameters = {
     query: "",
-    processedUrlYet: false,
+    // processedUrlYet: false,
     starsThreshold: 2,
     numDisplay: 21, // 20
     forecastsThreshold: 0,
     forecastingPlatforms: platforms,
-  };
+  };*/
   const [queryParameters, setQueryParameters] = useState(
     initialQueryParameters
   );
@@ -201,6 +219,35 @@ export default function Home({ items, lastUpdated }) {
   /* Functions which I want to have access to the Home namespace */
   // I don't want to create an "items" object for each search.
   let executeSearch = async (queryData) => {
+    let results;
+    let preliminaryResults = await searchAccordingToQueryData(queryData);
+    let filterManually = (queryData, results) => {
+      if (
+        queryData.forecastingPlatforms &&
+        queryData.forecastingPlatforms.length > 0
+      ) {
+        results = results.filter((result) =>
+          forecastingPlatforms.includes(result.item.platform)
+        );
+      }
+      if (queryData.starsThreshold == 4) {
+        results = results.filter(
+          (result) => result.item.qualityindicators.stars >= 4
+        );
+      }
+      if (forecastsThreshold) {
+        // results = results.filter(result => (result.qualityindicators && result.item.qualityindicators.numforecasts > forecastsThreshold))
+      }
+    };
+
+    switch (preliminaryResults) {
+      case -1:
+        results = filterManually(items);
+        break;
+      default:
+        results = preliminaryResults;
+    }
+    /*
     let query = queryData.query;
     let forecastsThreshold = queryData.forecastsThreshold;
     let starsThreshold = queryData.starsThreshold;
@@ -246,34 +293,26 @@ export default function Home({ items, lastUpdated }) {
         }));
         results = resultsCompatibilityWithFuse;
       }
-    } else {
-      results = items;
-      if (forecastingPlatforms && forecastingPlatforms.length > 0) {
-        results = results.filter((result) =>
-          forecastingPlatforms.includes(result.item.platform)
-        );
-      }
-      if (starsThreshold == 4) {
-        results = results.filter(
-          (result) => result.item.qualityindicators.stars >= 4
-        );
-      }
-      if (forecastsThreshold) {
-        // results = results.filter(result => (result.qualityindicators && result.item.qualityindicators.numforecasts > forecastsThreshold))
-      }
+    } */
+    /*
+		else {
       // let resultsCompatibilityWithFuse = results.map((result, index) => ({item: result, score:0.4-(0.4/(index+1))}))
       // results = resultsCompatibilityWithFuse
 
       // results = [] // redundant
     }
+		*/
 
     console.log("Executing search");
     console.log("executeSearch/query", query);
     // console.log("executeSearch/items  ", itemsTotal);
-    console.log("executeSearch/starsThreshold", starsThreshold);
-    console.log("executeSearch/forecastsThreshold", forecastsThreshold);
-    console.log("executeSearch/forecastingPlatforms", forecastingPlatforms);
-    console.log("executeSearch/searchSpeedSettings", searchSpeedSettings);
+    console.log("executeSearch/starsThreshold", query.starsThresholy);
+    console.log("executeSearch/forecastsThreshold", query.forecastsThreshold);
+    console.log(
+      "executeSearch/forecastingPlatforms",
+      query.forecastingPlatforms
+    );
+    console.log("executeSearch/searchSpeedSettings", query.searchSpeedSettings);
     console.log("executeSearch/results", results);
     setResults(results);
   };
@@ -425,7 +464,7 @@ export default function Home({ items, lastUpdated }) {
 
   /* State controllers */
   let onChangeSearchInputs = (newQueryParameters) => {
-    setQueryParameters({ ...newQueryParameters, processedUrlYet: true });
+    setQueryParameters(newQueryParameters); // ({ ...newQueryParameters, processedUrlYet: true });
     console.log("onChangeSearchInputs/newQueryParameters", newQueryParameters);
     setResults([]);
     setDisplayCapture(
@@ -445,7 +484,8 @@ export default function Home({ items, lastUpdated }) {
         .replace("&numDisplay=21", "")
         .replace("&forecastsThreshold=0", "")
         .replace(
-          "&forecastingPlatforms=Betfair|FantasySCOTUS|Foretold|GiveWell/OpenPhilanthropy|Good 20Judgment|Good Judgment Open|Guesstimate|Infer|Kalshi|Manifold Markets|Metaculus|Peter Wildeford|PolyMarket|PredictIt|Rootclaim|Smarkets|X-risk estimates",
+          //"&forecastingPlatforms=Betfair|FantasySCOTUS|Foretold|GiveWell/OpenPhilanthropy|Good Judgment|Good Judgment Open|Guesstimate|Infer|Kalshi|Manifold Markets|Metaculus|Peter Wildeford|PolyMarket|PredictIt|Rootclaim|Smarkets|X-risk estimates",
+          `&forecastingPlatforms=${platformNames.join("|")}`,
           ""
         );
       // replace(defaultTrailingUrl, "")
@@ -457,6 +497,7 @@ export default function Home({ items, lastUpdated }) {
     setSearchSpeedSettings({ ...searchSpeedSettings, timeoutId: newtimeoutId });
   };
 
+  /*
   let processState = (queryParameters) => {
     // I am using the static version of netlify, because the server side one is too slow
     // (see getServerSideProps vs getStaticProps under helper functions)
@@ -493,6 +534,7 @@ export default function Home({ items, lastUpdated }) {
       // Do nothing
     }
   };
+	*/
 
   /* Change the stars threshold */
   // const starOptions = ["≥ ★☆☆☆☆", "≥ ★★☆☆☆", "≥ ★★★☆☆", "≥ ★★★★☆"];
@@ -566,7 +608,8 @@ export default function Home({ items, lastUpdated }) {
       captureToggle={captureToggle}
       switchCaptureToggle={switchCaptureToggle}
     >
-      <div className="invisible">{processState(queryParameters)}</div>
+      {/* Not necessary once I'm using server side props:
+			<div className="invisible">{processState(queryParameters)}</div> */}
 
       <label className="mb-4 mt-4 flex flex-row justify-center items-center">
         <div className="w-10/12 mb-2">
