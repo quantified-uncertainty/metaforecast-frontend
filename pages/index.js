@@ -1,14 +1,10 @@
 /* Imports */
 
 // React
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/router"; // https://nextjs.org/docs/api-reference/next/router
 
 // Utilities
-// import Fuse from "fuse.js";
-// import { getFrontpage } from "../lib/worker/getFrontpage.js"; // This throws an error if it's loader but not used.
-// import searchGuesstimate from "../lib/worker/searchGuesstimate.js";
-// import searchWithAlgolia from "../lib/worker/searchWithAlgolia.js";
 import searchAccordingToQueryData from "../lib/worker/searchAccordingToQueryData.js";
 import { displayForecastsWrapperForSearch } from "../lib/display/displayForecastsWrappers.js";
 import { displayForecastsWrapperForCapture } from "../lib/display/displayForecastsWrappers.js";
@@ -19,16 +15,16 @@ import Form from "../lib/display/form.js";
 import { SliderElement } from "../lib/display/slider.js";
 import MultiSelectPlatform from "../lib/display/multiSelectPlatforms.js";
 import ButtonsForStars from "../lib/display/buttonsForStars.js";
-import { platforms, platformNames, distinctColors } from "../lib/platforms.js";
+import { platformsWithLabels, platformNames, distinctColors } from "../lib/platforms.js";
 
 // Data
-// import frontPageForecasts from "../lib/data/frontpage.json";
 import { getFrontpage } from "../lib/worker/getFrontpage.js";
 
 /* Definitions */
 
 // Toggle options
 // For search
+const SEARCH_OR_CAPTURE = "search"
 const search = {
   pageName: "search",
   processDisplayOnSearchBegin: () => null,
@@ -46,41 +42,7 @@ const capture = {
   displayForecastsWrapper: displayForecastsWrapperForCapture,
 };
 
-/*
-const pageName = "capture"
-const processDisplayOnSearchBegin = () => false
-const placeholder = "Get best title match"
-const displaySeeMoreHint = false
-const displayForecastsWrapper = displayForecastsWrapperForCapture
-*/
-
-// Search options for Fuse (no longer needed)
-// https://github.com/krisk/Fuse/
-const opts = {
-  includeScore: true,
-  keys: ["title", "platform", "author", "optionsstringforsearch"],
-  ignoreLocation: true,
-  //threshold: 0.4
-};
-
-// Default parameters to not push to url (because they are default)
-const defaultTrailingUrl = `&starsThreshold=2&numDisplay=21&forecastsThreshold=0&forecastingPlatforms=${platformNames.join(
-  "|"
-)}`;
-// "&starsThreshold=2&numDisplay=21&forecastsThreshold=0&forecastingPlatforms=Betfair|FantasySCOTUS|Foretold|Good Judgment|Good Judgment Open|Guesstimate|Hypermind|Infer|Kalshi|Manifold Markets|Metaculus|PolyMarket|PredictIt|Rootclaim|Smarkets|Peter Wildeford|X-risk estimates";
-
 /* Helper functions */
-// Shuffle
-let shuffleArray = (array) => {
-  let newArray = array;
-  for (let i = newArray.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-  }
-  return newArray;
-};
-
-let decreaseUntil0 = (num) => (num - 1 > 0 ? num - 1 : 0);
 
 // URL slugs
 let transformObjectIntoUrlSlug = (obj) => {
@@ -102,9 +64,6 @@ let transformObjectIntoUrlSlug = (obj) => {
 // rather than checking it from the data; the data is now first fetched on search
 // The principled way to do this might be to create a document in mongo
 // with just the date of last update
-
-/* get Props */
-
 let calculateLastUpdate = () => {
   let today = new Date().toISOString();
   let yesterdayObj = new Date();
@@ -117,33 +76,22 @@ let calculateLastUpdate = () => {
   }
 };
 
+/* get Props */
 /*
 export async function getStaticProps() {
-
-  let calculateLastUpdate = () => {
-    let today = new Date().toISOString();
-    let yesterdayObj = new Date();
-    yesterdayObj.setDate(yesterdayObj.getDate() - 1);
-    let yesterday = yesterdayObj.toISOString();
-    if (today.slice(11, 16) > "02:00") {
-      return today.slice(0, 10);
-    } else {
-      return yesterday.slice(0, 10);
-    }
-  };
-
-  //getServerSideProps
-  let itemsCompatibleWithFuse = frontPageForecasts.map((result) => ({
-    item: result,
-    score: 0,
-  }));
-  let items = shuffleArray(itemsCompatibleWithFuse); //[]//await getFrontpage();
+  // get frontPageForecasts somehow.
   let lastUpdated = calculateLastUpdate(); // metaforecasts.find(forecast => forecast.platform == "Good Judgment Open").timestamp
-  // console.log(lastUpdated)
-  //console.log("metaforecasts", metaforecasts)
+  let initialQueryParameters = {
+    query: "",
+    processedUrlYet: false,
+    starsThreshold: 2,
+    numDisplay: 21, // 20
+    forecastsThreshold: 0,
+    forecastingPlatforms: platforms,
+  };
   return {
     props: {
-      items,
+      frontPageForecasts,
       lastUpdated,
     },
   };
@@ -152,59 +100,49 @@ export async function getStaticProps() {
 
 export async function getServerSideProps(context) {
   let urlQuery = context.query; // this is an object, not a string which I have to parse!!
-  let lastUpdated = calculateLastUpdate(); // metaforecasts.find(forecast => forecast.platform == "Good Judgment Open").timestamp
+  let lastUpdated = calculateLastUpdate();
+  // The correct way to do this woudl be something like: frontPageForecasts.find(forecast => forecast.platform == "Good Judgment Open").timestamp
 
   let initialQueryParameters = {
     query: "",
     starsThreshold: 2,
     numDisplay: 21, // 20
     forecastsThreshold: 0,
-    forecastingPlatforms: platforms, // weird key value format,
+    forecastingPlatforms: platformsWithLabels, // weird key value format,
     ...urlQuery,
   };
 
   let frontPageForecasts = await getFrontpage();
-  let frontPageForecastsCompatibleWithFuse = frontPageForecasts.map((result) => ({
-    item: result,
-    score: 0,
-  }));
-
-  let items
+  let initialResults
   switch (initialQueryParameters.query != "") {
     case true:
-      items = await searchAccordingToQueryData(initialQueryParameters);;
+      initialResults = await searchAccordingToQueryData(initialQueryParameters);
       break;
     default:
-      items = frontPageForecastsCompatibleWithFuse;
+      initialResults = frontPageForecasts;
       break;
   }
 
+  let props = ({
+    initialQueryParameters: initialQueryParameters,
+    initialResults: initialResults,
+    defaultResults: frontPageForecasts,
+    lastUpdated: lastUpdated,
+    urlQuery: urlQuery,
+  })
+
   return {
-    props: {
-      initialQueryParameters: initialQueryParameters,
-      items: items,
-      defaultItems: frontPageForecastsCompatibleWithFuse,
-      lastUpdated: lastUpdated,
-      urlQuery: urlQuery,
-    },
+    props: props,
   };
 }
 
 /* Body */
-export default function Home({ items, lastUpdated, initialQueryParameters }) {
-  //, urlQuery }) {
+export default function Home({ initialResults, defaultResults, lastUpdated, initialQueryParameters }) {
   console.log("===============\nNew page render");
 
   /* States */
   const router = useRouter();
-  /* let initialQueryParameters = {
-    query: "",
-    // processedUrlYet: false,
-    starsThreshold: 2,
-    numDisplay: 21, // 20
-    forecastsThreshold: 0,
-    forecastingPlatforms: platforms,
-  };*/
+
   const [queryParameters, setQueryParameters] = useState(
     initialQueryParameters
   );
@@ -216,16 +154,17 @@ export default function Home({ items, lastUpdated, initialQueryParameters }) {
   const [searchSpeedSettings, setSearchSpeedSettings] = useState(
     initialSearchSpeedSettings
   );
-  // let initialResults = items || [] // []; // shuffleArray(items.filter(item => item.qualityindicators.stars >= 3)).slice(0,100).map(item => ({score: 0, item: item}))
-  const [results, setResults] = useState(items); // useState([])//
+  const [results, setResults] = useState(initialResults);
   let [advancedOptions, showAdvancedOptions] = useState(false);
-  let [captureToggle, switchCaptureToggle] = useState("search"); // capture
+  let [captureToggle, switchCaptureToggle] = useState(SEARCH_OR_CAPTURE); // capture
   let [displayCapture, setDisplayCapture] = useState(false);
   let [whichToDisplayCapture, setWhichToDisplayCapture] = useState(0);
 
   /* Functions which I want to have access to the Home namespace */
-  // I don't want to create an "items" object for each search.
-  let executeSearch = async (queryData) => {
+  // I don't want to create an "defaultResults" object for each search.
+  async function executeSearchOrAnswerWithDefaultResults(queryData){
+    // the queryData object has the same contents as queryParameters.
+    // but I wanted to spare myself having to think about namespace conflicts.
     let filterManually = (queryData, results) => {
       if (
         queryData.forecastingPlatforms &&
@@ -251,207 +190,17 @@ export default function Home({ items, lastUpdated, initialQueryParameters }) {
         results = await searchAccordingToQueryData(queryData);;
         break;
       case false:
-        results = filterManually(items);
+        results = filterManually(defaultResults);
         break;
       default:
         results = [];
         break;
     }
-    /*
-    let query = queryData.query;
-    let forecastsThreshold = queryData.forecastsThreshold;
-    let starsThreshold = queryData.starsThreshold;
-    let forecastingPlatforms = queryData.forecastingPlatforms.map(
-      (x) => x.value
-    );
-    let results = [];
-    if (query != undefined && query != "") {
-      if (forecastingPlatforms.includes("Guesstimate") && starsThreshold <= 1) {
-        let responses = await Promise.all([
-          searchWithAlgolia({
-            queryString: query,
-            hitsPerPage: queryParameters.numDisplay + 50,
-            starsThreshold,
-            filterByPlatforms: forecastingPlatforms,
-            forecastsThreshold,
-          }),
-          searchGuesstimate(query),
-        ]);
-        let responsesNotGuesstimate = responses[0];
-        let responsesGuesstimate = responses[1];
-        let resultsUnprocessed = [
-          ...responsesNotGuesstimate,
-          ...responsesGuesstimate,
-        ];
-        //results.sort((x,y)=> x.ranking < y.ranking ? -1: 1)
-        let resultsCompatibilityWithFuse = resultsUnprocessed.map((result) => ({
-          item: result,
-          score: 0,
-        }));
-        results = resultsCompatibilityWithFuse;
-      } else {
-        let response = await searchWithAlgolia({
-          queryString: query,
-          hitsPerPage: queryParameters.numDisplay + 50,
-          starsThreshold,
-          filterByPlatforms: forecastingPlatforms,
-          forecastsThreshold,
-        });
-        let resultsCompatibilityWithFuse = response.map((result, index) => ({
-          item: result,
-          score: 0.4 - 0.4 / (index + 1),
-        }));
-        results = resultsCompatibilityWithFuse;
-      }
-    } */
-    /*
-    else {
-      // let resultsCompatibilityWithFuse = results.map((result, index) => ({item: result, score:0.4-(0.4/(index+1))}))
-      // results = resultsCompatibilityWithFuse
-
-      // results = [] // redundant
-    }
-    */
-
-    console.log("Executing search");
-    console.log("executeSearch/query", query);
-    // console.log("executeSearch/items  ", itemsTotal);
-    console.log("executeSearch/starsThreshold", query.starsThresholy);
-    console.log("executeSearch/forecastsThreshold", query.forecastsThreshold);
-    console.log(
-      "executeSearch/forecastingPlatforms",
-      query.forecastingPlatforms
-    );
-    console.log("executeSearch/searchSpeedSettings", query.searchSpeedSettings);
-    console.log("executeSearch/results", results);
+    console.log("executeSearchOrAnswerWithDefaultResults/queryData", queryData);
     setResults(results);
   };
-  /*, (results) => {
-    
-  searchGuesstimate(query).then((itemsGuesstimate) => {
-    // We enter the first level of asynchronous hell.
-    
-    let itemsTotal = items.concat(itemsGuesstimate);
 
-    let itemsFiltered = itemsTotal.filter(
-      (item) =>
-        item.qualityindicators.stars >= starsThreshold &&
-        (item.qualityindicators.numforecasts >= forecastsThreshold ||
-          forecastsThreshold == 0) &&
-        forecastingPlatforms.includes(item.platform)
-    );
-
-    let fuse = new Fuse(itemsFiltered, opts);
-
-    results = fuse.search(query)
-    
-    // Adjust for search quality
-    // Elicit results are so bad but so numerous that I need to make an adjustment here.
-    // (Higher scores are worse)
-    results = results.map((result) => {
-      result.score = result.item.platform == "Elicit" ? result.score * 2 + 0.1 : result.score 
-      result.score = result.item.platform == "Guesstimate" ? result.score + 0.1 : result.score
-      return result;
-    });
-    results.sort((a, b) => {
-      return Number(a.score) > Number(b.score) ? 1 : -1;
-    });
-    
-    // Catch stray exact matches
-    let querylowercase = query.toLowerCase();
-    let queriesSplit = querylowercase.split(" ")
-    let queriesSplitlength = queriesSplit.length
-    let resultsExactMatch = []
-    let resultsPseudoExactMatchAND = []
-    let resultsPseudoExactMatchOR = []
-    let resultsNotExactMatch = []
-
-    let exactMatchDetector = obj => obj.item.title.toLowerCase().includes(querylowercase)
-    let pseudoExactMatchDetectorAND = obj => {
-      if(queriesSplitlength <= 3){
-        let results = queriesSplit.map(querySplit => obj.item.title.toLowerCase().includes(querySplit))
-        return results.reduce((a,b) => a && b)
-      }else{
-        return []
-      }
-    }
-    let pseudoExactMatchDetectorOR = obj => {
-      if(queriesSplitlength < 3){
-        let results = queriesSplit.map(querySplit => obj.item.title.toLowerCase().includes(querySplit))
-        return results.reduce((a,b) => a || b)
-      }else{
-        return []
-      }
-    }
-
-    if(queriesSplit[0] != querylowercase){
-      for(let result of results){
-        if(exactMatchDetector(result)){
-          resultsExactMatch.push(result)
-        }else if(pseudoExactMatchDetectorAND(result)){
-          resultsPseudoExactMatchAND.push(result)
-        }else if(pseudoExactMatchDetectorOR(result)){
-          resultsPseudoExactMatchOR.push(result)
-        }else{
-          resultsNotExactMatch.push(result)
-        }
-      }
-    }
-    
-    if(queriesSplit[0] == querylowercase){
-      for(let result of results){
-        if(exactMatchDetector(result)){
-          resultsExactMatch.push(result)
-        }else{
-          resultsNotExactMatch.push(result)
-        }
-      }
-    }
-
-    // Sort exact matches by forecast quality, rather than by string match.
-    let sortByStarsThenNumForecastsThenScore = (a, b) => {
-      if (a.item.qualityindicators.stars != b.item.qualityindicators.stars) {
-        return Number(a.item.qualityindicators.stars) < Number(b.item.qualityindicators.stars) ? 1 : -1;
-      } else if (a.item.qualityindicators.numforecasts != b.item.qualityindicators.numforecasts) {
-        return (Number(a.item.qualityindicators.numforecasts) || 20) <
-          (Number(b.item.qualityindicators.numforecasts) || 20)
-          ? 1
-          : -1;
-          // undefined number of forecasts => equivalent to 20 forecasts (not that many) for the purposes of sorting
-      } else {
-        return Number(a.score) > Number(b.score) ? 1 : -1;
-      }
-    }
-    resultsExactMatch.sort(sortByStarsThenNumForecastsThenScore);                
-    resultsPseudoExactMatchAND = resultsPseudoExactMatchAND.map(result => ({...result, score: result.score < 0.4 ? result.score : 0.39})) // Results with a score lower than 0.4 get shown in grey, but shouldn't in this case.
-    resultsPseudoExactMatchAND.sort(sortByStarsThenNumForecastsThenScore)
-
-    // Conclude
-    results = [...resultsExactMatch, ...resultsPseudoExactMatchAND, ...resultsPseudoExactMatchOR, ...resultsNotExactMatch];
-    
-
-    console.log("Executing search");
-    console.log("executeSearch/query", query);
-    // console.log("executeSearch/items  ", itemsTotal);
-    console.log("executeSearch/starsThreshold", starsThreshold);
-    console.log("executeSearch/forecastsThreshold", forecastsThreshold);
-    console.log("executeSearch/forecastingPlatforms", forecastingPlatforms);
-    console.log("executeSearch/searchSpeedSettings", searchSpeedSettings);
-    console.log("executeSearch/results", results);
-    let newResultsCompatibilityWithFuse = results.map(result => ({item: result, score:0}))
-    setResults(newResultsCompatibilityWithFuse);
-  });
-  
-//}else if(query == ""){
-  //let randomResults = shuffleArray(items.filter(item => item.qualityindicators.stars >= 3)).slice(0,100).map(item => ({score: 0, item: item}))
-  //setResults(randomResults);
-}else{
-  setResults(results)
- 
-}
-};
-*/
-  // I don't want display forecasts to change with a change in queryParameters, but I want it to have access to the queryParameters, in particular the numDisplay. Hence why this function lives inside Home.
+  // I don't want the function which dispaly forecasts (displayForecasts) to change with a change in queryParameters. But I want it to have access to the queryParameters, and in particular access to queryParameters.numDisplay. Hence why this function lives inside Home.
   let getInfoToDisplayForecastsFunction = (
     displayForecastsFunction,
     { results, displayCapture, setDisplayCapture, whichToDisplayCapture }
@@ -494,20 +243,18 @@ export default function Home({ items, lastUpdated, initialQueryParameters }) {
         .replace("&numDisplay=21", "")
         .replace("&forecastsThreshold=0", "")
         .replace(
-          //"&forecastingPlatforms=Betfair|FantasySCOTUS|Foretold|GiveWell/OpenPhilanthropy|Good Judgment|Good Judgment Open|Guesstimate|Infer|Kalshi|Manifold Markets|Metaculus|Peter Wildeford|PolyMarket|PredictIt|Rootclaim|Smarkets|X-risk estimates",
           `&forecastingPlatforms=${platformNames.join("|")}`,
           ""
         );
-      // replace(defaultTrailingUrl, "")
-      // replace default parameters
       router.push(urlWithoutDefaultParameters);
-      executeSearch(newQueryParameters);
+      executeSearchOrAnswerWithDefaultResults(newQueryParameters);
       setSearchSpeedSettings({ ...searchSpeedSettings, timeoutId: null });
     }, searchSpeedSettings.awaitEndTyping);
     setSearchSpeedSettings({ ...searchSpeedSettings, timeoutId: newtimeoutId });
+    // avoid sending results if user has not stopped typing.
   };
 
-  /*
+  /* Only necessary if I go back to static props
   let processState = (queryParameters) => {
     // I am using the static version of netlify, because the server side one is too slow
     // (see getServerSideProps vs getStaticProps under helper functions)
@@ -538,7 +285,7 @@ export default function Home({ items, lastUpdated, initialQueryParameters }) {
           newQuery.forecastingPlatforms = forecastingPlatformsAsObject;
         }
         setQueryParameters(newQuery);
-        executeSearch(newQuery);
+        executeSearchOrAnswerWithDefaultResults(newQuery);
       }
     } else {
       // Do nothing
@@ -547,7 +294,6 @@ export default function Home({ items, lastUpdated, initialQueryParameters }) {
   */
 
   /* Change the stars threshold */
-  // const starOptions = ["≥ ★☆☆☆☆", "≥ ★★☆☆☆", "≥ ★★★☆☆", "≥ ★★★★☆"];
   let onChangeStars = (value) => {
     console.log("onChangeStars/buttons", value);
     let newQueryParameters = { ...queryParameters, starsThreshold: value };
@@ -599,7 +345,9 @@ export default function Home({ items, lastUpdated, initialQueryParameters }) {
     onChangeSearchInputs(newQueryParameters);
   };
 
+  // Capture functionality
   let onClickBack = () => {
+    let decreaseUntil0 = (num) => (num - 1 > 0 ? num - 1 : 0);
     setWhichToDisplayCapture(decreaseUntil0(whichToDisplayCapture));
     setDisplayCapture(false);
   };
@@ -663,7 +411,6 @@ export default function Home({ items, lastUpdated, initialQueryParameters }) {
         </div>
       </label>
 
-      {/*<div className="flex flex-col mx-auto justify-center items-center">*/}
       <div
         className={`flex-1 flex-col mx-auto justify-center items-center w-full ${advancedOptions && captureToggle == "search" ? "" : "hidden"
           }`}
@@ -698,7 +445,6 @@ export default function Home({ items, lastUpdated, initialQueryParameters }) {
           </div>
         </div>
       </div>
-      {/*</div>*/}
 
       <div className={captureToggle == "search" ? "" : "hidden"}>
         {getInfoToDisplayForecastsFunction(search.displayForecastsWrapper, {
