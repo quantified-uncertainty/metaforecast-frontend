@@ -18,31 +18,32 @@ import Form from "../lib/display/form.js";
 import { SliderElement } from "../lib/display/slider.js";
 import MultiSelectPlatform from "../lib/display/multiSelectPlatforms.js";
 import ButtonsForStars from "../lib/display/buttonsForStars.js";
-import { platforms, distinctColors } from "../lib/platforms.js"
+import { platforms, distinctColors } from "../lib/platforms.js";
 
 // Data
-import frontPageForecasts from "../lib/data/frontpage.json"
+// import frontPageForecasts from "../lib/data/frontpage.json";
+import { getForecasts } from "../lib/worker/getForecasts.js";
 
 /* Definitions */
 
 // Toggle options
 // For search
-const search = ({
+const search = {
   pageName: "search",
   processDisplayOnSearchBegin: () => null,
   placeholder: "Find forecasts about...",
   displaySeeMoreHint: true,
-  displayForecastsWrapper: displayForecastsWrapperForSearch
-})
+  displayForecastsWrapper: displayForecastsWrapperForSearch,
+};
 
 // For capture
-const capture = ({
+const capture = {
   pageName: "capture",
   processDisplayOnSearchBegin: () => false,
   placeholder: "Get best title match",
   displaySeeMoreHint: false,
-  displayForecastsWrapper: displayForecastsWrapperForCapture
-})
+  displayForecastsWrapper: displayForecastsWrapperForCapture,
+};
 
 /*
 const pageName = "capture"
@@ -62,20 +63,21 @@ const opts = {
 };
 
 // Default parameters to not push to url (because they are default)
-const defaultTrailingUrl = "&starsThreshold=2&numDisplay=21&forecastsThreshold=0&forecastingPlatforms=Betfair|FantasySCOTUS|Foretold|Good Judgment|Good Judgment Open|Guesstimate|Hypermind|Infer|Kalshi|Manifold Markets|Metaculus|PolyMarket|PredictIt|Rootclaim|Smarkets|Peter Wildeford|X-risk estimates"
+const defaultTrailingUrl =
+  "&starsThreshold=2&numDisplay=21&forecastsThreshold=0&forecastingPlatforms=Betfair|FantasySCOTUS|Foretold|Good Judgment|Good Judgment Open|Guesstimate|Hypermind|Infer|Kalshi|Manifold Markets|Metaculus|PolyMarket|PredictIt|Rootclaim|Smarkets|Peter Wildeford|X-risk estimates";
 
 /* Helper functions */
 // Shuffle
 let shuffleArray = (array) => {
-  let newArray = array
+  let newArray = array;
   for (let i = newArray.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
   }
-  return newArray
-}
+  return newArray;
+};
 
-let decreaseUntil0 = (num) => ((num - 1) > 0) ? (num - 1) : 0
+let decreaseUntil0 = (num) => (num - 1 > 0 ? num - 1 : 0);
 
 // URL slugs
 let transformObjectIntoUrlSlug = (obj) => {
@@ -97,46 +99,71 @@ let transformObjectIntoUrlSlug = (obj) => {
 // rather than checking it from the data; the data is now first fetched on search
 // The principled way to do this might be to create a document in mongo
 // with just the date of last update
-let calculateLastUpdate = () => {
-  let today = new Date().toISOString()
-  let yesterdayObj = new Date();
-  yesterdayObj.setDate(yesterdayObj.getDate() - 1)
-  let yesterday = yesterdayObj.toISOString()
-  if (today.slice(11, 16) > "02:00") {
-    return today.slice(0, 10)
-  } else {
-    return yesterday.slice(0, 10)
-  }
-}
-
 
 /* get Props */
+
+let calculateLastUpdate = () => {
+  let today = new Date().toISOString();
+  let yesterdayObj = new Date();
+  yesterdayObj.setDate(yesterdayObj.getDate() - 1);
+  let yesterday = yesterdayObj.toISOString();
+  if (today.slice(11, 16) > "02:00") {
+    return today.slice(0, 10);
+  } else {
+    return yesterday.slice(0, 10);
+  }
+};
+
+/*
 export async function getStaticProps() {
+
+	let calculateLastUpdate = () => {
+		let today = new Date().toISOString();
+		let yesterdayObj = new Date();
+		yesterdayObj.setDate(yesterdayObj.getDate() - 1);
+		let yesterday = yesterdayObj.toISOString();
+		if (today.slice(11, 16) > "02:00") {
+			return today.slice(0, 10);
+		} else {
+			return yesterday.slice(0, 10);
+		}
+	};
+
   //getServerSideProps
-  let itemsCompatibleWithFuse = frontPageForecasts.map(result => ({ item: result, score: 0 }))
-  let items = shuffleArray(itemsCompatibleWithFuse) //[]//await getForecasts();
-  let lastUpdated = calculateLastUpdate() // metaforecasts.find(forecast => forecast.platform == "Good Judgment Open").timestamp
+  let itemsCompatibleWithFuse = frontPageForecasts.map((result) => ({
+    item: result,
+    score: 0,
+  }));
+  let items = shuffleArray(itemsCompatibleWithFuse); //[]//await getForecasts();
+  let lastUpdated = calculateLastUpdate(); // metaforecasts.find(forecast => forecast.platform == "Good Judgment Open").timestamp
   // console.log(lastUpdated)
   //console.log("metaforecasts", metaforecasts)
   return {
     props: {
       items,
-      lastUpdated
-    },
-  };
-}
-
-/*
-export async function getServerSideProps(context) { //getServerSideProps
-  const { metaforecasts } = await getForecasts();
-  return {
-    props: {
-      items: metaforecasts,
-      urlQuery: context.query
+      lastUpdated,
     },
   };
 }
 */
+
+export async function getServerSideProps() {
+  // context
+  //getServerSideProps
+  let frontPageForecasts = await getForecasts();
+  let itemsCompatibleWithFuse = frontPageForecasts.map((result) => ({
+    item: result,
+    score: 0,
+  }));
+  let lastUpdated = calculateLastUpdate(); // metaforecasts.find(forecast => forecast.platform == "Good Judgment Open").timestamp
+  return {
+    props: {
+      items: itemsCompatibleWithFuse,
+      lastUpdated: lastUpdated,
+      // urlQuery: context.query
+    },
+  };
+}
 
 /* Body */
 export default function Home({ items, lastUpdated }) {
@@ -161,11 +188,13 @@ export default function Home({ items, lastUpdated }) {
     awaitEndTyping: 500,
     time: Date.now(),
   };
-  const [searchSpeedSettings, setSearchSpeedSettings] = useState(initialSearchSpeedSettings);
+  const [searchSpeedSettings, setSearchSpeedSettings] = useState(
+    initialSearchSpeedSettings
+  );
   // let initialResults = items || [] // []; // shuffleArray(items.filter(item => item.qualityindicators.stars >= 3)).slice(0,100).map(item => ({score: 0, item: item}))
   const [results, setResults] = useState(items); // useState([])//
   let [advancedOptions, showAdvancedOptions] = useState(false);
-  let [captureToggle, switchCaptureToggle] = useState("search")  // capture
+  let [captureToggle, switchCaptureToggle] = useState("search"); // capture
   let [displayCapture, setDisplayCapture] = useState(false);
   let [whichToDisplayCapture, setWhichToDisplayCapture] = useState(0);
 
@@ -178,35 +207,59 @@ export default function Home({ items, lastUpdated }) {
     let forecastingPlatforms = queryData.forecastingPlatforms.map(
       (x) => x.value
     );
-    let results = []
+    let results = [];
     if (query != undefined && query != "") {
       if (forecastingPlatforms.includes("Guesstimate") && starsThreshold <= 1) {
         let responses = await Promise.all([
-          searchWithAlgolia({ queryString: query, hitsPerPage: queryParameters.numDisplay + 50, starsThreshold, filterByPlatforms: forecastingPlatforms, forecastsThreshold }),
-          searchGuesstimate(query)
-        ])
-        let responsesNotGuesstimate = responses[0]
-        let responsesGuesstimate = responses[1]
-        let resultsUnprocessed = [...responsesNotGuesstimate, ...responsesGuesstimate]
+          searchWithAlgolia({
+            queryString: query,
+            hitsPerPage: queryParameters.numDisplay + 50,
+            starsThreshold,
+            filterByPlatforms: forecastingPlatforms,
+            forecastsThreshold,
+          }),
+          searchGuesstimate(query),
+        ]);
+        let responsesNotGuesstimate = responses[0];
+        let responsesGuesstimate = responses[1];
+        let resultsUnprocessed = [
+          ...responsesNotGuesstimate,
+          ...responsesGuesstimate,
+        ];
         //results.sort((x,y)=> x.ranking < y.ranking ? -1: 1)
-        let resultsCompatibilityWithFuse = resultsUnprocessed.map(result => ({ item: result, score: 0 }))
-        results = resultsCompatibilityWithFuse
+        let resultsCompatibilityWithFuse = resultsUnprocessed.map((result) => ({
+          item: result,
+          score: 0,
+        }));
+        results = resultsCompatibilityWithFuse;
       } else {
-        let response = await searchWithAlgolia({ queryString: query, hitsPerPage: queryParameters.numDisplay + 50, starsThreshold, filterByPlatforms: forecastingPlatforms, forecastsThreshold })
-        let resultsCompatibilityWithFuse = response.map((result, index) => ({ item: result, score: 0.4 - (0.4 / (index + 1)) }))
-        results = resultsCompatibilityWithFuse
+        let response = await searchWithAlgolia({
+          queryString: query,
+          hitsPerPage: queryParameters.numDisplay + 50,
+          starsThreshold,
+          filterByPlatforms: forecastingPlatforms,
+          forecastsThreshold,
+        });
+        let resultsCompatibilityWithFuse = response.map((result, index) => ({
+          item: result,
+          score: 0.4 - 0.4 / (index + 1),
+        }));
+        results = resultsCompatibilityWithFuse;
       }
-
     } else {
-      results = items
+      results = items;
       if (forecastingPlatforms && forecastingPlatforms.length > 0) {
-        results = results.filter(result => forecastingPlatforms.includes(result.item.platform))
+        results = results.filter((result) =>
+          forecastingPlatforms.includes(result.item.platform)
+        );
       }
       if (starsThreshold == 4) {
-        results = results.filter(result => result.item.qualityindicators.stars >= 4)
+        results = results.filter(
+          (result) => result.item.qualityindicators.stars >= 4
+        );
       }
       if (forecastsThreshold) {
-        // results = results.filter(result => (result.qualityindicators && result.item.qualityindicators.numforecasts > forecastsThreshold)) 
+        // results = results.filter(result => (result.qualityindicators && result.item.qualityindicators.numforecasts > forecastsThreshold))
       }
       // let resultsCompatibilityWithFuse = results.map((result, index) => ({item: result, score:0.4-(0.4/(index+1))}))
       // results = resultsCompatibilityWithFuse
@@ -222,8 +275,8 @@ export default function Home({ items, lastUpdated }) {
     console.log("executeSearch/forecastingPlatforms", forecastingPlatforms);
     console.log("executeSearch/searchSpeedSettings", searchSpeedSettings);
     console.log("executeSearch/results", results);
-    setResults(results)
-  }
+    setResults(results);
+  };
   /*, (results) => {
     
   searchGuesstimate(query).then((itemsGuesstimate) => {
@@ -350,15 +403,24 @@ export default function Home({ items, lastUpdated }) {
 };
 */
   // I don't want display forecasts to change with a change in queryParameters, but I want it to have access to the queryParameters, in particular the numDisplay. Hence why this function lives inside Home.
-  let getInfoToDisplayForecastsFunction = (displayForecastsFunction, { results, displayCapture, setDisplayCapture, whichToDisplayCapture }) => {
+  let getInfoToDisplayForecastsFunction = (
+    displayForecastsFunction,
+    { results, displayCapture, setDisplayCapture, whichToDisplayCapture }
+  ) => {
     let numDisplayRounded =
       queryParameters.numDisplay % 3 != 0
         ? queryParameters.numDisplay +
-        (3 - (Math.round(queryParameters.numDisplay) % 3))
+          (3 - (Math.round(queryParameters.numDisplay) % 3))
         : queryParameters.numDisplay;
     console.log("numDisplay", queryParameters.numDisplay);
     console.log("numDisplayRounded", numDisplayRounded);
-    return displayForecastsFunction({ results, numDisplay: numDisplayRounded, displayCapture, setDisplayCapture, whichToDisplayCapture });
+    return displayForecastsFunction({
+      results,
+      numDisplay: numDisplayRounded,
+      displayCapture,
+      setDisplayCapture,
+      whichToDisplayCapture,
+    });
   };
 
   /* State controllers */
@@ -366,7 +428,11 @@ export default function Home({ items, lastUpdated }) {
     setQueryParameters({ ...newQueryParameters, processedUrlYet: true });
     console.log("onChangeSearchInputs/newQueryParameters", newQueryParameters);
     setResults([]);
-    setDisplayCapture(captureToggle == "search" ? search.processDisplayOnSearchBegin() : capture.processDisplayOnSearchBegin())
+    setDisplayCapture(
+      captureToggle == "search"
+        ? search.processDisplayOnSearchBegin()
+        : capture.processDisplayOnSearchBegin()
+    );
     clearTimeout(searchSpeedSettings.timeoutId);
     let newtimeoutId = setTimeout(async () => {
       console.log(
@@ -374,10 +440,14 @@ export default function Home({ items, lastUpdated }) {
         newQueryParameters
       );
       let urlSlug = transformObjectIntoUrlSlug(newQueryParameters);
-      let urlWithoutDefaultParameters = urlSlug.replace("&starsThreshold=2", "")
+      let urlWithoutDefaultParameters = urlSlug
+        .replace("&starsThreshold=2", "")
         .replace("&numDisplay=21", "")
         .replace("&forecastsThreshold=0", "")
-        .replace("&forecastingPlatforms=Betfair|FantasySCOTUS|Foretold|GiveWell/OpenPhilanthropy|Good 20Judgment|Good Judgment Open|Guesstimate|Infer|Kalshi|Manifold Markets|Metaculus|Peter Wildeford|PolyMarket|PredictIt|Rootclaim|Smarkets|X-risk estimates", "")
+        .replace(
+          "&forecastingPlatforms=Betfair|FantasySCOTUS|Foretold|GiveWell/OpenPhilanthropy|Good 20Judgment|Good Judgment Open|Guesstimate|Infer|Kalshi|Manifold Markets|Metaculus|Peter Wildeford|PolyMarket|PredictIt|Rootclaim|Smarkets|X-risk estimates",
+          ""
+        );
       // replace(defaultTrailingUrl, "")
       // replace default parameters
       router.push(urlWithoutDefaultParameters);
@@ -405,11 +475,14 @@ export default function Home({ items, lastUpdated }) {
         let initialQuery = queryParameters;
         let newQuery = { ...initialQuery, ...urlQuery, processedUrlYet: true };
         if (!Array.isArray(newQuery.forecastingPlatforms)) {
-          let forecastingPlatformsAsArray = newQuery.forecastingPlatforms.split(
-            "|"
-          );
+          let forecastingPlatformsAsArray =
+            newQuery.forecastingPlatforms.split("|");
           let forecastingPlatformsAsObject = forecastingPlatformsAsArray.map(
-            (platformName, i) => ({ value: platformName, label: platformName, color: distinctColors[i] })
+            (platformName, i) => ({
+              value: platformName,
+              label: platformName,
+              color: distinctColors[i],
+            })
           );
           newQuery.forecastingPlatforms = forecastingPlatformsAsObject;
         }
@@ -475,25 +548,43 @@ export default function Home({ items, lastUpdated }) {
   };
 
   let onClickBack = () => {
-    setWhichToDisplayCapture(decreaseUntil0(whichToDisplayCapture))
-    setDisplayCapture(false)
-  }
+    setWhichToDisplayCapture(decreaseUntil0(whichToDisplayCapture));
+    setDisplayCapture(false);
+  };
   let onClickForward = (whichToDisplayCapture) => {
-    setWhichToDisplayCapture(whichToDisplayCapture + 1)
-    setDisplayCapture(false)
+    setWhichToDisplayCapture(whichToDisplayCapture + 1);
+    setDisplayCapture(false);
     // setTimeout(()=> {onClickForward(whichToDisplayCapture+1)}, 5000)
-  }
+  };
 
   /* Final return */
   return (
-    <Layout key="index" page={captureToggle == "search" ? search.pageName : capture.pageName} lastUpdated={lastUpdated} captureToggle={captureToggle} switchCaptureToggle={switchCaptureToggle}>
+    <Layout
+      key="index"
+      page={captureToggle == "search" ? search.pageName : capture.pageName}
+      lastUpdated={lastUpdated}
+      captureToggle={captureToggle}
+      switchCaptureToggle={switchCaptureToggle}
+    >
       <div className="invisible">{processState(queryParameters)}</div>
 
       <label className="mb-4 mt-4 flex flex-row justify-center items-center">
         <div className="w-10/12 mb-2">
-          <Form value={queryParameters.query} onChange={onChangeSearchBar} placeholder={captureToggle == "search" ? search.placeholder : capture.placeholder} />
+          <Form
+            value={queryParameters.query}
+            onChange={onChangeSearchBar}
+            placeholder={
+              captureToggle == "search"
+                ? search.placeholder
+                : capture.placeholder
+            }
+          />
         </div>
-        <div className={`w-2/12 flex justify-center ml-4 md:ml-2 lg:ml-0 ${captureToggle == "search" ? "" : "hidden"}`}>
+        <div
+          className={`w-2/12 flex justify-center ml-4 md:ml-2 lg:ml-0 ${
+            captureToggle == "search" ? "" : "hidden"
+          }`}
+        >
           <button
             className="text-gray-500 text-sm mb-2"
             onClick={() => showAdvancedOptions(!advancedOptions)}
@@ -501,14 +592,21 @@ export default function Home({ items, lastUpdated }) {
             Advanced options ▼
           </button>
         </div>
-        <div className={`w-2/12 flex justify-center ml-4 md:ml-2 gap-1 lg:ml-0 ${captureToggle == "capture" ? "" : "hidden"}`}>
-          <button className="text-blue-500 cursor-pointer text-xl mb-3 pr-3 hover:text-blue-600"
+        <div
+          className={`w-2/12 flex justify-center ml-4 md:ml-2 gap-1 lg:ml-0 ${
+            captureToggle == "capture" ? "" : "hidden"
+          }`}
+        >
+          <button
+            className="text-blue-500 cursor-pointer text-xl mb-3 pr-3 hover:text-blue-600"
             onClick={() => onClickBack()}
           >
             ◀
           </button>
-          <button className="text-blue-500 cursor-pointer text-xl mb-3 pl-3 hover:text-blue-600"
-            onClick={() => onClickForward(whichToDisplayCapture)}>
+          <button
+            className="text-blue-500 cursor-pointer text-xl mb-3 pl-3 hover:text-blue-600"
+            onClick={() => onClickForward(whichToDisplayCapture)}
+          >
             ▶
           </button>
         </div>
@@ -516,8 +614,9 @@ export default function Home({ items, lastUpdated }) {
 
       {/*<div className="flex flex-col mx-auto justify-center items-center">*/}
       <div
-        className={`flex-1 flex-col mx-auto justify-center items-center w-full ${advancedOptions && (captureToggle == "search") ? "" : "hidden"
-          }`}
+        className={`flex-1 flex-col mx-auto justify-center items-center w-full ${
+          advancedOptions && captureToggle == "search" ? "" : "hidden"
+        }`}
       >
         <div className="grid sm:grid-rows-4 sm:grid-cols-1 md:grid-rows-2 lg:grid-rows-2 grid-cols-1 md:grid-cols-3 lg:grid-cols-3 items-center content-center bg-gray-50 rounded-md px-8 pt-4 pb-1 shadow mb-4">
           <div className="flex row-start-1 row-end-1  col-start-1 col-end-4 md:row-span-1 md:col-start-1 md:col-end-1 md:row-start-1 md:row-end-1 lg:row-span-1 lg:col-start-1 lg:col-end-1 lg:row-start-1 lg:row-end-1 items-center justify-center mb-4">
@@ -552,26 +651,60 @@ export default function Home({ items, lastUpdated }) {
       {/*</div>*/}
 
       <div className={captureToggle == "search" ? "" : "hidden"}>
-        {getInfoToDisplayForecastsFunction((search.displayForecastsWrapper), { results, displayCapture, setDisplayCapture, whichToDisplayCapture })}
+        {getInfoToDisplayForecastsFunction(search.displayForecastsWrapper, {
+          results,
+          displayCapture,
+          setDisplayCapture,
+          whichToDisplayCapture,
+        })}
       </div>
       <div className={captureToggle == "capture" ? "" : "hidden"}>
-        {getInfoToDisplayForecastsFunction((capture.displayForecastsWrapper), { results, displayCapture, setDisplayCapture, whichToDisplayCapture })}
+        {getInfoToDisplayForecastsFunction(capture.displayForecastsWrapper, {
+          results,
+          displayCapture,
+          setDisplayCapture,
+          whichToDisplayCapture,
+        })}
       </div>
 
-
-      <div className={`${(captureToggle == "search" ? search.displaySeeMoreHint : capture.displaySeeMoreHint) ? "" : "hidden"/*Fairly barroque, but keeps to the overall toggle-based scheme */}`}>
-        <p className={`mt-4 mb-4 ${results.length != 0 && queryParameters.numDisplay < results.length ? "" : "hidden"}`}>
+      <div
+        className={`${
+          (
+            captureToggle == "search"
+              ? search.displaySeeMoreHint
+              : capture.displaySeeMoreHint
+          )
+            ? ""
+            : "hidden" /*Fairly barroque, but keeps to the overall toggle-based scheme */
+        }`}
+      >
+        <p
+          className={`mt-4 mb-4 ${
+            results.length != 0 && queryParameters.numDisplay < results.length
+              ? ""
+              : "hidden"
+          }`}
+        >
           {"Can't find what you were looking for? "}
           <span
             className="cursor-pointer text-blue-800"
             onClick={() => {
-              setQueryParameters({ ...queryParameters, numDisplay: queryParameters.numDisplay * 2 });
+              setQueryParameters({
+                ...queryParameters,
+                numDisplay: queryParameters.numDisplay * 2,
+              });
             }}
           >
             {"Show more,"}
           </span>
           {" or "}
-          <a href="https://www.metaculus.com/questions/create/" className="cursor-pointer text-blue-800 no-underline" target="_blank" >suggest a question on Metaculus</a>
+          <a
+            href="https://www.metaculus.com/questions/create/"
+            className="cursor-pointer text-blue-800 no-underline"
+            target="_blank"
+          >
+            suggest a question on Metaculus
+          </a>
         </p>
       </div>
       <br></br>
