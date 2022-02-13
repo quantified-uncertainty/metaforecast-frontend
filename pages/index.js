@@ -27,7 +27,7 @@ import { getFrontpage } from "../lib/worker/getFrontpage.js";
 const SEARCH_OR_CAPTURE = "search"
 const search = {
   pageName: "search",
-  processDisplayOnSearchBegin: () => null,
+  setHasDisplayBeenCapturedOnChangeSearchInputs: () => null,
   placeholder: "Find forecasts about...",
   displaySeeMoreHint: true,
   displayForecastsWrapper: displayForecastsWrapperForSearch,
@@ -36,7 +36,7 @@ const search = {
 // For capture
 const capture = {
   pageName: "capture",
-  processDisplayOnSearchBegin: () => false,
+  setHasDisplayBeenCapturedOnChangeSearchInputs: () => false,
   placeholder: "Get best title match",
   displaySeeMoreHint: false,
   displayForecastsWrapper: displayForecastsWrapperForCapture,
@@ -157,8 +157,8 @@ export default function Home({ initialResults, defaultResults, lastUpdated, init
   const [results, setResults] = useState(initialResults);
   let [advancedOptions, showAdvancedOptions] = useState(false);
   let [captureToggle, switchCaptureToggle] = useState(SEARCH_OR_CAPTURE); // capture
-  let [displayCapture, setDisplayCapture] = useState(false);
-  let [whichToDisplayCapture, setWhichToDisplayCapture] = useState(0);
+  let [hasDisplayBeenCaptured, setHasDisplayBeenCaptured] = useState(false);
+  let [whichTohasDisplayBeenCaptured, setWhichTohasDisplayBeenCaptured] = useState(0);
 
   /* Functions which I want to have access to the Home namespace */
   // I don't want to create an "defaultResults" object for each search.
@@ -203,7 +203,7 @@ export default function Home({ initialResults, defaultResults, lastUpdated, init
   // I don't want the function which dispaly forecasts (displayForecasts) to change with a change in queryParameters. But I want it to have access to the queryParameters, and in particular access to queryParameters.numDisplay. Hence why this function lives inside Home.
   let getInfoToDisplayForecastsFunction = (
     displayForecastsFunction,
-    { results, displayCapture, setDisplayCapture, whichToDisplayCapture }
+    { results, hasDisplayBeenCaptured, setHasDisplayBeenCaptured, whichTohasDisplayBeenCaptured }
   ) => {
     let numDisplayRounded =
       queryParameters.numDisplay % 3 != 0
@@ -215,9 +215,9 @@ export default function Home({ initialResults, defaultResults, lastUpdated, init
     return displayForecastsFunction({
       results,
       numDisplay: numDisplayRounded,
-      displayCapture,
-      setDisplayCapture,
-      whichToDisplayCapture,
+      hasDisplayBeenCaptured,
+      setHasDisplayBeenCaptured,
+      whichTohasDisplayBeenCaptured,
     });
   };
 
@@ -226,10 +226,10 @@ export default function Home({ initialResults, defaultResults, lastUpdated, init
     setQueryParameters(newQueryParameters); // ({ ...newQueryParameters, processedUrlYet: true });
     console.log("onChangeSearchInputs/newQueryParameters", newQueryParameters);
     setResults([]);
-    setDisplayCapture(
+    setHasDisplayBeenCaptured(
       captureToggle == "search"
-        ? search.processDisplayOnSearchBegin()
-        : capture.processDisplayOnSearchBegin()
+        ? search.setHasDisplayBeenCapturedOnChangeSearchInputs()
+        : capture.setHasDisplayBeenCapturedOnChangeSearchInputs()
     );
     clearTimeout(searchSpeedSettings.timeoutId);
     let newtimeoutId = setTimeout(async () => {
@@ -348,13 +348,13 @@ export default function Home({ initialResults, defaultResults, lastUpdated, init
   // Capture functionality
   let onClickBack = () => {
     let decreaseUntil0 = (num) => (num - 1 > 0 ? num - 1 : 0);
-    setWhichToDisplayCapture(decreaseUntil0(whichToDisplayCapture));
-    setDisplayCapture(false);
+    setWhichTohasDisplayBeenCaptured(decreaseUntil0(whichTohasDisplayBeenCaptured));
+    setHasDisplayBeenCaptured(false);
   };
-  let onClickForward = (whichToDisplayCapture) => {
-    setWhichToDisplayCapture(whichToDisplayCapture + 1);
-    setDisplayCapture(false);
-    // setTimeout(()=> {onClickForward(whichToDisplayCapture+1)}, 5000)
+  let onClickForward = (whichTohasDisplayBeenCaptured) => {
+    setWhichTohasDisplayBeenCaptured(whichTohasDisplayBeenCaptured + 1);
+    setHasDisplayBeenCaptured(false);
+    // setTimeout(()=> {onClickForward(whichTohasDisplayBeenCaptured+1)}, 5000)
   };
 
   /* Final return */
@@ -404,7 +404,7 @@ export default function Home({ initialResults, defaultResults, lastUpdated, init
           </button>
           <button
             className="text-blue-500 cursor-pointer text-xl mb-3 pl-3 hover:text-blue-600"
-            onClick={() => onClickForward(whichToDisplayCapture)}
+            onClick={() => onClickForward(whichTohasDisplayBeenCaptured)}
           >
             ▶
           </button>
@@ -449,17 +449,17 @@ export default function Home({ initialResults, defaultResults, lastUpdated, init
       <div className={captureToggle == "search" ? "" : "hidden"}>
         {getInfoToDisplayForecastsFunction(search.displayForecastsWrapper, {
           results,
-          displayCapture,
-          setDisplayCapture,
-          whichToDisplayCapture,
+          hasDisplayBeenCaptured,
+          setHasDisplayBeenCaptured,
+          whichTohasDisplayBeenCaptured,
         })}
       </div>
       <div className={captureToggle == "capture" ? "" : "hidden"}>
         {getInfoToDisplayForecastsFunction(capture.displayForecastsWrapper, {
           results,
-          displayCapture,
-          setDisplayCapture,
-          whichToDisplayCapture,
+          hasDisplayBeenCaptured,
+          setHasDisplayBeenCaptured,
+          whichTohasDisplayBeenCaptured,
         })}
       </div>
 
