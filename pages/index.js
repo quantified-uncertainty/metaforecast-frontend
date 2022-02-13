@@ -120,17 +120,17 @@ let calculateLastUpdate = () => {
 /*
 export async function getStaticProps() {
 
-	let calculateLastUpdate = () => {
-		let today = new Date().toISOString();
-		let yesterdayObj = new Date();
-		yesterdayObj.setDate(yesterdayObj.getDate() - 1);
-		let yesterday = yesterdayObj.toISOString();
-		if (today.slice(11, 16) > "02:00") {
-			return today.slice(0, 10);
-		} else {
-			return yesterday.slice(0, 10);
-		}
-	};
+  let calculateLastUpdate = () => {
+    let today = new Date().toISOString();
+    let yesterdayObj = new Date();
+    yesterdayObj.setDate(yesterdayObj.getDate() - 1);
+    let yesterday = yesterdayObj.toISOString();
+    if (today.slice(11, 16) > "02:00") {
+      return today.slice(0, 10);
+    } else {
+      return yesterday.slice(0, 10);
+    }
+  };
 
   //getServerSideProps
   let itemsCompatibleWithFuse = frontPageForecasts.map((result) => ({
@@ -152,31 +152,38 @@ export async function getStaticProps() {
 
 export async function getServerSideProps(context) {
   let urlQuery = context.query; // this is an object, not a string which I have to parse!!
-  console.log(urlQuery);
-  // context
-  //getServerSideProps
-  let frontPageForecasts = await getForecasts();
-  let itemsCompatibleWithFuse = frontPageForecasts.map((result) => ({
-    item: result,
-    score: 0,
-  }));
   let lastUpdated = calculateLastUpdate(); // metaforecasts.find(forecast => forecast.platform == "Good Judgment Open").timestamp
 
   let initialQueryParameters = {
     query: "",
-    // processedUrlYet: false,
     starsThreshold: 2,
     numDisplay: 21, // 20
     forecastsThreshold: 0,
     forecastingPlatforms: platforms, // weird key value format,
     ...urlQuery,
   };
-  console.log("initialQueryParameters:");
-  console.log(initialQueryParameters);
+
+  let frontPageForecasts = await getForecasts();
+  let frontPageForecastsCompatibleWithFuse = frontPageForecasts.map((result) => ({
+    item: result,
+    score: 0,
+  }));
+
+  let items
+  switch (initialQueryParameters.query != "") {
+    case true:
+      items = await searchAccordingToQueryData(initialQueryParameters);;
+      break;
+    default:
+      items = frontPageForecastsCompatibleWithFuse;
+      break;
+  }
+
   return {
     props: {
       initialQueryParameters: initialQueryParameters,
-      items: itemsCompatibleWithFuse,
+      items: items,
+      defaultItems: frontPageForecastsCompatibleWithFuse,
       lastUpdated: lastUpdated,
       urlQuery: urlQuery,
     },
@@ -219,8 +226,6 @@ export default function Home({ items, lastUpdated, initialQueryParameters }) {
   /* Functions which I want to have access to the Home namespace */
   // I don't want to create an "items" object for each search.
   let executeSearch = async (queryData) => {
-    let results;
-    let preliminaryResults = await searchAccordingToQueryData(queryData);
     let filterManually = (queryData, results) => {
       if (
         queryData.forecastingPlatforms &&
@@ -240,12 +245,17 @@ export default function Home({ items, lastUpdated, initialQueryParameters }) {
       }
     };
 
-    switch (preliminaryResults) {
-      case -1:
+    let results;
+    switch (queryData.query != "") {
+      case true:
+        results = await searchAccordingToQueryData(queryData);;
+        break;
+      case false:
         results = filterManually(items);
         break;
       default:
-        results = preliminaryResults;
+        results = [];
+        break;
     }
     /*
     let query = queryData.query;
@@ -295,13 +305,13 @@ export default function Home({ items, lastUpdated, initialQueryParameters }) {
       }
     } */
     /*
-		else {
+    else {
       // let resultsCompatibilityWithFuse = results.map((result, index) => ({item: result, score:0.4-(0.4/(index+1))}))
       // results = resultsCompatibilityWithFuse
 
       // results = [] // redundant
     }
-		*/
+    */
 
     console.log("Executing search");
     console.log("executeSearch/query", query);
@@ -449,7 +459,7 @@ export default function Home({ items, lastUpdated, initialQueryParameters }) {
     let numDisplayRounded =
       queryParameters.numDisplay % 3 != 0
         ? queryParameters.numDisplay +
-          (3 - (Math.round(queryParameters.numDisplay) % 3))
+        (3 - (Math.round(queryParameters.numDisplay) % 3))
         : queryParameters.numDisplay;
     console.log("numDisplay", queryParameters.numDisplay);
     console.log("numDisplayRounded", numDisplayRounded);
@@ -534,7 +544,7 @@ export default function Home({ items, lastUpdated, initialQueryParameters }) {
       // Do nothing
     }
   };
-	*/
+  */
 
   /* Change the stars threshold */
   // const starOptions = ["≥ ★☆☆☆☆", "≥ ★★☆☆☆", "≥ ★★★☆☆", "≥ ★★★★☆"];
@@ -624,9 +634,8 @@ export default function Home({ items, lastUpdated, initialQueryParameters }) {
           />
         </div>
         <div
-          className={`w-2/12 flex justify-center ml-4 md:ml-2 lg:ml-0 ${
-            captureToggle == "search" ? "" : "hidden"
-          }`}
+          className={`w-2/12 flex justify-center ml-4 md:ml-2 lg:ml-0 ${captureToggle == "search" ? "" : "hidden"
+            }`}
         >
           <button
             className="text-gray-500 text-sm mb-2"
@@ -636,9 +645,8 @@ export default function Home({ items, lastUpdated, initialQueryParameters }) {
           </button>
         </div>
         <div
-          className={`w-2/12 flex justify-center ml-4 md:ml-2 gap-1 lg:ml-0 ${
-            captureToggle == "capture" ? "" : "hidden"
-          }`}
+          className={`w-2/12 flex justify-center ml-4 md:ml-2 gap-1 lg:ml-0 ${captureToggle == "capture" ? "" : "hidden"
+            }`}
         >
           <button
             className="text-blue-500 cursor-pointer text-xl mb-3 pr-3 hover:text-blue-600"
@@ -657,9 +665,8 @@ export default function Home({ items, lastUpdated, initialQueryParameters }) {
 
       {/*<div className="flex flex-col mx-auto justify-center items-center">*/}
       <div
-        className={`flex-1 flex-col mx-auto justify-center items-center w-full ${
-          advancedOptions && captureToggle == "search" ? "" : "hidden"
-        }`}
+        className={`flex-1 flex-col mx-auto justify-center items-center w-full ${advancedOptions && captureToggle == "search" ? "" : "hidden"
+          }`}
       >
         <div className="grid sm:grid-rows-4 sm:grid-cols-1 md:grid-rows-2 lg:grid-rows-2 grid-cols-1 md:grid-cols-3 lg:grid-cols-3 items-center content-center bg-gray-50 rounded-md px-8 pt-4 pb-1 shadow mb-4">
           <div className="flex row-start-1 row-end-1  col-start-1 col-end-4 md:row-span-1 md:col-start-1 md:col-end-1 md:row-start-1 md:row-end-1 lg:row-span-1 lg:col-start-1 lg:col-end-1 lg:row-start-1 lg:row-end-1 items-center justify-center mb-4">
@@ -711,22 +718,20 @@ export default function Home({ items, lastUpdated, initialQueryParameters }) {
       </div>
 
       <div
-        className={`${
-          (
-            captureToggle == "search"
-              ? search.displaySeeMoreHint
-              : capture.displaySeeMoreHint
-          )
-            ? ""
-            : "hidden" /*Fairly barroque, but keeps to the overall toggle-based scheme */
-        }`}
+        className={`${(
+          captureToggle == "search"
+            ? search.displaySeeMoreHint
+            : capture.displaySeeMoreHint
+        )
+          ? ""
+          : "hidden" /*Fairly barroque, but keeps to the overall toggle-based scheme */
+          }`}
       >
         <p
-          className={`mt-4 mb-4 ${
-            results.length != 0 && queryParameters.numDisplay < results.length
-              ? ""
-              : "hidden"
-          }`}
+          className={`mt-4 mb-4 ${results.length != 0 && queryParameters.numDisplay < results.length
+            ? ""
+            : "hidden"
+            }`}
         >
           {"Can't find what you were looking for? "}
           <span
