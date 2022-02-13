@@ -165,7 +165,7 @@ export default function Home({ items, lastUpdated }) {
   // let initialResults = items || [] // []; // shuffleArray(items.filter(item => item.qualityindicators.stars >= 3)).slice(0,100).map(item => ({score: 0, item: item}))
   const [results, setResults] = useState(items); // useState([])//
   let [advancedOptions, showAdvancedOptions] = useState(false);
-  let [captureToggle, switchCaptureToggle] = useState("search")  // capture
+  let [captureToggle, switchCaptureToggle] = useState("capture")  // capture
   let [displayCapture, setDisplayCapture] = useState(false);
   let [whichToDisplayCapture, setWhichToDisplayCapture] = useState(0);
 
