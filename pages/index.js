@@ -30,7 +30,9 @@ export async function getServerSideProps(context) {
   let frontPageForecasts = await getFrontpage();
   let initialResults
   let props
-  switch (initialQueryParameters.query != "") {
+  switch (!!initialQueryParameters && 
+    initialQueryParameters.query != "" && 
+    initialQueryParameters.query != undefined) {
     case true:
       initialResults = await searchAccordingToQueryData(initialQueryParameters);
       props = ({
