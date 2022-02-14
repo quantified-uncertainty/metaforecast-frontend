@@ -8,7 +8,7 @@ function Recursion() {
 
     return (
         <div>
-            <h2>You have now reached the fourth level of recursion!!</h2>
+            <h2>You have now reached the fourth level of recursion</h2>
         </div>
     );
 }

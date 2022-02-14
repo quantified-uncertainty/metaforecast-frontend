@@ -29,56 +29,29 @@ export async function getStaticProps() {
 
 /* Display one tool */
 function displayTool({
-    sameWebpage,
     title,
     description,
-    link,
     url,
     img,
     i
 }) {
-    switch (sameWebpage) {
-        case true:
-            return (
-                <Link href={link} passHref key={`tool-${i}`} >
-                    <div className="hover:bg-gray-100 hover:no-underline cursor-pointer flex flex-col px-4 py-3 bg-white rounded-md shadow place-content-stretch flex-grow no-underline b-6">
-                        <div
-                            className="flex-grow items-stretch"
-                        >
-                            <div className={`text-gray-800 text-lg mb-2 font-medium `}>
-                                {title}
-                            </div>
-                            <div className={`text-gray-500 mb-3 `}>
-                                {description}
-                            </div>
-                            { }
-                            <img src={img} className={`text-gray-500 mb-2`} />
-                        </div>
-                    </div>
+    return (
 
-                </Link>
-            )
-            break;
-        default:
-            return (
-                <a href={url} passHref key={`tool-${i}`} className="hover:bg-gray-100 hover:no-underline cursor-pointer flex flex-col px-4 py-3 bg-white rounded-md shadow place-content-stretch flex-grow no-underline b-6">
-                    <div
-                        className="flex-grow items-stretch"
-                    >
-                        <div className={`text-gray-800 text-lg mb-2 font-medium `}>
-                            {title}
-                        </div>
-                        <div className={`text-gray-500 mb-3 `}>
-                            {description}
-                        </div>
-                        { }
-                        <img src={img} className={`text-gray-500 mb-2`} />
-                    </div>
-                </a>
-            )
-            break;
-    }
+        <a href={url} passHref key={`tool-${i}`} className="hover:bg-gray-100 hover:no-underline cursor-pointer flex flex-col px-4 py-3 bg-white rounded-md shadow place-content-stretch flex-grow no-underline b-6">
+            <div
+                className="flex-grow items-stretch"
+            >
+                <div className={`text-gray-800 text-lg mb-2 font-medium `}>
+                    {title}
+                </div>
+                <div className={`text-gray-500 mb-3 `}>
+                    {description}
+                </div>
+                <img src={img} className={`text-gray-500 mb-2`} />
+            </div>
+        </a>
 
+    );
 }
 
 
@@ -89,15 +62,13 @@ export default function Tools({ lastUpdated }) {
         {
             title: "Search",
             description: "Find forecasting questions on many platforms",
-            link: "/",
-            sameWebpage: true,
+            url: "https://metaforecast.org",
             img: "https://i.imgur.com/UECzHlu.png"
         },
         {
             title: "Capture",
             description: "Capture forecasts save them to Imgur. Useful for posting them somewhere else as images",
-            link: "/capture",
-            sameWebpage: true,
+            url: "capture",
             img: "https://i.imgur.com/URN4sj5.png"
         },
         {
