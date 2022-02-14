@@ -5,7 +5,7 @@ import React from "react";
 
 // Utilities
 import { displayForecastsWrapperForSearch } from "../lib/display/displayForecastsWrappers.js";
-import CommonDisplay from "../lib/display/commonDisplay.js"
+import displayForecasts from "../lib/display/displayForecasts.js"
 import Layout from "./layout.js";
 
 // Data
@@ -41,19 +41,9 @@ export default function Home({
       key="index"
       page={"dasbhboard"}
     >
-      <CommonDisplay
-        initialResults={dashBoardForecasts}
-        defaultResults={null}
-        initialQueryParameters={null}
-        pageName={"dashboard"}
-        hasSearchbar={false}
-        hasCapture={false}
-        hasAdvancedOptions={false}
-        placeholder={null}
-        setHasDisplayBeenCapturedOnChangeSearchInputs={() => null}
-        displaySeeMoreHint={true}
-        displayForecastsWrapper={displayForecastsWrapperForSearch}
-      />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {displayForecasts({ results: dashBoardForecasts, numDisplay: dashBoardForecasts.length })}
+      </div>
     </Layout>
   )
 }
