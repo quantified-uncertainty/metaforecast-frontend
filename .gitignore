@@ -38,6 +38,6 @@ yarn-error.log*
 # yarn vs npm conflict
 package-lock.json ## use yarn.lock instead
 
-# private files
-FutureSteps.md
-imgurAPI.md
+# Notes
+notes/
+notes/**
