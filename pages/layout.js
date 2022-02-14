@@ -24,7 +24,7 @@ let calculateLastUpdate = () => {
 };
 
 /* Main */
-export default function Layout({
+export default function Layout2({
   page,
   children,
 }) {
