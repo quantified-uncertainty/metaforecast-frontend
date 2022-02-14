@@ -71,7 +71,7 @@ export default function Layout({
                       <circle cx="4" cy="4" r="4" fill="rgb(29, 78, 216)" />
                     </svg>
 
-                    <span>{`Last updated: ${lastUpdated ? lastUpdated.slice(0, 10) : "unknown"
+                    <span>{`Last updated: ${(lastUpdated && !!lastUpdated.slice) ? lastUpdated.slice(0, 10) : "unknown"
                       }`}</span>
                   </div>
                 </div>
