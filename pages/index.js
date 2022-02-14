@@ -4,7 +4,7 @@
 import React from "react";
 
 // Utilities
-  import searchAccordingToQueryData from "../lib/worker/searchAccordingToQueryData.js";
+import searchAccordingToQueryData from "../lib/worker/searchAccordingToQueryData.js";
 import { displayForecastsWrapperForSearch } from "../lib/display/displayForecastsWrappers.js";
 import CommonDisplay from "../lib/display/commonDisplay.js"
 import Layout from "./layout.js";
@@ -81,26 +81,27 @@ export async function getStaticProps() {
 export default function Home({
   initialResults,
   defaultResults,
-  initialQueryParameters 
+  initialQueryParameters
 }) {
 
   return (
     <Layout
-    key="index"
-    page={"search"}
-  >
-    <CommonDisplay
-      initialResults={initialResults}
-      defaultResults={defaultResults}
-      initialQueryParameters={initialQueryParameters}
-      pageName={"search"}
-      hasCapture={false}
-      hasAdvancedOptions={true}
-      placeholder={"Find forecasts about..."}
-      setHasDisplayBeenCapturedOnChangeSearchInputs={() => null}
-      displaySeeMoreHint={true}
-      displayForecastsWrapper={displayForecastsWrapperForSearch} 
-    />
+      key="index"
+      page={"search"}
+    >
+      <CommonDisplay
+        initialResults={initialResults}
+        defaultResults={defaultResults}
+        initialQueryParameters={initialQueryParameters}
+        pageName={"search"}
+        hasSearchbar={true}
+        hasCapture={false}
+        hasAdvancedOptions={true}
+        placeholder={"Find forecasts about..."}
+        setHasDisplayBeenCapturedOnChangeSearchInputs={() => null}
+        displaySeeMoreHint={true}
+        displayForecastsWrapper={displayForecastsWrapperForSearch}
+      />
     </Layout>
   )
 }

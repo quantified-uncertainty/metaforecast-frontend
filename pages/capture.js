@@ -89,6 +89,7 @@ export default function Home({
         defaultResults={defaultResults}
         initialQueryParameters={initialQueryParameters}
         pageName={"capture"}
+        hasSearchbar={true}
         hasCapture={true}
         hasAdvancedOptions={false}
         placeholder={"Get best title match..."}
