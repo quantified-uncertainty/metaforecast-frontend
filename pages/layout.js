@@ -5,33 +5,30 @@ import { AiOutlineCompass } from "react-icons/ai";
 import { Logo2 } from "../lib/icons/index.js";
 
 /* Utilities */
+const IconElement = AiOutlineCompass;
 const classNameSelected = (isSelected) =>
-  `py-4 px-2 ml-4 text-md font-medium cursor-pointer border-b-2 border-transparent ${isSelected
-    ? "text-blue-700 border-blue-700"
-    : "text-gray-400 hover:text-blue-500 hover:border-blue-500"
+  `py-4 px-2 ml-4 text-md font-medium cursor-pointer border-b-2 border-transparent ${
+    isSelected
+      ? "text-blue-700 border-blue-700"
+      : "text-gray-400 hover:text-blue-500 hover:border-blue-500"
   }`;
-
-let calculateLastUpdate = () => {
-  let today = new Date().toISOString();
-  let yesterdayObj = new Date();
-  yesterdayObj.setDate(yesterdayObj.getDate() - 1);
-  let yesterday = yesterdayObj.toISOString();
-  if (today.slice(11, 16) > "02:00") {
-    return today.slice(0, 10);
-  } else {
-    return yesterday.slice(0, 10);
-  }
-};
+const isCaptureSelected = (captureToggle) =>
+  `py-4 px-2 ml-4 text-md font-medium cursor-pointer border-2 border-transparent ${
+    captureToggle == "capture"
+      ? "text-blue-700 border-blue-700"
+      : "text-gray-400 hover:text-blue-500 hover:border-blue-500"
+  }`;
+const changeCaptureToggle = (captureToggle) =>
+  captureToggle == "capture" ? "search" : "capture";
 
 /* Main */
 export default function Layout({
   page,
+  lastUpdated,
   children,
+  captureToggle,
+  switchCaptureToggle,
 }) {
-  let lastUpdated = calculateLastUpdate();
-  // The correct way to do this would be by passing a prop to Layout, 
-  // and to get the last updating using server side props.
-
   const refreshPage = () => {
     // window.location.reload(true);
     // window.location.replace(window.location.pathname);
@@ -63,36 +60,52 @@ export default function Layout({
                   </a>
                 </button>
                 <div
-                  className={`flex py-4 px-2 sm:ml-4 text-base text-gray-400 ${lastUpdated || "hidden"
-                    }`}
+                  className={`flex py-4 px-2 sm:ml-4 text-base text-gray-400 ${
+                    lastUpdated || "hidden"
+                  }`}
                 >
                   <div className="hidden sm:inline-flex items-center text-gray-700">
                     <svg className="ml-4 mr-1 mt-1" height="10" width="16">
                       <circle cx="4" cy="4" r="4" fill="rgb(29, 78, 216)" />
                     </svg>
 
-                    <span>{`Last updated: ${lastUpdated ? lastUpdated.slice(0, 10) : "unknown"
-                      }`}</span>
+                    <span>{`Last updated: ${
+                      lastUpdated ? lastUpdated.slice(0, 10) : "unknown"
+                    }`}</span>
                   </div>
                 </div>
               </div>
 
               <div className="flex flex-row-reverse items-start space-x-4 text-sm sm:text-lg md:text-lg lg:text-lg">
+                <button
+                  className="mt-4"
+                  onClick={() =>
+                    switchCaptureToggle(changeCaptureToggle(captureToggle))
+                  }
+                >
+                  <span
+                    className={`${
+                      page === "search" || page == "capture" ? "" : "hidden"
+                    } ${isCaptureSelected(captureToggle)}`}
+                  >
+                    Capture
+                  </span>
+                </button>
                 <Link href={`/about`} passHref>
                   <span className={classNameSelected(page === "about")}>
                     About
                   </span>
                 </Link>
-
-                <Link href={`/`} passHref>
-                  <button
-                    className="mt-4"
-                    className={classNameSelected(page === "search")}
-                  >
-                    Search
-                  </button>
-                </Link>
-
+                <button
+                  onClick={() => switchCaptureToggle("search")}
+                  className="mt-4"
+                >
+                  <Link href={`/`} passHref>
+                    <span className={classNameSelected(page === "search")}>
+                      Search
+                    </span>
+                  </Link>
+                </button>
               </div>
             </div>
           </div>

@@ -9,8 +9,8 @@ module.exports = {
     extend: {
       backgroundImage: {
         'quri': "url('/icons/logo.svg')",
-       },
-    }
+       }
+    },
   },
   variants: {
     extend: {},
