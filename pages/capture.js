@@ -6,7 +6,7 @@ import { useRouter } from "next/router"; // https://nextjs.org/docs/api-referenc
 
 // Utilities
 // import Fuse from "fuse.js";
-// import { getFrontpage } from "../lib/worker/getFrontpage.js"; // This throws an error if it's loader but not used.
+// import { getForecasts } from "../lib/worker/getForecasts.js"; // This throws an error if it's loader but not used.
 import searchGuesstimate from "../lib/worker/searchGuesstimate.js";
 import searchWithAlgolia from "../lib/worker/searchWithAlgolia.js";
 import { displayForecastsWrapperForSearch } from "../lib/display/displayForecastsWrappers.js";
@@ -114,7 +114,7 @@ let calculateLastUpdate = () => {
 export async function getStaticProps() {
   //getServerSideProps
   let itemsCompatibleWithFuse = frontPageForecasts.map(result => ({ item: result, score: 0 }))
-  let items = shuffleArray(itemsCompatibleWithFuse) //[]//await getFrontpage();
+  let items = shuffleArray(itemsCompatibleWithFuse) //[]//await getForecasts();
   let lastUpdated = calculateLastUpdate() // metaforecasts.find(forecast => forecast.platform == "Good Judgment Open").timestamp
   // console.log(lastUpdated)
   //console.log("metaforecasts", metaforecasts)
@@ -128,7 +128,7 @@ export async function getStaticProps() {
 
 /*
 export async function getServerSideProps(context) { //getServerSideProps
-  const { metaforecasts } = await getFrontpage();
+  const { metaforecasts } = await getForecasts();
   return {
     props: {
       items: metaforecasts,
