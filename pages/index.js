@@ -47,6 +47,7 @@ export async function getServerSideProps(context) {
       props = ({
         initialQueryParameters: initialQueryParameters,
         initialResults: initialResults,
+        defaultResults: frontPageForecasts, // different from initialResults!
         urlQuery: urlQuery,
       })
       break;
