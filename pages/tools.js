@@ -94,15 +94,18 @@ export default function Tools({ lastUpdated }) {
             img: "https://i.imgur.com/UECzHlu.png"
         },
         {
+            title: "[Beta] Present",
+            description: "Present forecasts in dashboards.",
+            sameWebpage: true,
+            link: "/dashboards",
+            img: "https://i.imgur.com/EFTiq6W.png"
+        },
+        {
             title: "Capture",
             description: "Capture forecasts save them to Imgur. Useful for posting them somewhere else as images",
             link: "/capture",
             sameWebpage: true,
             img: "https://i.imgur.com/URN4sj5.png"
-        },
-        {
-            title: "[Upcoming] Request",
-            description: "Interact with metaforecast's API and fetch forecasts for your application. Currently possible but documentation is poor, get in touch.",
         },
         {
             title: "Summon",
@@ -111,9 +114,10 @@ export default function Tools({ lastUpdated }) {
             img: "https://i.imgur.com/BQ4Zzjw.png"
         },
         {
-            title: "[Upcoming] Dashboards",
-            description: "Present forecasts in dashboards.",
+            title: "[Upcoming] Request",
+            description: "Interact with metaforecast's API and fetch forecasts for your application. Currently possible but documentation is poor, get in touch.",
         },
+
         {
             title: "[Upcoming] Record",
             description: "Save your forecasts or bets.",
@@ -121,7 +125,7 @@ export default function Tools({ lastUpdated }) {
 
     ]
     return (
-        <Layout key="tools" page="" lastUpdated={lastUpdated} captureToggle={"search"} >
+        <Layout key="tools" page="tools" lastUpdated={lastUpdated} captureToggle={"search"} >
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 mb-8">
                 {tools.map((tool, i) => displayTool({ ...tool, i }))}
             </div>

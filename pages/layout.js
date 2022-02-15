@@ -84,6 +84,11 @@ export default function Layout({
                     About
                   </span>
                 </Link>
+                <Link href={`/tools`} passHref>
+                  <span className={classNameSelected(page === "tools")}>
+                    Tools
+                  </span>
+                </Link>
 
                 <Link href={`/`} passHref>
                   <button

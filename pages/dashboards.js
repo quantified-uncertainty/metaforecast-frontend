@@ -66,7 +66,7 @@ export default function Home({ initialDashboardForecasts }) {
     let response = await createDashboard(data)
     let dashboardId = response.dashboardId
     console.log("response: ", response)
-    window.history.replaceState(null, "Metaforecast", `/dashboards/?dashboardId=${dashboardId}`)
+    window.history.replaceState(null, "Metaforecast", `/dashboards?dashboardId=${dashboardId}`)
     // router.push(`?dashboardId=${dashboardId}`)
     // display it
     if(!!dashboardId){
@@ -90,7 +90,8 @@ export default function Home({ initialDashboardForecasts }) {
           aria-hidden="true"
           className="flex-grow bg-gray-300 rounded h-0.5"
         ></span>
-        <span className="mx-3 text-md font-medium text-center">Or create your own</span>
+        <span className={(!!dashboardForecasts && dashboardForecasts.length > 0) ? `mx-3 text-md font-medium text-center` : "hidden"}>Or create your own</span>
+        <span className={(!dashboardForecasts || dashboardForecasts.length == 0) ? `mx-3 text-md font-medium text-center` : "hidden"}>Create a dashboard!</span>
         <span
           aria-hidden="true"
           className="flex-grow bg-gray-300 rounded h-0.5"
