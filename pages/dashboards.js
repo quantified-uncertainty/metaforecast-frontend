@@ -29,12 +29,16 @@ export async function getServerSideProps(context) {
     });
     props = {
       initialDashboardForecasts: dashboardForecasts,
+      initialDashboardId: urlQuery.dashboardId,
+      initialDashboardItem: dashboardItem
+
     };
   } else {
     console.log()
     props = {
       initialDashboardForecasts: [],
-      initialDashboardId: urlQuery.dashboardId || null
+      initialDashboardId: urlQuery.dashboardId || null,
+      initialDashboardItem: null
     };
   }
   return {
@@ -55,9 +59,10 @@ export async function getServerSideProps(context) {
 }
 
 /* Body */
-export default function Home({ initialDashboardForecasts }) {
+export default function Home({ initialDashboardForecasts, initialDashboardItem }) {
   const router = useRouter();
   const [dashboardForecasts, setDashboardForecasts] = useState(initialDashboardForecasts);
+  const [dashboardItem, setDashboardItem] = useState(initialDashboardItem);
 
   let handleSubmit = async (data) => {
     console.log(data)
@@ -75,11 +80,18 @@ export default function Home({ initialDashboardForecasts }) {
       });
       console.log("response2", dashboardForecasts)
       setDashboardForecasts(dashboardForecasts)
+      setDashboardItem(dashboardItem)
     }
   }
   return (
     <Layout key="index" page={"dashboard"}>
       {/* Display forecasts */}
+      <div className="mt-7 mb-7">
+        <h1 className={(!!dashboardItem && !!dashboardItem.title) ? "text-4xl text-center text-gray-600 mt-2 mb-2" : "hidden"}>{!!dashboardItem ? dashboardItem.title : ""}</h1>
+        <p className={(!!dashboardItem && !!dashboardItem.creator) ? "text-lg text-center text-gray-600 mt-2 mb-2" : "hidden"}>{!!dashboardItem ? `Created by: ${dashboardItem.creator}` : ""}</p>
+        <p className={(!!dashboardItem && !!dashboardItem.description) ? "text-lg text-center text-gray-600 mt-2 mb-2" : "hidden"}>{!!dashboardItem ? `${dashboardItem.description}` : ""}</p>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
         {displayForecasts({
           results: dashboardForecasts,
