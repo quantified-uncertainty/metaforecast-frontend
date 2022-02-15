@@ -79,7 +79,6 @@ export async function getStaticProps() {
 }
 */
 
-
 /* Body */
 export default function Home({
   initialResults,
