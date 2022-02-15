@@ -84,12 +84,24 @@ export default function Home({ initialDashboardForecasts, initialDashboardItem }
       setDashboardItem(dashboardItem)
     }
   }
+
+  let isGraubardEasterEgg = (name) => (name == "Clay Graubard") ? true : false;
+
   return (
     <Layout key="index" page={"dashboard"}>
       {/* Display forecasts */}
       <div className="mt-7 mb-7">
         <h1 className={(!!dashboardItem && !!dashboardItem.title) ? "text-4xl text-center text-gray-600 mt-2 mb-2" : "hidden"}>{!!dashboardItem ? dashboardItem.title : ""}</h1>
-        <p className={(!!dashboardItem && !!dashboardItem.creator) ? "text-lg text-center text-gray-600 mt-2 mb-2" : "hidden"}>{!!dashboardItem ? `Created by: ${dashboardItem.creator}` : ""}</p>
+        <p className={(!!dashboardItem && !!dashboardItem.creator && !isGraubardEasterEgg(dashboardItem.creator)) ? "text-lg text-center text-gray-600 mt-2 mb-2" : "hidden"}>
+          {!!dashboardItem ? `Created by: ${dashboardItem.creator}` : ""}
+        </p>
+        <p className={(!!dashboardItem && !!dashboardItem.creator && isGraubardEasterEgg(dashboardItem.creator)) ? "text-lg text-center text-gray-600 mt-2 mb-2" : "hidden"} >
+          {!!dashboardItem ? `Created by: @` : ""}
+          <a href={"https://twitter.com/ClayGraubard"} className="text-blue-600">
+            Clay Graubard
+          </a>
+
+        </p>
         <p className={(!!dashboardItem && !!dashboardItem.description) ? "text-lg text-center text-gray-600 mt-2 mb-2" : "hidden"}>{!!dashboardItem ? `${dashboardItem.description}` : ""}</p>
       </div>
 
