@@ -102,7 +102,7 @@ export default function Tools({ lastUpdated }) {
         },
         {
             title: "Capture",
-            description: "Capture forecasts save them to Imgur. Useful for posting them somewhere else as images",
+            description: "Capture forecasts save them to Imgur. Useful for posting them somewhere else as images. Currently rate limited by Imgur, so if you get a .gif of a fox falling flat on his face, that's why.",
             link: "/capture",
             sameWebpage: true,
             img: "https://i.imgur.com/EXkFBzz.png"

@@ -97,6 +97,7 @@ export default function Home({ initialDashboardForecasts, initialDashboardItem }
         {displayForecasts({
           results: dashboardForecasts,
           numDisplay: dashboardForecasts.length,
+          showIdToggle: false
         })}
       </div>
       {/*  */}
