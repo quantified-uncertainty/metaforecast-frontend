@@ -98,7 +98,7 @@ export default function Tools({ lastUpdated }) {
             description: "Present forecasts in dashboards.",
             sameWebpage: true,
             link: "/dashboards",
-            img: "https://i.imgur.com/EFTiq6W.png"
+            img: "https://i.imgur.com/x8qkuHQ.png"
         },
         {
             title: "Capture",
