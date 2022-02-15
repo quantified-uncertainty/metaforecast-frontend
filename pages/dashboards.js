@@ -24,7 +24,7 @@ export async function getServerSideProps(context) {
   let props;
   if (!!dashboardId) {
     console.log(dashboardId);
-    let dashboardForecasts = await getDashboardForecastsByDashboardId({
+    let { dashboardForecasts, dashboardItem } = await getDashboardForecastsByDashboardId({
       dashboardId,
     });
     props = {
@@ -69,10 +69,12 @@ export default function Home({ initialDashboardForecasts }) {
     window.history.replaceState(null, "Metaforecast", `/dashboards?dashboardId=${dashboardId}`)
     // router.push(`?dashboardId=${dashboardId}`)
     // display it
-    if(!!dashboardId){
-      let response2 = await getDashboardForecastsByDashboardId({ dashboardId })
-      console.log("response2", response2)
-      setDashboardForecasts(response2)
+    if (!!dashboardId) {
+      let { dashboardForecasts, dashboardItem } = await getDashboardForecastsByDashboardId({
+        dashboardId,
+      });
+      console.log("response2", dashboardForecasts)
+      setDashboardForecasts(dashboardForecasts)
     }
   }
   return (
