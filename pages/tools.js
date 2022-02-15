@@ -91,7 +91,7 @@ export default function Tools({ lastUpdated }) {
             description: "Find forecasting questions on many platforms",
             link: "/",
             sameWebpage: true,
-            img: "https://i.imgur.com/UECzHlu.png"
+            img: "https://i.imgur.com/Q94gVqG.png"
         },
         {
             title: "[Beta] Present",
@@ -105,7 +105,7 @@ export default function Tools({ lastUpdated }) {
             description: "Capture forecasts save them to Imgur. Useful for posting them somewhere else as images",
             link: "/capture",
             sameWebpage: true,
-            img: "https://i.imgur.com/URN4sj5.png"
+            img: "https://i.imgur.com/EXkFBzz.png"
         },
         {
             title: "Summon",

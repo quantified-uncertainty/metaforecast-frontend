@@ -70,11 +70,12 @@ export default function Home({ initialDashboardForecasts, initialDashboardItem }
     // Get back the id
     let response = await createDashboard(data)
     let dashboardId = response.dashboardId
-    console.log("response: ", response)
-    window.history.replaceState(null, "Metaforecast", `/dashboards?dashboardId=${dashboardId}`)
-    // router.push(`?dashboardId=${dashboardId}`)
-    // display it
     if (!!dashboardId) {
+      console.log("response: ", response)
+      window.history.replaceState(null, "Metaforecast", `/dashboards?dashboardId=${dashboardId}`)
+      // router.push(`?dashboardId=${dashboardId}`)
+      // display it
+
       let { dashboardForecasts, dashboardItem } = await getDashboardForecastsByDashboardId({
         dashboardId,
       });

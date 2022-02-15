@@ -1,3 +1,5 @@
+import React from "react";
+
 import Link from "next/link";
 import Head from "next/head";
 import { AiOutlineCompass } from "react-icons/ai";
@@ -22,6 +24,43 @@ let calculateLastUpdate = () => {
     return yesterday.slice(0, 10);
   }
 };
+
+// Error catcher
+class ErrorBoundary extends React.Component {
+  // https://reactjs.org/docs/error-boundaries.html
+  constructor(props) {
+    super(props);
+    this.state = { error: null, errorInfo: null };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    // Catch errors in any components below and re-render with error message
+    this.setState({
+      error: error,
+      errorInfo: errorInfo
+    })
+    // You can also log error messages to an error reporting service here
+  }
+
+  render() {
+    if (this.state.errorInfo) {
+      // Error path
+      return (
+        <div>
+          <h2>Something went wrong. </h2>
+          <details style={{ whiteSpace: 'pre-wrap' }}>
+            {"You should angrily tweet at @NunoSempere about this. or send an email to nuno.semperelh@gmail.com"}
+            {this.state.error && this.state.error.toString()}
+            <br />
+            {this.state.errorInfo.componentStack}
+          </details>
+        </div>
+      );
+    }
+    // Normally, just render children
+    return this.props.children;
+  }
+}
 
 /* Main */
 export default function Layout({
@@ -104,9 +143,11 @@ export default function Layout({
           </div>
         </nav>
         <main>
-          <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-left pt-5">
-            {children}
-          </div>
+          <ErrorBoundary>
+            <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-left pt-5">
+              {children}
+            </div>
+          </ErrorBoundary>
         </main>
       </div>
     </div>
