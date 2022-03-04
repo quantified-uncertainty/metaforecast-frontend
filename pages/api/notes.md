@@ -10,3 +10,11 @@ Modelled roughly after the [Manifold Markets API.](https://manifoldmarkets.notio
 ## Get history
 
 Not yet implemented
+
+
+//
+
+
+https://nextjs.org/docs/messages/api-routes-response-size-limit
+
+Will probably have to host somewhere else, using api.metaforecast.org or similar.
