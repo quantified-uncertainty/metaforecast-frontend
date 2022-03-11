@@ -21,6 +21,7 @@ export async function getServerSideProps(context) {
   // this returns ({a: "b", c: "d"}})
   console.log(urlQuery)
   let dashboardId = urlQuery.dashboardId;
+  let numCols = urlQuery.numCols;
   let props;
   if (!!dashboardId) {
     console.log(dashboardId);
@@ -30,7 +31,8 @@ export async function getServerSideProps(context) {
     props = {
       initialDashboardForecasts: dashboardForecasts,
       initialDashboardId: urlQuery.dashboardId,
-      initialDashboardItem: dashboardItem
+      initialDashboardItem: dashboardItem,
+      numCols: numCols || null
 
     };
   } else {
@@ -38,7 +40,8 @@ export async function getServerSideProps(context) {
     props = {
       initialDashboardForecasts: [],
       initialDashboardId: urlQuery.dashboardId || null,
-      initialDashboardItem: null
+      initialDashboardItem: null,
+      numCols: numCols || null
     };
   }
   return {
@@ -59,10 +62,11 @@ export async function getServerSideProps(context) {
 }
 
 /* Body */
-export default function Home({ initialDashboardForecasts, initialDashboardItem }) {
+export default function Home({ initialDashboardForecasts, initialDashboardItem, numCols }) {
   const router = useRouter();
   const [dashboardForecasts, setDashboardForecasts] = useState(initialDashboardForecasts);
   const [dashboardItem, setDashboardItem] = useState(initialDashboardItem);
+  console.log(`numCols: ${numCols}`)
 
   let handleSubmit = async (data) => {
     console.log(data)
@@ -90,7 +94,7 @@ export default function Home({ initialDashboardForecasts, initialDashboardItem }
   return (
     <div className="mb-4 mt-3 flex flex-row justify-left items-center ">
       <div className="ml-2 mr-2 place-self-left">
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-4 mb-6">
+        <div className={`grid ${numCols !=null ? `grid-cols-${numCols}`: "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"} gap-4 mb-6`}>
           {displayForecasts({
             results: dashboardForecasts,
             numDisplay: dashboardForecasts.length,
