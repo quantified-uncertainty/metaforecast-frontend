@@ -90,24 +90,7 @@ export default function Home({ initialDashboardForecasts, initialDashboardItem }
   return (
     <div className="mb-4 mt-3 flex flex-row justify-left items-center ">
       <div className="ml-2 mr-2 place-self-left">
-
-        {/* Display forecasts */}
-        <div className="mb-5">
-          <h1 className={(!!dashboardItem && !!dashboardItem.title) ? "text-4xl text-center text-gray-600 mt-2 mb-2" : "hidden"}>{!!dashboardItem ? dashboardItem.title : ""}</h1>
-          <p className={(!!dashboardItem && !!dashboardItem.creator && !isGraubardEasterEgg(dashboardItem.creator)) ? "text-lg text-center text-gray-600 mt-2 mb-2" : "hidden"}>
-            {!!dashboardItem ? `Created by: ${dashboardItem.creator}` : ""}
-          </p>
-          <p className={(!!dashboardItem && !!dashboardItem.creator && isGraubardEasterEgg(dashboardItem.creator)) ? "text-lg text-center text-gray-600 mt-2 mb-2" : "hidden"} >
-            {!!dashboardItem ? `Created by: @` : ""}
-            <a href={"https://twitter.com/ClayGraubard"} className="text-blue-600">
-              Clay Graubard
-            </a>
-
-          </p>
-          <p className={(!!dashboardItem && !!dashboardItem.description) ? "text-lg text-center text-gray-600 mt-2 mb-2" : "hidden"}>{!!dashboardItem ? `${dashboardItem.description}` : ""}</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-4 mb-6">
           {displayForecasts({
             results: dashboardForecasts,
             numDisplay: dashboardForecasts.length,
