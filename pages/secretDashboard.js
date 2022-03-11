@@ -32,7 +32,7 @@ export async function getServerSideProps(context) {
       initialDashboardForecasts: dashboardForecasts,
       initialDashboardId: urlQuery.dashboardId,
       initialDashboardItem: dashboardItem,
-      numCols: numCols || null
+      initialNumCols: !numCols ? null : (numCols < 5 ? numCols : 4)
 
     };
   } else {
@@ -41,7 +41,7 @@ export async function getServerSideProps(context) {
       initialDashboardForecasts: [],
       initialDashboardId: urlQuery.dashboardId || null,
       initialDashboardItem: null,
-      numCols: numCols || null
+      initialNumCols: !numCols ? null : (numCols < 5 ? numCols : 4)
     };
   }
   return {
@@ -62,11 +62,12 @@ export async function getServerSideProps(context) {
 }
 
 /* Body */
-export default function Home({ initialDashboardForecasts, initialDashboardItem, numCols }) {
+export default function Home({ initialDashboardForecasts, initialDashboardItem, initialNumCols }) {
   const router = useRouter();
   const [dashboardForecasts, setDashboardForecasts] = useState(initialDashboardForecasts);
   const [dashboardItem, setDashboardItem] = useState(initialDashboardItem);
-  console.log(`numCols: ${numCols}`)
+  const [numCols, setNumCols] = useState(initialNumCols)
+  console.log("initialNumCols", initialNumCols)
 
   let handleSubmit = async (data) => {
     console.log(data)
@@ -75,9 +76,9 @@ export default function Home({ initialDashboardForecasts, initialDashboardItem, 
     let response = await createDashboard(data)
     let dashboardId = response.dashboardId
     if (!!dashboardId) {
-      console.log("response: ", response)
+      console.log("response: ", esponse)
       window.history.replaceState(null, "Metaforecast", `/dashboards?dashboardId=${dashboardId}`)
-      // router.push(`?dashboardId=${dashboardId}`)
+      // router.push(`?dashboardId=${dash rboardId}`)
       // display it
 
       let { dashboardForecasts, dashboardItem } = await getDashboardForecastsByDashboardId({
@@ -89,12 +90,14 @@ export default function Home({ initialDashboardForecasts, initialDashboardItem, 
     }
   }
 
-  let isGraubardEasterEgg = (name) => (name == "Clay Graubard") ? true : false;
+  // <div className={`grid ${!!numCols ? `grid-cols-${numCols} md:grid-cols-${numCols} lg:grid-cols-${numCols}`: "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"} gap-4 mb-6`}>
+  // <div className={`grid grid-cols-${numCols || 1} md:grid-cols-${numCols || 2} lg:grid-cols-${numCols || 3} gap-4 mb-6`}>
+
 
   return (
     <div className="mb-4 mt-3 flex flex-row justify-left items-center ">
       <div className="ml-2 mr-2 place-self-left">
-        <div className={`grid ${numCols !=null ? `grid-cols-${numCols}`: "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"} gap-4 mb-6`}>
+        <div className={`grid grid-cols-${numCols || 1} sm:grid-cols-${numCols || 1} md:grid-cols-${numCols || 2} lg:grid-cols-${numCols || 3} gap-4 mb-6`}>
           {displayForecasts({
             results: dashboardForecasts,
             numDisplay: dashboardForecasts.length,
