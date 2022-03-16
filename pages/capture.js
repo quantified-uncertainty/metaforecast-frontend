@@ -6,7 +6,7 @@ import React from "react";
 // Utilities
 import searchAccordingToQueryData from "../lib/worker/searchAccordingToQueryData.js";
 import { displayForecastsWrapperForCapture } from "../lib/display/displayForecastsWrappers.js";
-import CommonDisplay from "../lib/display/commonDisplay.js"
+import CommonDisplay from "../lib/display/commonDisplay.js";
 import Layout from "./layout.js";
 
 // Data
@@ -28,7 +28,7 @@ export async function getServerSideProps(context) {
   };
 
   let frontPageForecasts = await getFrontpage();
-  let initialResults
+  let initialResults;
   switch (initialQueryParameters.query != "") {
     case true:
       initialResults = await searchAccordingToQueryData(initialQueryParameters);
@@ -38,12 +38,12 @@ export async function getServerSideProps(context) {
       break;
   }
 
-  let props = ({
+  let props = {
     initialQueryParameters: initialQueryParameters,
     initialResults: initialResults,
     defaultResults: frontPageForecasts,
     urlQuery: urlQuery,
-  })
+  };
 
   return {
     props: props,
@@ -71,19 +71,14 @@ export async function getStaticProps() {
 }
 */
 
-
 /* Body */
 export default function Home({
   initialResults,
   defaultResults,
-  initialQueryParameters
+  initialQueryParameters,
 }) {
-
   return (
-    <Layout
-      key="index"
-      page={"capture"}
-    >
+    <Layout key="index" page={"capture"}>
       <CommonDisplay
         initialResults={initialResults}
         defaultResults={defaultResults}
@@ -98,5 +93,5 @@ export default function Home({
         displayForecastsWrapper={displayForecastsWrapperForCapture}
       />
     </Layout>
-  )
+  );
 }

@@ -26,7 +26,13 @@ Also note that, whatever other redeeming features they might have, prediction ma
 
 export default function About() {
   return (
-    <Layout key="index" page="about" lastUpdated={null} captureToggle={null} switchCaptureToggle={() => null}>
+    <Layout
+      key="index"
+      page="about"
+      lastUpdated={null}
+      captureToggle={null}
+      switchCaptureToggle={() => null}
+    >
       <div className="px-2 py-2 bg-white rounded-md shadow place-content-stretch flex-grow place-self-center">
         <ReactMarkdown
           plugins={[gfm]}
