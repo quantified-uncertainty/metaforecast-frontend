@@ -8,9 +8,10 @@ import { Logo2 } from "../lib/icons/index.js";
 
 /* Utilities */
 const classNameSelected = (isSelected) =>
-  `py-4 px-2 ml-4 text-md font-medium cursor-pointer border-b-2 border-transparent ${isSelected
-    ? "text-blue-700 border-blue-700"
-    : "text-gray-400 hover:text-blue-500 hover:border-blue-500"
+  `py-4 px-2 ml-4 text-md font-medium cursor-pointer border-b-2 border-transparent ${
+    isSelected
+      ? "text-blue-700 border-blue-700"
+      : "text-gray-400 hover:text-blue-500 hover:border-blue-500"
   }`;
 
 let calculateLastUpdate = () => {
@@ -37,8 +38,8 @@ class ErrorBoundary extends React.Component {
     // Catch errors in any components below and re-render with error message
     this.setState({
       error: error,
-      errorInfo: errorInfo
-    })
+      errorInfo: errorInfo,
+    });
     // You can also log error messages to an error reporting service here
   }
 
@@ -48,8 +49,10 @@ class ErrorBoundary extends React.Component {
       return (
         <div>
           <h2>Something went wrong. </h2>
-          <details style={{ whiteSpace: 'pre-wrap' }}>
-            {"You should angrily tweet at @NunoSempere about this. or send an email to nuno.semperelh@gmail.com"}
+          <details style={{ whiteSpace: "pre-wrap" }}>
+            {
+              "You should angrily tweet at @NunoSempere about this. or send an email to nuno.semperelh@gmail.com"
+            }
             {this.state.error && this.state.error.toString()}
             <br />
             {this.state.errorInfo.componentStack}
@@ -63,12 +66,9 @@ class ErrorBoundary extends React.Component {
 }
 
 /* Main */
-export default function Layout({
-  page,
-  children,
-}) {
+export default function Layout({ page, children }) {
   let lastUpdated = calculateLastUpdate();
-  // The correct way to do this would be by passing a prop to Layout, 
+  // The correct way to do this would be by passing a prop to Layout,
   // and to get the last updating using server side props.
 
   const refreshPage = () => {
@@ -79,8 +79,8 @@ export default function Layout({
     // https://developer.mozilla.org/en-US/docs/Web/API/Location/replace
     // https://developer.mozilla.org/en-US/docs/Web/API/Location/assign
     // window.location.hostname
-    if(typeof window !== "undefined"){
-      if(window.location != window.location.pathname){
+    if (typeof window !== "undefined") {
+      if (window.location != window.location.pathname) {
         window.location.assign(window.location.pathname);
       }
     }
@@ -107,16 +107,20 @@ export default function Layout({
                   </a>
                 </button>
                 <div
-                  className={`flex py-4 px-2 sm:ml-4 text-base text-gray-400 ${lastUpdated || "hidden"
-                    }`}
+                  className={`flex py-4 px-2 sm:ml-4 text-base text-gray-400 ${
+                    lastUpdated || "hidden"
+                  }`}
                 >
                   <div className="hidden sm:inline-flex items-center text-gray-700">
                     <svg className="ml-4 mr-1 mt-1" height="10" width="16">
                       <circle cx="4" cy="4" r="4" fill="rgb(29, 78, 216)" />
                     </svg>
 
-                    <span>{`Last updated: ${(lastUpdated && !!lastUpdated.slice) ? lastUpdated.slice(0, 10) : "unknown"
-                      }`}</span>
+                    <span>{`Last updated: ${
+                      lastUpdated && !!lastUpdated.slice
+                        ? lastUpdated.slice(0, 10)
+                        : "unknown"
+                    }`}</span>
                   </div>
                 </div>
               </div>
@@ -141,7 +145,6 @@ export default function Layout({
                     Search
                   </button>
                 </Link>
-
               </div>
             </div>
           </div>

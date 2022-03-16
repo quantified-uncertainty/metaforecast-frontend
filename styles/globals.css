@@ -2,7 +2,7 @@ html,
 body {
   padding: 0;
   margin: 0;
-  background-color: #ECECF1;
+  background-color: #ececf1;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
@@ -15,7 +15,7 @@ h1 {
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 10px;
-  color: #1F2937;
+  color: #1f2937;
 }
 
 h2 {
@@ -23,14 +23,14 @@ h2 {
   font-weight: bold;
   margin-top: 10px;
   margin-bottom: 10px;
-  color: #1F2937;
+  color: #1f2937;
 }
 
 h3 {
   font-weight: bold;
   margin-top: 5px;
   margin-bottom: 5px;
-  color: #1F2937;
+  color: #1f2937;
 }
 
 a {
@@ -38,7 +38,8 @@ a {
   text-decoration: underline;
 }
 
-p, ul {
+p,
+ul {
   margin-bottom: 10px;
 }
 

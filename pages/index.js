@@ -6,7 +6,7 @@ import React from "react";
 // Utilities
 import searchAccordingToQueryData from "../lib/worker/searchAccordingToQueryData.js";
 import { displayForecastsWrapperForSearch } from "../lib/display/displayForecastsWrappers.js";
-import CommonDisplay from "../lib/display/commonDisplay.js"
+import CommonDisplay from "../lib/display/commonDisplay.js";
 import Layout from "./layout.js";
 
 // Data
@@ -28,28 +28,30 @@ export async function getServerSideProps(context) {
   };
 
   let frontPageForecasts = await getFrontpage();
-  let initialResults
-  let props
-  switch (!!initialQueryParameters && 
-    initialQueryParameters.query != "" && 
-    initialQueryParameters.query != undefined) {
+  let initialResults;
+  let props;
+  switch (
+    !!initialQueryParameters &&
+    initialQueryParameters.query != "" &&
+    initialQueryParameters.query != undefined
+  ) {
     case true:
       initialResults = await searchAccordingToQueryData(initialQueryParameters);
-      props = ({
+      props = {
         initialQueryParameters: initialQueryParameters,
         initialResults: initialResults,
         defaultResults: frontPageForecasts, // different from initialResults!
         urlQuery: urlQuery,
-      })
+      };
       break;
     default:
       initialResults = frontPageForecasts;
-      props = ({
+      props = {
         initialQueryParameters: initialQueryParameters,
         initialResults: initialResults,
         defaultResults: frontPageForecasts, // different from initialResults!
         urlQuery: urlQuery,
-      })
+      };
       break;
   }
 
@@ -83,14 +85,10 @@ export async function getStaticProps() {
 export default function Home({
   initialResults,
   defaultResults,
-  initialQueryParameters
+  initialQueryParameters,
 }) {
-
   return (
-    <Layout
-      key="index"
-      page={"search"}
-    >
+    <Layout key="index" page={"search"}>
       <CommonDisplay
         initialResults={initialResults}
         defaultResults={defaultResults}
@@ -105,5 +103,5 @@ export default function Home({
         displayForecastsWrapper={displayForecastsWrapperForSearch}
       />
     </Layout>
-  )
+  );
 }
