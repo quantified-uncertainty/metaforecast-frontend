@@ -80,7 +80,9 @@ export default function Layout({
     // https://developer.mozilla.org/en-US/docs/Web/API/Location/assign
     // window.location.hostname
     if(typeof window !== "undefined"){
-      window.location.assign(window.location.pathname);
+      if(window.location != window.location.pathname){
+        window.location.assign(window.location.pathname);
+      }
     }
   };
   return (

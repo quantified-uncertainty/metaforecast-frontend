@@ -72,8 +72,11 @@ export default function Home({ initialDashboardForecasts, initialDashboardItem }
     let dashboardId = response.dashboardId
     if (!!dashboardId) {
       console.log("response: ", response)
-      if(typeof window !== "undefined"){
-        window.history.replaceState(null, "Metaforecast", `/dashboards?dashboardId=${dashboardId}`)      
+      if (typeof window !== "undefined") {
+        let urlWithoutDefaultParameters = `/dashboards?dashboardId=${dashboardId}`
+        if (!window.location.href.includes(urlWithoutDefaultParameters)) {
+          window.history.replaceState(null, "Metaforecast", urlWithoutDefaultParameters)
+        }
       }
       // router.push(`?dashboardId=${dashboardId}`)
       // display it

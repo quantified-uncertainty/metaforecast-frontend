@@ -69,29 +69,6 @@ export default function Home({ initialDashboardForecasts, initialDashboardItem, 
   const [numCols, setNumCols] = useState(initialNumCols)
   console.log("initialNumCols", initialNumCols)
 
-  let handleSubmit = async (data) => {
-    console.log(data)
-    // Send to server to create
-    // Get back the id
-    let response = await createDashboard(data)
-    let dashboardId = response.dashboardId
-    if (!!dashboardId) {
-      console.log("response: ", esponse)
-      if(typeof window !== "undefined"){
-        window.history.replaceState(null, "Metaforecast", `/dashboards?dashboardId=${dashboardId}`)
-      }
-      // router.push(`?dashboardId=${dash rboardId}`)
-      // display it
-
-      let { dashboardForecasts, dashboardItem } = await getDashboardForecastsByDashboardId({
-        dashboardId,
-      });
-      console.log("response2", dashboardForecasts)
-      setDashboardForecasts(dashboardForecasts)
-      setDashboardItem(dashboardItem)
-    }
-  }
-
   // <div className={`grid ${!!numCols ? `grid-cols-${numCols} md:grid-cols-${numCols} lg:grid-cols-${numCols}`: "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"} gap-4 mb-6`}>
   // <div className={`grid grid-cols-${numCols || 1} md:grid-cols-${numCols || 2} lg:grid-cols-${numCols || 3} gap-4 mb-6`}>
 
