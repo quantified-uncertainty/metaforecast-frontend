@@ -77,7 +77,9 @@ export default function Home({ initialDashboardForecasts, initialDashboardItem, 
     let dashboardId = response.dashboardId
     if (!!dashboardId) {
       console.log("response: ", esponse)
-      window.history.replaceState(null, "Metaforecast", `/dashboards?dashboardId=${dashboardId}`)
+      if(!!window){
+        window.history.replaceState(null, "Metaforecast", `/dashboards?dashboardId=${dashboardId}`)
+      }
       // router.push(`?dashboardId=${dash rboardId}`)
       // display it
 

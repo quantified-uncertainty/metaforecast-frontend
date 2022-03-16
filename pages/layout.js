@@ -79,7 +79,9 @@ export default function Layout({
     // https://developer.mozilla.org/en-US/docs/Web/API/Location/replace
     // https://developer.mozilla.org/en-US/docs/Web/API/Location/assign
     // window.location.hostname
-    window.location.assign(window.location.pathname);
+    if(!!window){
+      window.location.assign(window.location.pathname);
+    }
   };
   return (
     <div>

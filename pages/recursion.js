@@ -3,7 +3,9 @@ import React, { useEffect } from "react";
 function Recursion() {
 
     useEffect(() => {
-        window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+        if(!!window){
+            window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+        }
     }, []);
 
     return (
