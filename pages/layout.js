@@ -1,14 +1,12 @@
-import React from "react";
-
-import Link from "next/link";
 import Head from "next/head";
-import { AiOutlineCompass } from "react-icons/ai";
+import Link from "next/link";
+import React from "react";
 // import { GiDiceEightFacesEight } from "react-icons/gi";
 import { Logo2 } from "../lib/icons/index.js";
 
 /* Utilities */
 const classNameSelected = (isSelected) =>
-  `py-4 px-2 ml-4 text-md font-medium cursor-pointer border-b-2 border-transparent ${
+  `no-underline py-4 px-2 ml-4 text-md font-medium cursor-pointer border-b-2 border-transparent ${
     isSelected
       ? "text-blue-700 border-blue-700"
       : "text-gray-400 hover:text-blue-500 hover:border-blue-500"
@@ -127,23 +125,13 @@ export default function Layout({ page, children }) {
 
               <div className="flex flex-row-reverse items-start space-x-4 text-sm sm:text-lg md:text-lg lg:text-lg">
                 <Link href={`/about`} passHref>
-                  <span className={classNameSelected(page === "about")}>
-                    About
-                  </span>
+                  <a className={classNameSelected(page === "about")}>About</a>
                 </Link>
                 <Link href={`/tools`} passHref>
-                  <span className={classNameSelected(page === "tools")}>
-                    Tools
-                  </span>
+                  <a className={classNameSelected(page === "tools")}>Tools</a>
                 </Link>
-
                 <Link href={`/`} passHref>
-                  <button
-                    className="mt-4"
-                    className={classNameSelected(page === "search")}
-                  >
-                    Search
-                  </button>
+                  <a className={classNameSelected(page === "search")}>Search</a>
                 </Link>
               </div>
             </div>
