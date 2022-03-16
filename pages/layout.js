@@ -79,7 +79,7 @@ export default function Layout({
     // https://developer.mozilla.org/en-US/docs/Web/API/Location/replace
     // https://developer.mozilla.org/en-US/docs/Web/API/Location/assign
     // window.location.hostname
-    if(!!window){
+    if(typeof window !== "undefined"){
       window.location.assign(window.location.pathname);
     }
   };
