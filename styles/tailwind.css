@@ -2,6 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
-.text-orange-400 { color: #ffac75; }
-
+.text-orange-400 {
+  color: #ffac75;
+}

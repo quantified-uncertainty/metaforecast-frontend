@@ -19,7 +19,7 @@ export async function getServerSideProps(context) {
     ...urlQuery,
   };
 
-  let results
+  let results;
   switch (initialQueryParameters.query != "") {
     case true:
       results = await searchAccordingToQueryData(initialQueryParameters);
@@ -49,11 +49,11 @@ export default function Home({ results }) {
             <div id="secretEmbed">
               {result
                 ? displayForecast({
-                  ...result.item,
-                  score: result.score,
-                  showTimeStamp: true,
-                  expandFooterToFullWidth: true,
-                })
+                    ...result.item,
+                    score: result.score,
+                    showTimeStamp: true,
+                    expandFooterToFullWidth: true,
+                  })
                 : null}
             </div>
             <br></br>
