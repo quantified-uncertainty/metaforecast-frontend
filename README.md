@@ -1,3 +1,5 @@
+### This repository is now deprecated. See [metaforecast](https://github.com/QURIresearch/metaforecast)'s monorepo instead.
+
 This is the source code for the [metaforecast.org](https://metaforecast.org/) webpage. This is a [Next.js](https://nextjs.org/) project initially created with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app). It searches a database produced using [metaforecasts](https://github.com/QURIresearch/metaforecasts) using [Algolia](https://www.algolia.com/) (previously [Fuse](https://fusejs.io/)). 
 
 ## Getting Started
